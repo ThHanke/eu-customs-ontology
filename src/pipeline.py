@@ -10,6 +10,7 @@ import argparse
 import json
 import sys
 import time
+from datetime import date as Date
 from pathlib import Path
 
 from rdflib import Dataset, Graph
@@ -41,14 +42,19 @@ def run(
     xlsx_path: Path | None = None,
     no_reasoner: bool = False,
     force: bool = False,
+    extract_date: Date | None = None,
 ) -> None:
+    if extract_date is None:
+        extract_date = Date.today()
+
     DATA_INTERMEDIATE.mkdir(parents=True, exist_ok=True)
     DATA_ONTOLOGY.mkdir(parents=True, exist_ok=True)
 
     taric_json = DATA_INTERMEDIATE / f"taric_ch{chapter:02d}.json"
     wizard_jsonl = DATA_INTERMEDIATE / f"wizard_ch{chapter:02d}.jsonl"
-    ttl_out = DATA_ONTOLOGY / f"ch{chapter:02d}.ttl"
-    trig_out = DATA_ONTOLOGY / f"ch{chapter:02d}.trig"
+    date_str = extract_date.isoformat()
+    ttl_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{date_str}.ttl"
+    trig_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{date_str}.trig"
 
     t0 = time.perf_counter()
 
@@ -99,7 +105,7 @@ def run(
 
             # Build TBox + ABox in default graph
             g = Graph()
-            build_tbox(g)
+            build_tbox(g, extract_date=extract_date)
             build_abox(chapter_data, wizard_tree, g)
 
             # Provenance in named graph
@@ -145,11 +151,11 @@ def run(
             store.load_turtle(ttl_out)
             rows = store.query(PREFIXES + """
                 SELECT ?rate WHERE {
-                    ?measure a customs:TARICMeasure ;
-                             customs:codeString ?code ;
-                             customs:measureTypeId "103" ;
-                             customs:geographicScope "1011" ;
-                             customs:dutyAmount ?rate .
+                    ?measure a eucn:TARICMeasure ;
+                             eucn:codeString ?code ;
+                             eucn:measureTypeId "103" ;
+                             eucn:geographicScope "1011" ;
+                             eucn:dutyAmount ?rate .
                     FILTER(STRSTARTS(STR(?code), "220421"))
                     FILTER(?rate > 0)
                 }
@@ -179,6 +185,8 @@ def main() -> None:
     p.add_argument("--xlsx-path", type=Path, default=None, help="CIRCABC Duties Import xlsx")
     p.add_argument("--no-reasoner", action="store_true")
     p.add_argument("--force", action="store_true")
+    p.add_argument("--extract-date", type=Date.fromisoformat, default=None,
+                   metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
     args = p.parse_args()
 
     run(
@@ -189,6 +197,7 @@ def main() -> None:
         xlsx_path=args.xlsx_path,
         no_reasoner=args.no_reasoner,
         force=args.force,
+        extract_date=args.extract_date,
     )
 
 

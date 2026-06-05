@@ -3,9 +3,9 @@ from __future__ import annotations
 from rdflib import Dataset, Graph, Literal, URIRef
 from rdflib.namespace import PROV, RDF, XSD
 
-from src.ontology.namespaces import CUSTOMS, DCTERMS
+from src.ontology.namespaces import DCTERMS, EUCN
 
-PROV_GRAPH_IRI = CUSTOMS["provenance"]
+PROV_GRAPH_IRI = EUCN["provenance"]
 
 
 def build_provenance(
@@ -18,9 +18,9 @@ def build_provenance(
     pg = ds.graph(PROV_GRAPH_IRI)
     pg.bind("prov", PROV)
     pg.bind("dcterms", DCTERMS)
-    pg.bind("customs", CUSTOMS)
+    pg.bind("eucn", EUCN)
 
-    activity_iri = CUSTOMS[f"run/{run_id}"]
+    activity_iri = EUCN[f"run/{run_id}"]
     pg.add((activity_iri, RDF.type, PROV.Activity))
     pg.add((activity_iri, DCTERMS.description,
             Literal(f"Pipeline run for Chapter {chapter:02d}", datatype=XSD.string)))

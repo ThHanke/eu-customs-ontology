@@ -3,7 +3,7 @@ from rdflib import Graph
 from rdflib.namespace import OWL, RDF, SKOS
 
 from src.ontology.tbox import build_tbox
-from src.ontology.namespaces import CUSTOMS
+from src.ontology.namespaces import EUCN
 
 
 class TestBuildTBox:
@@ -66,4 +66,4 @@ class TestBuildTBox:
     def test_taric_code_subclass_of_cn_code(self):
         from rdflib.namespace import RDFS
         g = self._tbox()
-        assert (CUSTOMS.TARICCode, RDFS.subClassOf, CUSTOMS.CNCode) in g
+        assert (EUCN.TARICCode, RDFS.subClassOf, EUCN.CNCode) in g

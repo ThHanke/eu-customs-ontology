@@ -68,41 +68,46 @@ class TestPipelineIntegration:
             pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True)
 
     def test_fixture_pipeline_produces_ttl(self, tmp_path, monkeypatch):
+        from datetime import date
         import src.pipeline as pipeline_mod
         monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
+        ed = date(2026, 6, 5)
         pipeline_mod.run(
             chapter=22,
             skip_fetch=True,
             skip_scrape=True,
             no_reasoner=False,
+            extract_date=ed,
         )
-        ttl = tmp_path / "ch22.ttl"
-        trig = tmp_path / "ch22.trig"
-        assert ttl.exists(), "ch22.ttl not produced"
-        assert trig.exists(), "ch22.trig not produced"
+        ttl = tmp_path / "eucn-ch22-2026-06-05.ttl"
+        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
+        assert ttl.exists(), "eucn-ch22-2026-06-05.ttl not produced"
+        assert trig.exists(), "eucn-ch22-2026-06-05.trig not produced"
         content = ttl.read_text()
-        assert "TARICMeasure" in content or "customs" in content
+        assert "TARICMeasure" in content or "w3id.org/eucn" in content
 
     def test_idempotent_output(self, tmp_path, monkeypatch):
+        from datetime import date
         import src.pipeline as pipeline_mod
         monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
+        ed = date(2026, 6, 5)
 
         out1 = tmp_path / "run1"
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
-        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, no_reasoner=True)
-        nt1 = sorted((out1 / "ch22.ttl").read_text().splitlines())
+        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
+                         no_reasoner=True, extract_date=ed)
+        nt1 = sorted((out1 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
-        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, no_reasoner=True)
-        nt2 = sorted((out2 / "ch22.ttl").read_text().splitlines())
+        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
+                         no_reasoner=True, extract_date=ed)
+        nt2 = sorted((out2 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
 
-        # longturtle has provenance-free output but run_id differs → compare structural triples
-        # Test that same semantic content (TARIC measures, CN codes) is present
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"

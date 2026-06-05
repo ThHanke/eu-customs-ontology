@@ -9,7 +9,7 @@ from src.schema.taric import ChapterData, MeasureComponent, TARICMeasure
 from src.schema.wizard import AnswerOption, ClassificationNode, WizardTree
 from src.ontology.abox import build_abox
 from src.ontology.tbox import build_tbox
-from src.ontology.namespaces import CUSTOMS
+from src.ontology.namespaces import EUCN
 
 
 def _make_fixture():
@@ -56,7 +56,7 @@ class TestABoxIntegration:
     def test_measure_individuals_present(self):
         cd, wt = _make_fixture()
         g = build_abox(cd, wt, Graph())
-        measures = list(g.subjects(RDF.type, CUSTOMS.TARICMeasure))
+        measures = list(g.subjects(RDF.type, EUCN.TARICMeasure))
         assert len(measures) >= 1
 
     def test_serialization_roundtrip(self, tmp_path):

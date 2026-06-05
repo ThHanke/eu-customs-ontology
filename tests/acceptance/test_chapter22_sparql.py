@@ -12,7 +12,7 @@ from rdflib.namespace import XSD
 
 from src.ontology.abox import build_abox
 from src.ontology.tbox import build_tbox
-from src.ontology.namespaces import CUSTOMS
+from src.ontology.namespaces import EUCN
 from src.schema.taric import ChapterData, MeasureComponent, TARICMeasure
 from src.schema.wizard import AnswerOption, ClassificationNode, WizardTree
 from src.sparql.store import OntologyStore
@@ -86,7 +86,7 @@ def _build_ch22_store(tmp_path: Path) -> OntologyStore:
 
 
 PREFIXES = """
-PREFIX customs: <https://eu-customs-ontology.example.org/ontology/>
+PREFIX eucn: <https://w3id.org/eucn/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 """
@@ -97,7 +97,7 @@ class TestChapter22SPARQL:
         store = _build_ch22_store(tmp_path)
         rows = store.query(PREFIXES + """
             SELECT (COUNT(?m) AS ?count) WHERE {
-                ?m a customs:TARICMeasure .
+                ?m a eucn:TARICMeasure .
             }
         """)
         assert float(str(rows[0]["count"])) >= 2
@@ -106,11 +106,11 @@ class TestChapter22SPARQL:
         store = _build_ch22_store(tmp_path)
         rows = store.query(PREFIXES + """
             SELECT ?rate WHERE {
-                ?measure a customs:TARICMeasure ;
-                         customs:codeString ?code ;
-                         customs:measureTypeId "103" ;
-                         customs:geographicScope "1011" ;
-                         customs:dutyAmount ?rate .
+                ?measure a eucn:TARICMeasure ;
+                         eucn:codeString ?code ;
+                         eucn:measureTypeId "103" ;
+                         eucn:geographicScope "1011" ;
+                         eucn:dutyAmount ?rate .
                 FILTER(STRSTARTS(STR(?code), "220421"))
                 FILTER(?rate > 0)
             }
@@ -123,12 +123,12 @@ class TestChapter22SPARQL:
 
     def test_ask_classification_node(self, tmp_path):
         store = _build_ch22_store(tmp_path)
-        result = store.ask(PREFIXES + "ASK { ?x a customs:ClassificationNode . }")
+        result = store.ask(PREFIXES + "ASK { ?x a eucn:ClassificationNode . }")
         assert result is True
 
     def test_empty_store_returns_empty(self):
         store = OntologyStore()
-        rows = store.query(PREFIXES + "SELECT ?x WHERE { ?x a customs:TARICMeasure . }")
+        rows = store.query(PREFIXES + "SELECT ?x WHERE { ?x a eucn:TARICMeasure . }")
         assert rows == []
 
     def test_malformed_sparql_raises(self, tmp_path):
@@ -140,8 +140,8 @@ class TestChapter22SPARQL:
         store = _build_ch22_store(tmp_path)
         rows = store.query(PREFIXES + """
             SELECT ?node WHERE {
-                ?node a customs:ClassificationNode .
-                FILTER NOT EXISTS { ?parent customs:hasAnswer ?node . }
+                ?node a eucn:ClassificationNode .
+                FILTER NOT EXISTS { ?parent eucn:hasAnswer ?node . }
             }
         """)
         assert len(rows) >= 1

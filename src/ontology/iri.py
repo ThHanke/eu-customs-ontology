@@ -4,13 +4,13 @@ import uuid
 
 from rdflib import URIRef
 
-from src.ontology.namespaces import CUSTOMS, PIPELINE_NS_UUID
+from src.ontology.namespaces import EUCN, PIPELINE_NS_UUID
 
 
 def mint_iri(key: str) -> URIRef:
     """Deterministic IRI via UUID5 keyed on key string."""
     uid = uuid.uuid5(PIPELINE_NS_UUID, key)
-    return CUSTOMS[f"ind/{uid}"]
+    return EUCN[f"ind/{uid}"]
 
 
 def cn_code_iri(code: str) -> URIRef:

@@ -31,27 +31,27 @@ class TestKonclude:
     def test_simple_abox_consistent(self, tmp_path):
         from rdflib import Literal, URIRef
         from rdflib.namespace import XSD
-        from src.ontology.namespaces import CUSTOMS
+        from src.ontology.namespaces import EUCN
         g = Graph()
         build_tbox(g)
-        ind = CUSTOMS["ind/test001"]
-        g.add((ind, RDF.type, CUSTOMS.CNCode))
-        g.add((ind, CUSTOMS.codeString, Literal("22042100", datatype=XSD.string)))
+        ind = EUCN["ind/test001"]
+        g.add((ind, RDF.type, EUCN.CNCode))
+        g.add((ind, EUCN.codeString, Literal("22042100", datatype=XSD.string)))
         ttl = _write_ttl(tmp_path, g)
         assert check_consistency(ttl) is True
 
     def test_inconsistent_ontology_raises(self, tmp_path):
         from rdflib import URIRef
-        from src.ontology.namespaces import CUSTOMS
+        from src.ontology.namespaces import EUCN
         g = Graph()
         build_tbox(g)
         # Add two disjoint classes and type one individual as both
-        ClsA = CUSTOMS["ClsA"]
-        ClsB = CUSTOMS["ClsB"]
+        ClsA = EUCN["ClsA"]
+        ClsB = EUCN["ClsB"]
         g.add((ClsA, RDF.type, OWL.Class))
         g.add((ClsB, RDF.type, OWL.Class))
         g.add((ClsA, OWL.disjointWith, ClsB))
-        ind = CUSTOMS["ind/broken"]
+        ind = EUCN["ind/broken"]
         g.add((ind, RDF.type, ClsA))
         g.add((ind, RDF.type, ClsB))
         ttl = _write_ttl(tmp_path, g)

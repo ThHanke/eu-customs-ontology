@@ -14,7 +14,7 @@ class TestIRIMinting:
     def test_cn_code_is_uriref(self):
         iri = cn_code_iri("22042100")
         assert isinstance(iri, URIRef)
-        assert iri.startswith("https://eu-customs-ontology.example.org/ontology/")
+        assert iri.startswith("https://w3id.org/eucn/")
 
     def test_different_codes_different_iris(self):
         assert cn_code_iri("22042100") != cn_code_iri("22042200")
