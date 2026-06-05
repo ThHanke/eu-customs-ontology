@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.env
+.venv/
+venv/
+
+# Large intermediate downloads (re-downloadable)
+data/intermediate/*.xlsx
+data/intermediate/*.json

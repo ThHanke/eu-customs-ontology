@@ -1,0 +1,29 @@
+[project]
+name = "eu-customs-ontology"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "rdflib>=7.6.0",
+    "pyoxigraph>=0.5.8,<0.6",
+    "playwright>=1.60.0",
+    "pydantic>=2.12",
+    "httpx>=0.28",
+    "lxml>=5.0",
+    "owlrl>=7.1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.2",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
