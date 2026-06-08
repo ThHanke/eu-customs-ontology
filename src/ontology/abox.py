@@ -154,7 +154,10 @@ def build_abox(
         approved_sets = [s for s in node_registry.iter_all() if s.status == "approved"]
         if approved_sets:
             import tempfile
-            flat_path = Path(tempfile.mktemp(suffix=".jsonl"))
+            fd, _tmp = tempfile.mkstemp(suffix=".jsonl")
+            import os as _os
+            _os.close(fd)
+            flat_path = Path(_tmp)
             try:
                 node_registry.flatten_to_candidates(flat_path)
                 from src.agent.candidate_registry import CandidateRegistry
