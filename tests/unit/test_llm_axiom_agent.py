@@ -476,6 +476,107 @@ def test_existing_axioms_ttl_included_in_scratch(tmp_path):
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Test: no tool_use block → status="failed" (not raises)
+# ---------------------------------------------------------------------------
+
+
+def test_no_tool_use_block_returns_failed(tmp_path):
+    """When API returns no tool_use block, run() returns status='failed' instead of raising."""
+    base_tbox = _make_base_tbox(tmp_path)
+    running_tbox = _make_running_tbox(tmp_path)
+
+    # Response with no tool_use block (only a text block)
+    mock_text_block = MagicMock()
+    mock_text_block.type = "text"
+    mock_text_block.text = "I cannot help with that."
+    mock_response = MagicMock()
+    mock_response.content = [mock_text_block]
+
+    with patch("src.agent.llm_axiom_agent.anthropic.Anthropic") as MockClient:
+        mock_client = MockClient.return_value
+        mock_client.messages.create.return_value = mock_response
+
+        agent = LLMAxiomAgent(model="claude-opus-4-8", static_context="ctx")
+        result = agent.run(
+            cn_code="2204",
+            node_context={
+                "hierarchy_path": [],
+                "notes_en": ["Wine note"],
+                "notes_de": [],
+                "running_tbox": "",
+                "existing_axioms": [],
+            },
+            base_tbox_path=base_tbox,
+            running_tbox_path=running_tbox,
+            existing_axioms_ttl="",
+        )
+
+    assert result.status == "failed"
+    assert result.cn_code == "2204"
+
+
+# ---------------------------------------------------------------------------
+# Test: invalid bfo_parent_iri → status="failed" after max retries (not raises)
+# ---------------------------------------------------------------------------
+
+
+def test_invalid_bfo_parent_iri_returns_failed_after_max_retries(tmp_path):
+    """When LLM returns invalid bfo_parent_iri, run() returns status='failed' after max retries."""
+    base_tbox = _make_base_tbox(tmp_path)
+    running_tbox = _make_running_tbox(tmp_path)
+
+    bad_tool_input = {
+        "cn_code": "2204",
+        "new_classes": [
+            {
+                "iri_local_name": "BadClass",
+                "label_en": "Bad Class",
+                "label_de": "Schlechte Klasse",
+                "definition_en": "A class with a bad parent IRI.",
+                "bfo_parent_iri": "http://invalid-namespace.example.org/SomeClass",
+                "class_type": "material_entity",
+            }
+        ],
+        "new_properties": [],
+        "restrictions": [],
+        "coverage_score": 0.5,
+        "coverage_explanation": "Partial coverage.",
+        "source_note_ids": [],
+        "source_text_hash": "a" * 64,
+        "tbox_hash": "b" * 64,
+    }
+
+    with patch("src.agent.llm_axiom_agent.anthropic.Anthropic") as MockClient:
+        mock_client = MockClient.return_value
+        mock_client.messages.create.return_value = _make_mock_response(bad_tool_input)
+
+        agent = LLMAxiomAgent(model="claude-opus-4-8", static_context="ctx")
+        result = agent.run(
+            cn_code="2204",
+            node_context={
+                "hierarchy_path": [],
+                "notes_en": ["Wine note"],
+                "notes_de": [],
+                "running_tbox": "",
+                "existing_axioms": [],
+            },
+            base_tbox_path=base_tbox,
+            running_tbox_path=running_tbox,
+            existing_axioms_ttl="",
+        )
+
+    assert result.status == "failed"
+    assert result.cn_code == "2204"
+    # All _MAX_ATTEMPTS were made
+    assert mock_client.messages.create.call_count == 3
+
+
+# ---------------------------------------------------------------------------
+# Test: system prompt uses template from file
+# ---------------------------------------------------------------------------
+
+
 def test_system_prompt_contains_static_context():
     """The system prompt passed to the API embeds the static_context."""
     captured: list[dict] = []

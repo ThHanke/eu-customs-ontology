@@ -33,8 +33,6 @@ def _build_axiom_graph(axiom_set: NodeAxiomSet) -> Graph:
     """Convert a NodeAxiomSet into an rdflib Graph of OWL triples."""
     g = Graph()
     eucn_ns = "https://w3id.org/eucn/"
-    bfo_ns = "http://purl.obolibrary.org/obo/"
-
     def _iri(s: str) -> URIRef:
         # If already a full IRI, return as-is; otherwise treat as local name under EUCN
         if s.startswith("http://") or s.startswith("https://"):
@@ -86,13 +84,15 @@ def _build_axiom_graph(axiom_set: NodeAxiomSet) -> Graph:
             r = BNode(f"r_hv_{key}")
             g.add((r, RDF.type, OWL.Restriction))
             g.add((r, OWL.onProperty, prop_iri))
-            # Try to detect boolean / numeric literals
             val_str = restr.value
-            if val_str.lower() in ("true", "false"):
-                lit = Literal(val_str.lower() == "true", datatype=XSD.boolean)
+            if ":" in val_str:
+                # IRI-shaped value (e.g. named singleton individual like eucn:GrapeFermentation_individual)
+                filler = URIRef(val_str)
+            elif val_str.lower() in ("true", "false"):
+                filler = Literal(val_str.lower() == "true", datatype=XSD.boolean)
             else:
-                lit = Literal(val_str, datatype=XSD.string)
-            g.add((r, OWL.hasValue, lit))
+                filler = Literal(val_str, datatype=XSD.string)
+            g.add((r, OWL.hasValue, filler))
             g.add((cls_iri, RDFS.subClassOf, r))
 
         elif restr.restriction_type == "decimalRange":
@@ -143,7 +143,11 @@ def _build_scratch_ttl(
         g.add(triple)
     with tempfile.NamedTemporaryFile(suffix=".ttl", delete=False, mode="w") as f:
         scratch_path = Path(f.name)
-    g.serialize(destination=str(scratch_path), format="turtle")
+    try:
+        g.serialize(destination=str(scratch_path), format="turtle")
+    except Exception:
+        scratch_path.unlink(missing_ok=True)
+        raise
     return scratch_path
 
 
@@ -255,23 +259,39 @@ class LLMAxiomAgent:
                 messages=messages,
             )
 
-            tool_block, tool_input = _parse_tool_use(response.content)
+            try:
+                tool_block, tool_input = _parse_tool_use(response.content)
 
-            # Build NodeAxiomSet from tool output
-            axiom_set = NodeAxiomSet(
-                cn_code=tool_input["cn_code"],
-                new_classes=[NewClass(**c) for c in tool_input.get("new_classes", [])],
-                new_properties=[NewProperty(**p) for p in tool_input.get("new_properties", [])],
-                restrictions=[NodeRestriction(**r) for r in tool_input.get("restrictions", [])],
-                coverage_score=tool_input["coverage_score"],
-                coverage_explanation=tool_input["coverage_explanation"],
-                source_note_ids=tool_input.get("source_note_ids", []),
-                source_text_hash=tool_input.get("source_text_hash", "0" * 64),
-                tbox_hash=tool_input.get("tbox_hash", "0" * 64),
-                status="proposed",
-                agent_model=self.model,
-                generated_at=datetime.datetime.now(datetime.UTC).isoformat(),
-            )
+                # Build NodeAxiomSet from tool output
+                axiom_set = NodeAxiomSet(
+                    cn_code=tool_input["cn_code"],
+                    new_classes=[NewClass(**c) for c in tool_input.get("new_classes", [])],
+                    new_properties=[NewProperty(**p) for p in tool_input.get("new_properties", [])],
+                    restrictions=[NodeRestriction(**r) for r in tool_input.get("restrictions", [])],
+                    coverage_score=tool_input["coverage_score"],
+                    coverage_explanation=tool_input["coverage_explanation"],
+                    source_note_ids=tool_input.get("source_note_ids", []),
+                    source_text_hash=tool_input.get("source_text_hash", "0" * 64),
+                    tbox_hash=tool_input.get("tbox_hash", "0" * 64),
+                    status="proposed",
+                    agent_model=self.model,
+                    generated_at=datetime.datetime.now(datetime.UTC).isoformat(),
+                )
+            except (ValueError, Exception) as exc:
+                logger.warning(
+                    "LLMAxiomAgent: invalid response on attempt %d for CN %s: %s",
+                    attempt + 1, cn_code, exc,
+                )
+                if attempt < _MAX_ATTEMPTS - 1:
+                    messages.append({
+                        "role": "user",
+                        "content": (
+                            f"Your previous response was invalid: {exc}. "
+                            "Please provide a valid propose_axioms tool call."
+                        ),
+                    })
+                    continue
+                break
 
             # Check consistency via Konclude
             scratch_path: Path | None = None
