@@ -67,7 +67,7 @@ def _make_agent() -> LLMAxiomAgent:
 
 
 def test_happy_path_returns_proposed(tmp_path):
-    """First attempt is consistent → status='proposed'."""
+    """First attempt is consistent → status='approved'."""
     base_tbox = _make_base_tbox(tmp_path)
     running_tbox = _make_running_tbox(tmp_path)
 
@@ -92,7 +92,7 @@ def test_happy_path_returns_proposed(tmp_path):
             )
 
     assert isinstance(result, NodeAxiomSet)
-    assert result.status == "proposed"
+    assert result.status == "approved"
     assert result.cn_code == "2204"
     assert result.coverage_score == 0.8
     assert mock_client.messages.create.call_count == 1
@@ -142,7 +142,7 @@ def test_retry_second_attempt_consistent(tmp_path):
                 existing_axioms_ttl="",
             )
 
-    assert result.status == "proposed"
+    assert result.status == "approved"
     assert mock_client.messages.create.call_count == 2
 
 
@@ -268,7 +268,7 @@ def test_empty_notes_no_api_call(tmp_path):
             existing_axioms_ttl="",
         )
 
-    assert result.status == "proposed"
+    assert result.status == "approved"
     assert result.coverage_score == 0.0
     assert result.coverage_explanation == "No legal text available"
     assert result.new_classes == []
@@ -614,5 +614,6 @@ def test_system_prompt_contains_static_context():
                 )
 
     assert len(captured) == 1
-    system_prompt = captured[0]["system"]
-    assert "MY_UNIQUE_STATIC_CONTEXT_XYZ" in system_prompt
+    system_blocks = captured[0]["system"]
+    system_text = system_blocks[0]["text"] if isinstance(system_blocks, list) else system_blocks
+    assert "MY_UNIQUE_STATIC_CONTEXT_XYZ" in system_text

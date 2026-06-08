@@ -211,6 +211,10 @@ class LLMAxiomAgent:
         self.static_context = static_context
         self._client = anthropic.Anthropic()
         self._system_prompt = _load_system_prompt(static_context)
+        # Cache the system prompt — identical for every node in the chapter
+        self._system_blocks = [
+            {"type": "text", "text": self._system_prompt, "cache_control": {"type": "ephemeral"}}
+        ]
 
     def run(
         self,
@@ -252,11 +256,19 @@ class LLMAxiomAgent:
 
             response = self._client.messages.create(
                 model=self.model,
-                max_tokens=4096,
-                system=self._system_prompt,
+                max_tokens=1500,
+                system=self._system_blocks,
                 tools=[PROPOSE_AXIOMS_TOOL_SCHEMA],
                 tool_choice={"type": "any"},
                 messages=messages,
+            )
+            usage = response.usage
+            logger.debug(
+                "CN %s attempt %d — in=%d out=%d cache_read=%d cache_write=%d",
+                cn_code, attempt + 1,
+                usage.input_tokens, usage.output_tokens,
+                getattr(usage, "cache_read_input_tokens", 0),
+                getattr(usage, "cache_creation_input_tokens", 0),
             )
 
             try:
