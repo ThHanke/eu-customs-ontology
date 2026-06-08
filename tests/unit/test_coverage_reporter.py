@@ -9,6 +9,7 @@ from src.agent.chapter_runner import ChapterRunResult
 from src.agent.coverage_reporter import (
     ChapterCoverageReport,
     build_report,
+    print_summary,
     write_report,
 )
 from src.agent.node_registry import NodeRegistry
@@ -227,6 +228,31 @@ def test_write_report_atomic_write(tmp_path: Path):
     # Verify final file exists and tmp does not
     assert out_path.exists()
     assert not out_path.with_suffix(".json.tmp").exists()
+
+
+# ---------------------------------------------------------------------------
+# Verification: write_report prints summary to stdout
+# ---------------------------------------------------------------------------
+
+
+def test_write_report_prints_summary(tmp_path: Path, capsys):
+    """Test that write_report prints summary to stdout via print_summary."""
+    registry = NodeRegistry(tmp_path / "registry")
+
+    axiom_set = _make_axiom_set(cn_code="2204.1", coverage_score=0.8)
+    registry.upsert(axiom_set)
+
+    run_result = ChapterRunResult(total=1, skipped=0, proposed=1, failed=0)
+    report = build_report(chapter=22, node_registry=registry, run_result=run_result)
+
+    out_path = tmp_path / "report.json"
+    write_report(report, out_path)
+
+    # Capture stdout and verify summary was printed
+    captured = capsys.readouterr()
+    assert "[coverage] ch22:" in captured.out
+    assert "1 nodes" in captured.out
+    assert "mean 0.80" in captured.out
 
 
 # ---------------------------------------------------------------------------

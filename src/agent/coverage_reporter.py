@@ -7,11 +7,20 @@ import os
 from pathlib import Path
 
 from pydantic import BaseModel
+from typing_extensions import TypedDict
 
 from src.agent.chapter_runner import ChapterRunResult
 from src.agent.node_registry import NodeRegistry
 
 logger = logging.getLogger(__name__)
+
+
+class LowCoverageNode(TypedDict):
+    """Represents a low-coverage node in the report."""
+
+    cn_code: str
+    coverage_score: float
+    explanation: str
 
 
 class ChapterCoverageReport(BaseModel):
@@ -24,7 +33,7 @@ class ChapterCoverageReport(BaseModel):
     nodes_failed: int
     nodes_skipped: int
     mean_coverage_score: float
-    low_coverage_nodes: list[dict]  # list of {"cn_code": str, "coverage_score": float, "explanation": str}
+    low_coverage_nodes: list[LowCoverageNode]
     generated_at: str
 
 
@@ -45,7 +54,7 @@ def build_report(
     """
     # Collect all non-failed axiom sets
     coverage_scores: list[float] = []
-    low_coverage_nodes: list[dict] = []
+    low_coverage_nodes: list[LowCoverageNode] = []
 
     for axiom_set in node_registry.iter_all():
         # Only include non-failed entries in mean
@@ -84,7 +93,7 @@ def build_report(
 
 
 def write_report(report: ChapterCoverageReport, out_path: Path) -> None:
-    """Write report to disk atomically.
+    """Write report to disk atomically and print summary to stdout.
 
     Args:
         report: The report to write.
@@ -94,6 +103,7 @@ def write_report(report: ChapterCoverageReport, out_path: Path) -> None:
     tmp = out_path.with_suffix(".json.tmp")
     tmp.write_text(report.model_dump_json(indent=2), encoding="utf-8")
     os.rename(tmp, out_path)
+    print_summary(report)
 
 
 def print_summary(report: ChapterCoverageReport) -> None:
