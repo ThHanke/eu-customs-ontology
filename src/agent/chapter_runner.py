@@ -19,6 +19,25 @@ from src.schema.wizard import WizardTree
 logger = logging.getLogger(__name__)
 
 
+def _log_axiom_set(cn_code: str, axiom_set: "NodeAxiomSet") -> None:
+    lines = [
+        f"[axioms] {cn_code}  status={axiom_set.status}  "
+        f"score={axiom_set.coverage_score:.2f}  "
+        f"classes={len(axiom_set.new_classes)}  "
+        f"props={len(axiom_set.new_properties)}  "
+        f"restrictions={len(axiom_set.restrictions)}"
+    ]
+    for cls in axiom_set.new_classes:
+        lines.append(f"  class  {cls.iri_local_name}  rdfs:subClassOf {cls.bfo_parent_iri}")
+    for prop in axiom_set.new_properties:
+        lines.append(f"  prop   {prop.iri_local_name}  type={prop.property_type}  functional={prop.is_functional}")
+    for r in axiom_set.restrictions:
+        owl_local = r.owl_class_iri.rsplit("/", 1)[-1]
+        prop_local = r.property_iri.rsplit("/", 1)[-1] if r.property_iri else ""
+        lines.append(f"  axiom  {r.restriction_type:15s}  {owl_local:30s}  {prop_local}  {r.value or ''}")
+    logger.info("\n".join(lines))
+
+
 @dataclass
 class ChapterRunResult:
     total: int = 0
@@ -135,6 +154,7 @@ class ChapterRunner:
 
             # Upsert result into registry
             node_registry.upsert(axiom_set)
+            _log_axiom_set(cn_code, axiom_set)
 
             if axiom_set.status == "proposed":
                 result.proposed += 1
