@@ -40,6 +40,7 @@ def run(
     chapter: int,
     skip_fetch: bool = False,
     skip_scrape: bool = False,
+    skip_legal_text: bool = False,
     xml_path: Path | None = None,
     xlsx_path: Path | None = None,
     no_reasoner: bool = False,
@@ -91,6 +92,55 @@ def run(
         )
     else:
         print(f"[scrape-wizard] skipped (using existing {wizard_jsonl.name})")
+
+    # ── Step 2.6: Fetch legal text and extract axiom candidates ─────────────
+    legal_text_dir = ROOT / "data" / "legal_text" / f"ch{chapter:02d}"
+    candidates_path = ROOT / "data" / "axiom_candidates" / f"ch{chapter:02d}.jsonl"
+
+    if not skip_legal_text and (force or not candidates_path.exists()):
+        with _step("fetch-legal-text"):
+            from src.fetcher.class_api import fetch_chapter_notes
+            from src.agent.rule_extractor import extract_candidates
+            from src.agent.candidate_registry import CandidateRegistry
+            from src.ontology.chapter_registry import get_chapter as get_ch
+
+            chapter_module = get_ch(chapter)
+            legal_text_dir.mkdir(parents=True, exist_ok=True)
+            sections = fetch_chapter_notes(chapter, legal_text_dir, force=force)
+
+            registry = CandidateRegistry(candidates_path)
+            if candidates_path.exists():
+                registry.load()
+
+            for section in sections:
+                candidates = extract_candidates(section, section.cn_code, chapter)
+                for c in candidates:
+                    registry.upsert(c)
+
+            registry.save()
+            stale = registry.stale_summary()
+            if stale:
+                print(
+                    f"WARNING: {len(stale)} axiom candidate(s) for chapter {chapter} are stale "
+                    f"(CLASS note updated).",
+                    file=sys.stderr,
+                )
+                for s in stale:
+                    print(
+                        f"  - {s['candidate_id'][:8]}... ({s['owl_class']}, "
+                        f"{s['restriction_type']}, {s['property_iri']}) "
+                        f"— note {s['source_note_id'][:8]} updated {s['source_ingestion_date']}",
+                        file=sys.stderr,
+                    )
+                print(
+                    f"Re-run: python -m src.pipeline --chapter {chapter} --steps fetch-legal-text",
+                    file=sys.stderr,
+                )
+    else:
+        if skip_legal_text:
+            print(f"[fetch-legal-text] skipped (--skip-legal-text)")
+        else:
+            print(f"[fetch-legal-text] skipped (using existing {candidates_path.name})")
 
     # ── Step 2.5: Build and serialize core TBox ──────────────────────────────
     if force or not core_ttl_out.exists():
@@ -229,6 +279,7 @@ def main() -> None:
     p.add_argument("--chapter", type=int, required=True)
     p.add_argument("--skip-fetch", action="store_true")
     p.add_argument("--skip-scrape", action="store_true")
+    p.add_argument("--skip-legal-text", action="store_true")
     p.add_argument("--xml-path", type=Path, default=None)
     p.add_argument("--xlsx-path", type=Path, default=None, help="CIRCABC Duties Import xlsx")
     p.add_argument("--no-reasoner", action="store_true")
@@ -242,6 +293,7 @@ def main() -> None:
         chapter=args.chapter,
         skip_fetch=args.skip_fetch,
         skip_scrape=args.skip_scrape,
+        skip_legal_text=args.skip_legal_text,
         xml_path=args.xml_path,
         xlsx_path=args.xlsx_path,
         no_reasoner=args.no_reasoner,

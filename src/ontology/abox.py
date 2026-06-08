@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
@@ -123,7 +125,21 @@ def build_abox(
     for triple in wizard_triples:
         g.add(triple)
 
-    # Curated equivalence axioms (dispatched via registry)
-    get_chapter(wizard_tree.chapter).add_equivalence_axioms(g)
+    # Curated equivalence axioms — registry takes precedence over hand-authored
+    chapter_module = get_chapter(wizard_tree.chapter)
+    registry_path = Path(__file__).parent.parent.parent / "data" / "axiom_candidates" / f"ch{wizard_tree.chapter:02d}.jsonl"
+
+    if registry_path.exists():
+        from src.agent.candidate_registry import CandidateRegistry
+        from src.agent.axiom_builder import build_equivalence_axioms_from_candidates
+        registry = CandidateRegistry(registry_path)
+        registry.load()
+        active = registry.get_active()
+        if active:
+            build_equivalence_axioms_from_candidates(g, active)
+        elif chapter_module.add_equivalence_axioms is not None:
+            chapter_module.add_equivalence_axioms(g)
+    elif chapter_module.add_equivalence_axioms is not None:
+        chapter_module.add_equivalence_axioms(g)
 
     return g, coverage

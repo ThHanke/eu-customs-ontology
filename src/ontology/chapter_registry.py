@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Callable
+from dataclasses import dataclass, field
+from typing import Callable, Optional
 
 from rdflib import Graph
 
@@ -23,7 +23,7 @@ class ChapterModule:
     add_discriminating_props: Callable[[Graph], None]
     add_product_classes: Callable[[Graph], None]
     add_process_classes: Callable[[Graph], None]
-    add_equivalence_axioms: Callable[[Graph], None]
+    add_equivalence_axioms: Callable[[Graph], None] | None = None
 
 
 CHAPTERS: dict[int, ChapterModule] = {
