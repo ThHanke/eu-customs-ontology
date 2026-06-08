@@ -8,12 +8,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 import time
 from datetime import date as Date
 from pathlib import Path
 
-from rdflib import Dataset, Graph
+from rdflib import Dataset, Graph, URIRef
+from rdflib.namespace import OWL, RDF
 
 ROOT = Path(__file__).parent.parent
 DATA_INTERMEDIATE = ROOT / "data" / "intermediate"
@@ -54,8 +56,14 @@ def run(
     taric_json = DATA_INTERMEDIATE / f"taric_ch{chapter:02d}.json"
     wizard_jsonl = DATA_INTERMEDIATE / f"wizard_ch{chapter:02d}.jsonl"
     date_str = extract_date.isoformat()
-    ttl_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{date_str}.ttl"
-    trig_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{date_str}.trig"
+    from src.ontology.chapter_registry import get_chapter
+    slug = get_chapter(chapter).slug
+    ttl_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{slug}-{date_str}.ttl"
+    ttl_latest = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{slug}-latest.ttl"
+    trig_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{slug}-{date_str}.trig"
+    core_ttl_out = DATA_ONTOLOGY / f"eucn-core-{date_str}.ttl"
+    core_ttl_latest = DATA_ONTOLOGY / "eucn-core-latest.ttl"
+    flat_ttl_out = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{slug}-{date_str}-flat.ttl"
 
     t0 = time.perf_counter()
 
@@ -83,6 +91,18 @@ def run(
         )
     else:
         print(f"[scrape-wizard] skipped (using existing {wizard_jsonl.name})")
+
+    # ── Step 2.5: Build and serialize core TBox ──────────────────────────────
+    if force or not core_ttl_out.exists():
+        with _step("build-core"):
+            from src.ontology.core import build_core_tbox
+            core_g = Graph()
+            build_core_tbox(core_g, extract_date=extract_date)
+            core_g.serialize(destination=str(core_ttl_out), format="longturtle")
+            shutil.copy(str(core_ttl_out), str(core_ttl_latest))
+            print(f"  Written: {core_ttl_out} ({len(core_g)} triples)")
+    else:
+        print(f"[build-core] skipped (using existing {core_ttl_out.name})")
 
     # ── Step 3: Build ontology ───────────────────────────────────────────────
     if force or not ttl_out.exists():
@@ -133,10 +153,28 @@ def run(
                 f"(coverage {wizard_coverage.coverage_pct:.1f}%)"
             )
 
-            # Serialize
+            # Add chapter ontology header with owl:imports to core
+            from src.ontology.core import CORE_RAW_URL
+            ch_iri = URIRef(f"https://w3id.org/eucn/ch{chapter:02d}-{slug}")
+            g.add((ch_iri, RDF.type, OWL.Ontology))
+            g.add((ch_iri, OWL.imports, URIRef(CORE_RAW_URL)))
+
+            # Serialize chapter TTL (with owl:imports)
             g.serialize(destination=str(ttl_out), format="longturtle")
             ds.serialize(destination=str(trig_out), format="trig")
             print(f"  Written: {ttl_out} ({len(g)} triples)")
+
+            # Stable alias for chapter TTL
+            shutil.copy(str(ttl_out), str(ttl_latest))
+
+            # Flat TTL for Konclude (strip all owl:imports triples)
+            flat_g = Graph()
+            for s, p, o in g:
+                if p != OWL.imports:
+                    flat_g.add((s, p, o))
+            for prefix, ns in g.namespaces():
+                flat_g.bind(prefix, ns)
+            flat_g.serialize(destination=str(flat_ttl_out), format="longturtle")
     else:
         print(f"[build-ontology] skipped (using existing {ttl_out.name})")
 
@@ -145,7 +183,7 @@ def run(
         with _step("konclude-check"):
             from src.reasoning.konclude import KoncludeConsistencyError, check_consistency
             try:
-                check_consistency(ttl_out)
+                check_consistency(flat_ttl_out)
                 print("  Ontology: consistent")
             except KoncludeConsistencyError as exc:
                 print(f"  INCONSISTENT: {exc}", file=sys.stderr)
@@ -157,10 +195,9 @@ def run(
     if not no_classify and not no_reasoner:
         with _step("konclude-classify"):
             import subprocess
-            from rdflib import URIRef
             from src.reasoning.konclude import classify
             try:
-                inferred_ttl = classify(ttl_out)
+                inferred_ttl = classify(flat_ttl_out)
                 if inferred_ttl.strip():
                     inferred_g = Graph()
                     inferred_g.parse(data=inferred_ttl, format="turtle")
@@ -182,39 +219,6 @@ def run(
                       file=sys.stderr)
     else:
         print("[konclude-classify] skipped (--no-classify or --no-reasoner)")
-
-    # ── Step 5: SPARQL acceptance test (Chapter 22 only) ─────────────────────
-    if chapter == 22:
-        with _step("sparql-acceptance"):
-            from src.sparql.store import OntologyStore
-            from tests.acceptance.test_chapter22_sparql import (
-                EXPECTED_MFN_RATE_2204_21,
-                PREFIXES,
-            )
-            store = OntologyStore()
-            store.load_turtle(ttl_out)
-            rows = store.query(PREFIXES + """
-                SELECT ?rate WHERE {
-                    ?measure a eucn:TARICMeasure ;
-                             eucn:codeString ?code ;
-                             eucn:measureTypeId "103" ;
-                             eucn:geographicScope "1011" ;
-                             eucn:dutyAmount ?rate .
-                    FILTER(STRSTARTS(STR(?code), "220421"))
-                    FILTER(?rate > 0)
-                }
-            """)
-            if not rows:
-                print("  SPARQL acceptance: FAIL — no MFN rate found for CN 2204 21", file=sys.stderr)
-                sys.exit(1)
-            rates = [float(str(r["rate"])) for r in rows]
-            if EXPECTED_MFN_RATE_2204_21 not in rates:
-                print(
-                    f"  SPARQL acceptance: FAIL — expected {EXPECTED_MFN_RATE_2204_21}, got {rates}",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
-            print(f"  SPARQL acceptance: PASS (MFN rate {EXPECTED_MFN_RATE_2204_21})")
 
     total = time.perf_counter() - t0
     print(f"\nPipeline complete in {total:.1f}s")

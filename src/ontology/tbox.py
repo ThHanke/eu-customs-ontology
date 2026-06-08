@@ -7,9 +7,8 @@ from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
 from src.ontology.namespaces import DCTERMS, EUCN, ONTOLOGY_IRI, VANN
 from src.ontology.bfo_stubs import add_bfo_stubs
-from src.ontology.discriminating_props import add_discriminating_props
-from src.ontology.product_classes import add_product_classes_ch22
-from src.ontology.process_classes_ch22 import add_process_classes_ch22
+from src.ontology.core import build_core_tbox
+from src.ontology.chapter_registry import get_chapter
 
 
 def _class(g: Graph, iri: URIRef, label_en: str, label_de: str, def_en: str, def_de: str) -> None:
@@ -44,12 +43,13 @@ def _data_prop(g: Graph, iri: URIRef, label_en: str, label_de: str, def_en: str,
         g.add((iri, RDFS.range, range_))
 
 
-def build_tbox(graph: Graph, extract_date: Date | None = None) -> Graph:
+def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22) -> Graph:
     """Add all TBox triples to graph. Idempotent."""
     if extract_date is None:
         extract_date = Date.today()
 
     g = graph
+    build_core_tbox(g, extract_date=extract_date)
     g.bind("eucn", EUCN)
     g.bind("owl", OWL)
     g.bind("skos", SKOS)
@@ -103,14 +103,11 @@ def build_tbox(graph: Graph, extract_date: Date | None = None) -> Graph:
     # ── BFO stubs ──────────────────────────────────────────────────────────────
     add_bfo_stubs(g)
 
-    # ── Discriminating properties (Ch22) ───────────────────────────────────────
-    add_discriminating_props(g)
-
-    # ── Product class hierarchy (Ch22) ─────────────────────────────────────────
-    add_product_classes_ch22(g)
-
-    # ── Process class vocabulary (Ch22) ────────────────────────────────────────
-    add_process_classes_ch22(g)
+    # ── Chapter-specific TBox (dispatched via registry) ───────────────────────
+    ch = get_chapter(chapter)
+    ch.add_discriminating_props(g)
+    ch.add_product_classes(g)
+    ch.add_process_classes(g)
 
     # ── Classes ────────────────────────────────────────────────────────────────
     _class(g, EUCN.CNCode, "CN Code", "KN-Code",
@@ -288,15 +285,6 @@ def build_tbox(graph: Graph, extract_date: Date | None = None) -> Graph:
                "or last amended a TARIC measure",
                "Kennung der EU-Verordnung oder der maßnahmenerzeugenden Verordnung, die eine "
                "TARIC-Maßnahme erlassen oder zuletzt geändert hat",
-               range_=XSD.string)
-
-    _data_prop(g, EUCN.cnHeadingCode, "CN heading code", "KN-Positionsnummer",
-               "four-digit (or six-digit for subheadings) CN heading code inferred by the "
-               "OWL reasoner from the product class membership; e.g. '2203' for Beer, "
-               "'220410' for Sparkling Wine",
-               "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, "
-               "die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; "
-               "z. B. '2203' für Bier, '220410' für Schaumwein",
                range_=XSD.string)
 
     return g

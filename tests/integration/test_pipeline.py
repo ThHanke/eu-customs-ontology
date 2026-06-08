@@ -82,10 +82,10 @@ class TestPipelineIntegration:
             no_classify=True,
             extract_date=ed,
         )
-        ttl = tmp_path / "eucn-ch22-2026-06-05.ttl"
-        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
-        assert ttl.exists(), "eucn-ch22-2026-06-05.ttl not produced"
-        assert trig.exists(), "eucn-ch22-2026-06-05.trig not produced"
+        ttl = tmp_path / "eucn-ch22-beverages-2026-06-05.ttl"
+        trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
+        assert ttl.exists(), "eucn-ch22-beverages-2026-06-05.ttl not produced"
+        assert trig.exists(), "eucn-ch22-beverages-2026-06-05.trig not produced"
         content = ttl.read_text()
         assert "TARICMeasure" in content or "w3id.org/eucn" in content
 
@@ -105,7 +105,7 @@ class TestPipelineIntegration:
             no_classify=False,
             extract_date=ed,
         )
-        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
+        trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
         assert trig.exists(), ".trig must be written even when classify produces empty output"
 
     def test_no_classify_flag_skips_classify(self, tmp_path, monkeypatch):
@@ -120,7 +120,7 @@ class TestPipelineIntegration:
             chapter=22, skip_fetch=True, skip_scrape=True,
             no_reasoner=True, no_classify=True, extract_date=ed,
         )
-        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
+        trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
         assert trig.exists(), ".trig written from build step regardless of classify"
 
     def test_idempotent_output(self, tmp_path, monkeypatch):
@@ -136,13 +136,13 @@ class TestPipelineIntegration:
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
                          no_reasoner=True, no_classify=True, extract_date=ed)
-        nt1 = sorted((out1 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
+        nt1 = sorted((out1 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
                          no_reasoner=True, no_classify=True, extract_date=ed)
-        nt2 = sorted((out2 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
+        nt2 = sorted((out2 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"

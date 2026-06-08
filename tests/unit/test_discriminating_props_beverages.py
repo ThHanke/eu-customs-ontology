@@ -2,10 +2,10 @@ import pytest
 from rdflib import Graph
 from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
-from src.ontology.discriminating_props import add_discriminating_props
-from src.ontology.namespaces import BFO_PROCESS, EUCN, RO_HAS_OUTPUT
+from src.ontology.discriminating_props_beverages import add_discriminating_props_beverages
+from src.ontology.namespaces import EUCN
 
-# The 4 remaining DatatypeProperties
+# The 4 DatatypeProperties declared by this module
 DATA_PROPS = [
     EUCN.alcoholByVolumePercent,
     EUCN.isCarbonated,
@@ -20,14 +20,11 @@ EXPECTED_RANGES = {
     EUCN.maxContainerVolumeL: XSD.decimal,
 }
 
-# ObjectProperties
-OBJ_PROPS = [EUCN.producedBy]
 
-
-class TestDiscriminatingProps:
+class TestDiscriminatingPropsBeverages:
     def _graph(self) -> Graph:
         g = Graph()
-        add_discriminating_props(g)
+        add_discriminating_props_beverages(g)
         return g
 
     def test_all_four_are_datatype_properties(self):
@@ -65,46 +62,15 @@ class TestDiscriminatingProps:
             defs = [o for o in g.objects(p, SKOS.definition) if hasattr(o, "language") and o.language == "de"]
             assert defs, f"{p} missing skos:definition@de"
 
-    def test_produced_by_is_functional(self):
-        g = self._graph()
-        assert (EUCN.producedBy, RDF.type, OWL.FunctionalProperty) in g
-
-    def test_other_props_not_functional(self):
+    def test_data_props_not_functional(self):
         g = self._graph()
         for p in DATA_PROPS:
             assert (p, RDF.type, OWL.FunctionalProperty) not in g, f"{p} must not be FunctionalProperty"
 
-    def test_produced_by_is_object_property(self):
+    def test_produced_by_not_in_graph(self):
+        """eucn:producedBy must not be declared here — it lives in core.py."""
         g = self._graph()
-        assert (EUCN.producedBy, RDF.type, OWL.ObjectProperty) in g
-
-    def test_produced_by_inverse_of_ro_has_output(self):
-        g = self._graph()
-        assert (EUCN.producedBy, OWL.inverseOf, RO_HAS_OUTPUT) in g
-
-    def test_produced_by_range_is_bfo_process(self):
-        g = self._graph()
-        assert (EUCN.producedBy, RDFS.range, BFO_PROCESS) in g
-
-    def test_produced_by_en_label(self):
-        g = self._graph()
-        labels = [o for o in g.objects(EUCN.producedBy, RDFS.label) if hasattr(o, "language") and o.language == "en"]
-        assert labels, "eucn:producedBy missing rdfs:label@en"
-
-    def test_produced_by_de_label(self):
-        g = self._graph()
-        labels = [o for o in g.objects(EUCN.producedBy, RDFS.label) if hasattr(o, "language") and o.language == "de"]
-        assert labels, "eucn:producedBy missing rdfs:label@de"
-
-    def test_produced_by_en_definition(self):
-        g = self._graph()
-        defs = [o for o in g.objects(EUCN.producedBy, SKOS.definition) if hasattr(o, "language") and o.language == "en"]
-        assert defs, "eucn:producedBy missing skos:definition@en"
-
-    def test_produced_by_de_definition(self):
-        g = self._graph()
-        defs = [o for o in g.objects(EUCN.producedBy, SKOS.definition) if hasattr(o, "language") and o.language == "de"]
-        assert defs, "eucn:producedBy missing skos:definition@de"
+        assert (EUCN.producedBy, RDF.type, OWL.ObjectProperty) not in g
 
     def test_fermentation_base_not_in_graph(self):
         g = self._graph()
@@ -112,9 +78,9 @@ class TestDiscriminatingProps:
 
     def test_idempotent(self):
         g = Graph()
-        add_discriminating_props(g)
+        add_discriminating_props_beverages(g)
         count1 = len(g)
-        add_discriminating_props(g)
+        add_discriminating_props_beverages(g)
         count2 = len(g)
         assert count1 == count2
 

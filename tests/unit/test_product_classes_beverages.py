@@ -2,7 +2,7 @@ import pytest
 from rdflib import Graph
 from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
-from src.ontology.product_classes import add_product_classes_ch22
+from src.ontology.product_classes_beverages import add_product_classes_beverages
 from src.ontology.bfo_stubs import add_bfo_stubs
 from src.ontology.namespaces import BFO_OBJECT, EUCN
 from src.ontology.tbox import build_tbox
@@ -27,11 +27,11 @@ ALL_PRODUCT_CLASSES = HEADING_CLASSES + [
 ]
 
 
-class TestProductClasses:
+class TestProductClassesBeverages:
     def _graph(self) -> Graph:
         g = Graph()
         add_bfo_stubs(g)
-        add_product_classes_ch22(g)
+        add_product_classes_beverages(g)
         return g
 
     def test_beer_is_owl_class(self):
@@ -104,9 +104,9 @@ class TestProductClasses:
     def test_idempotent(self):
         g = Graph()
         add_bfo_stubs(g)
-        add_product_classes_ch22(g)
+        add_product_classes_beverages(g)
         count1 = len(g)
-        add_product_classes_ch22(g)
+        add_product_classes_beverages(g)
         count2 = len(g)
         assert count1 == count2
 

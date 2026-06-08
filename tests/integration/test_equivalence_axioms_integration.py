@@ -5,10 +5,10 @@ from rdflib import Graph, Literal
 from rdflib.namespace import OWL, RDF, XSD
 
 from src.ontology.bfo_stubs import add_bfo_stubs
-from src.ontology.discriminating_props import add_discriminating_props
-from src.ontology.equivalence_axioms import add_ch22_equivalence_axioms
+from src.ontology.discriminating_props_beverages import add_discriminating_props_beverages
+from src.ontology.equivalence_axioms_beverages import add_equivalence_axioms_beverages
 from src.ontology.namespaces import EUCN
-from src.ontology.product_classes import add_product_classes_ch22
+from src.ontology.product_classes_beverages import add_product_classes_beverages
 from src.ontology.tbox import build_tbox
 from src.reasoning.konclude import KoncludeConsistencyError, check_consistency, classify
 
@@ -27,7 +27,7 @@ class TestEquivalenceAxiomsIntegration:
     def _tbox_with_equiv(self) -> Graph:
         g = Graph()
         build_tbox(g)
-        add_ch22_equivalence_axioms(g)
+        add_equivalence_axioms_beverages(g)
         return g
 
     def test_tbox_with_equiv_axioms_consistent(self, tmp_path):

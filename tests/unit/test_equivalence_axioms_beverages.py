@@ -4,10 +4,10 @@ from rdflib import Graph, Literal
 from rdflib.namespace import OWL, RDF, XSD
 
 from src.ontology.bfo_stubs import add_bfo_stubs
-from src.ontology.discriminating_props import add_discriminating_props
-from src.ontology.equivalence_axioms import add_ch22_equivalence_axioms
+from src.ontology.discriminating_props_beverages import add_discriminating_props_beverages
+from src.ontology.equivalence_axioms_beverages import add_equivalence_axioms_beverages
 from src.ontology.namespaces import EUCN
-from src.ontology.product_classes import add_product_classes_ch22
+from src.ontology.product_classes_beverages import add_product_classes_beverages
 
 PRODUCT_CLASSES_WITH_EQUIV = [
     EUCN.Water,
@@ -24,13 +24,13 @@ PRODUCT_CLASSES_WITH_EQUIV = [
 ]
 
 
-class TestEquivalenceAxioms:
+class TestEquivalenceAxiomsBeverages:
     def _graph(self) -> Graph:
         g = Graph()
         add_bfo_stubs(g)
-        add_discriminating_props(g)
-        add_product_classes_ch22(g)
-        add_ch22_equivalence_axioms(g)
+        add_discriminating_props_beverages(g)
+        add_product_classes_beverages(g)
+        add_equivalence_axioms_beverages(g)
         return g
 
     def test_beer_equivalentclass_present(self):
@@ -71,11 +71,11 @@ class TestEquivalenceAxioms:
     def test_idempotent(self):
         g = Graph()
         add_bfo_stubs(g)
-        add_discriminating_props(g)
-        add_product_classes_ch22(g)
-        add_ch22_equivalence_axioms(g)
+        add_discriminating_props_beverages(g)
+        add_product_classes_beverages(g)
+        add_equivalence_axioms_beverages(g)
         count1 = len(g)
-        add_ch22_equivalence_axioms(g)
+        add_equivalence_axioms_beverages(g)
         count2 = len(g)
         assert count1 == count2
 
@@ -125,9 +125,9 @@ class TestEquivalenceComplementRestrictions:
     def _graph(self) -> Graph:
         g = Graph()
         add_bfo_stubs(g)
-        add_discriminating_props(g)
-        add_product_classes_ch22(g)
-        add_ch22_equivalence_axioms(g)
+        add_discriminating_props_beverages(g)
+        add_product_classes_beverages(g)
+        add_equivalence_axioms_beverages(g)
         return g
 
     def test_spirit_neg_hasvalue_covers_all_disjoint_sibling_conditions(self):

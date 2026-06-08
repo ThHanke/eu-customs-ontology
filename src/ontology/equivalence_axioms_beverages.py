@@ -1,128 +1,29 @@
 """Manually curated owl:equivalentClass axioms for Chapter 22 product classes.
 
 Encodes the discriminating physical criteria for each CN heading/subheading
-using the canonical data properties from discriminating_props.py.
+using the canonical data properties from discriminating_props_beverages.py.
 
 OWL 2 DL: no punning issues — named product classes (eucn:Beer etc.) are the
 subjects of owl:equivalentClass. BNode intersection class is the object.
 """
 from __future__ import annotations
 
-import hashlib
-
-from rdflib import BNode, Graph, Literal
-from rdflib.namespace import OWL, RDF, RDFS, XSD
+from rdflib import Graph, Literal
+from rdflib.namespace import XSD
 
 from src.ontology.namespaces import EUCN
+from src.ontology.owl_helpers import (
+    _bnode,
+    _build_list,
+    _decimal_range_restr,
+    _equiv,
+    _has_value_restr,
+    _neg_hasvalue_from_disjoint_equiv,
+    _some_values_class_restr,
+)
 
 
-def _bnode(key: str) -> BNode:
-    h = hashlib.sha256(key.encode()).hexdigest()[:16]
-    return BNode(h)
-
-
-def _build_list(g: Graph, items: list[BNode], key: str) -> BNode:
-    if not items:
-        return RDF.nil  # type: ignore[return-value]
-    head = _bnode(f"list:{key}")
-    current = head
-    for i, item in enumerate(items):
-        rest = _bnode(f"list:{key}:rest:{i}") if i < len(items) - 1 else RDF.nil
-        g.add((current, RDF.first, item))
-        g.add((current, RDF.rest, rest))
-        if i < len(items) - 1:
-            current = rest
-    return head
-
-
-def _neg_hasvalue_from_disjoint_equiv(g: Graph, cls_iri, key: str) -> list[BNode]:
-    """Return NOT(producedBy someValuesFrom C) BNodes derived from disjoint siblings.
-
-    Walks each disjoint sibling's equivalentClass intersectionOf list, finds
-    owl:Restriction someValuesFrom members whose value is a named class (URIRef,
-    not a datatype BNode), and emits owl:complementOf [Restriction someValuesFrom C]
-    for each.
-
-    Deterministic: siblings and values are sorted by IRI string.
-    """
-    exclusions: list[BNode] = []
-    for j, sibling in enumerate(sorted(g.objects(cls_iri, OWL.disjointWith), key=str)):
-        for inter in g.objects(sibling, OWL.equivalentClass):
-            lst = list(g.objects(inter, OWL.intersectionOf))
-            if not lst:
-                continue
-            node = lst[0]
-            while node != RDF.nil:
-                first = list(g.objects(node, RDF.first))
-                if first:
-                    member = first[0]
-                    if ((member, RDF.type, OWL.Restriction) in g
-                            and (member, OWL.someValuesFrom, None) in g):
-                        for prop in sorted(g.objects(member, OWL.onProperty), key=str):
-                            for val in sorted(g.objects(member, OWL.someValuesFrom), key=str):
-                                # Skip datatype restrictions (BNode = anonymous datatype)
-                                if isinstance(val, BNode):
-                                    continue
-                                neg_key = f"{key}:neg:{j}:{str(prop)}:{str(val)}"
-                                inner = _bnode(f"r:sv_cls:{neg_key}")
-                                g.add((inner, RDF.type, OWL.Restriction))
-                                g.add((inner, OWL.onProperty, prop))
-                                g.add((inner, OWL.someValuesFrom, val))
-                                outer = _bnode(f"r:compl:{neg_key}")
-                                g.add((outer, RDF.type, OWL.Class))
-                                g.add((outer, OWL.complementOf, inner))
-                                if outer not in exclusions:
-                                    exclusions.append(outer)
-                rest = list(g.objects(node, RDF.rest))
-                node = rest[0] if rest else RDF.nil
-    return exclusions
-
-
-def _some_values_class_restr(g: Graph, prop, class_iri, key: str) -> BNode:
-    """owl:someValuesFrom <NamedClass> — links process type to product class."""
-    r = _bnode(f"r:sv_cls:{key}")
-    g.add((r, RDF.type, OWL.Restriction))
-    g.add((r, OWL.onProperty, prop))
-    g.add((r, OWL.someValuesFrom, class_iri))
-    return r
-
-
-def _has_value_restr(g: Graph, prop, value, key: str) -> BNode:
-    r = _bnode(f"r:hv:{key}")
-    g.add((r, RDF.type, OWL.Restriction))
-    g.add((r, OWL.onProperty, prop))
-    g.add((r, OWL.hasValue, value))
-    return r
-
-
-def _decimal_range_restr(g: Graph, prop, facet_iri, threshold: float, key: str) -> BNode:
-    """owl:someValuesFrom [rdfs:Datatype xsd:decimal facet threshold]"""
-    facet_b = _bnode(f"facet:{key}")
-    g.add((facet_b, facet_iri, Literal(str(threshold), datatype=XSD.decimal)))
-
-    dtype = _bnode(f"dtype:{key}")
-    g.add((dtype, RDF.type, RDFS.Datatype))
-    g.add((dtype, OWL.onDatatype, XSD.decimal))
-    fl = _build_list(g, [facet_b], f"fl:{key}")
-    g.add((dtype, OWL.withRestrictions, fl))
-
-    r = _bnode(f"r:sv:{key}")
-    g.add((r, RDF.type, OWL.Restriction))
-    g.add((r, OWL.onProperty, prop))
-    g.add((r, OWL.someValuesFrom, dtype))
-    return r
-
-
-def _equiv(g: Graph, cls_iri, parts: list[BNode], key: str) -> None:
-    """Assert cls_iri owl:equivalentClass [intersectionOf parts]."""
-    inter = _bnode(f"inter:{key}")
-    g.add((inter, RDF.type, OWL.Class))
-    lst = _build_list(g, parts, f"lst:{key}")
-    g.add((inter, OWL.intersectionOf, lst))
-    g.add((cls_iri, OWL.equivalentClass, inter))
-
-
-def add_ch22_equivalence_axioms(graph: Graph) -> None:
+def add_equivalence_axioms_beverages(graph: Graph) -> None:
     """Add curated owl:equivalentClass axioms for Ch22 product classes. Idempotent.
 
     Two-phase structure:

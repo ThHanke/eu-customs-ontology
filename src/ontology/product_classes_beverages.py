@@ -10,50 +10,13 @@ classified individuals automatically.
 """
 from __future__ import annotations
 
-import hashlib
-import itertools
-
-from rdflib import BNode, Graph, Literal, URIRef
-from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
+from rdflib import Graph, URIRef
 
 from src.ontology.namespaces import BFO_OBJECT, EUCN
+from src.ontology.owl_helpers import _bnode, _cls, _cn_heading, _disjoint_pairs, _sub
 
 
-def _bnode(key: str) -> BNode:
-    h = hashlib.sha256(key.encode()).hexdigest()[:16]
-    return BNode(h)
-
-
-def _cls(g: Graph, iri: URIRef, label_en: str, label_de: str,
-         def_en: str, def_de: str) -> None:
-    g.add((iri, RDF.type, OWL.Class))
-    g.add((iri, RDFS.label, Literal(label_en, lang="en")))
-    g.add((iri, RDFS.label, Literal(label_de, lang="de")))
-    g.add((iri, SKOS.definition, Literal(def_en, lang="en")))
-    g.add((iri, SKOS.definition, Literal(def_de, lang="de")))
-
-
-def _sub(g: Graph, child: URIRef, parent: URIRef) -> None:
-    g.add((child, RDFS.subClassOf, parent))
-
-
-def _cn_heading(g: Graph, cls_iri: URIRef, code: str) -> None:
-    """Add rdfs:subClassOf [hasValue code] so the reasoner propagates the CN code."""
-    r = _bnode(f"cn:heading:{code}")
-    g.add((r, RDF.type, OWL.Restriction))
-    g.add((r, OWL.onProperty, EUCN.cnHeadingCode))
-    g.add((r, OWL.hasValue, Literal(code, datatype=XSD.string)))
-    g.add((cls_iri, RDFS.subClassOf, r))
-
-
-def _disjoint_pairs(g: Graph, classes: list[URIRef]) -> None:
-    """Assert pairwise owl:disjointWith for all pairs in classes (symmetric)."""
-    for a, b in itertools.combinations(classes, 2):
-        g.add((a, OWL.disjointWith, b))
-        g.add((b, OWL.disjointWith, a))
-
-
-def add_product_classes_ch22(graph: Graph) -> None:
+def add_product_classes_beverages(graph: Graph) -> None:
     """Declare Chapter 22 product class hierarchy. Idempotent."""
     g = graph
 

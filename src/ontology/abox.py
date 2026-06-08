@@ -11,7 +11,7 @@ from src.ontology.iri import (
     taric_measure_iri,
 )
 from src.ontology.namespaces import DCTERMS, EUCN
-from src.ontology.equivalence_axioms import add_ch22_equivalence_axioms
+from src.ontology.chapter_registry import get_chapter
 from src.ontology.wizard_axioms import WizardAxiomCoverage, transform
 from src.schema.taric import ChapterData, TARICMeasure
 from src.schema.wizard import ClassificationNode, WizardTree
@@ -123,7 +123,7 @@ def build_abox(
     for triple in wizard_triples:
         g.add(triple)
 
-    # Curated equivalence axioms for Ch22 product classes
-    add_ch22_equivalence_axioms(g)
+    # Curated equivalence axioms (dispatched via registry)
+    get_chapter(wizard_tree.chapter).add_equivalence_axioms(g)
 
     return g, coverage

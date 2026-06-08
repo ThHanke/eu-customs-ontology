@@ -6,7 +6,7 @@ from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 from src.ontology.bfo_stubs import add_bfo_stubs
 from src.ontology.namespaces import BFO_PROCESS, EUCN
-from src.ontology.process_classes_ch22 import add_process_classes_ch22
+from src.ontology.process_classes_beverages import add_process_classes_beverages
 from src.ontology.tbox import build_tbox
 
 PROCESS_CLASSES = [
@@ -23,11 +23,11 @@ PROCESS_CLASSES = [
 def _graph() -> Graph:
     g = Graph()
     add_bfo_stubs(g)
-    add_process_classes_ch22(g)
+    add_process_classes_beverages(g)
     return g
 
 
-class TestProcessClasses:
+class TestProcessClassesBeverages:
     def test_all_process_classes_are_owl_classes(self):
         g = _graph()
         for cls in PROCESS_CLASSES:
@@ -106,9 +106,9 @@ class TestIdempotency:
     def test_double_call_same_triple_count(self):
         g = Graph()
         add_bfo_stubs(g)
-        add_process_classes_ch22(g)
+        add_process_classes_beverages(g)
         count1 = len(g)
-        add_process_classes_ch22(g)
+        add_process_classes_beverages(g)
         count2 = len(g)
         assert count1 == count2, \
             f"Idempotency violated: {count1} triples after 1st call, {count2} after 2nd"
