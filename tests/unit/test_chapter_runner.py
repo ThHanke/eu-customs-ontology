@@ -687,3 +687,40 @@ def test_running_tbox_not_written_for_failed_node(tmp_path: Path):
 
     running_tbox_path = tmp_path / "agent_tbox" / "ch22" / "running.ttl"
     assert not running_tbox_path.exists()
+
+
+# ---------------------------------------------------------------------------
+# Test: agent raises exception — chapter run continues, failure counted
+# ---------------------------------------------------------------------------
+
+
+def test_agent_exception_continues_and_counts_failure(tmp_path: Path):
+    """When agent.run raises an exception, the loop continues and failed is incremented."""
+    sections = [
+        _make_section("22", "note_22", "Chapter 22"),
+        _make_section("2204", "note_2204", "Wine"),
+    ]
+    _write_notes_jsonl(tmp_path, 22, sections)
+    _make_base_tbox(tmp_path, 22)
+    wizard_tree = _make_wizard_tree()
+
+    axiom_proposed = _make_axiom_set("22", status="proposed")
+
+    with patch(_PATCH_STATIC_CTX, return_value=_FAKE_STATIC_CTX), \
+         patch(_PATCH_TBOX_HASH, return_value=_FAKE_TBOX_HASH), \
+         patch(_PATCH_NODE_CTX, return_value={"notes_en": ["text"], "notes_de": [], "hierarchy_path": [], "running_tbox": "", "existing_axioms": []}), \
+         patch(_PATCH_AGENT_CLS) as MockAgentCls:
+
+        mock_instance = MagicMock()
+        # First call succeeds; second call raises
+        mock_instance.run.side_effect = [axiom_proposed, RuntimeError("API error")]
+        MockAgentCls.return_value = mock_instance
+
+        runner = ChapterRunner(chapter=22, model="test-model", data_root=tmp_path)
+        result = runner.run(wizard_tree)
+
+    assert result.total == 2
+    assert result.proposed == 1
+    assert result.failed == 1
+    assert result.skipped == 0
+    assert mock_instance.run.call_count == 2

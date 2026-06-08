@@ -120,13 +120,18 @@ class ChapterRunner:
             )
 
             # Call agent
-            axiom_set = agent.run(
-                cn_code=cn_code,
-                node_context=node_context,
-                base_tbox_path=base_tbox_path,
-                running_tbox_path=running_tbox_path,
-                existing_axioms_ttl="",
-            )
+            try:
+                axiom_set = agent.run(
+                    cn_code=cn_code,
+                    node_context=node_context,
+                    base_tbox_path=base_tbox_path,
+                    running_tbox_path=running_tbox_path,
+                    existing_axioms_ttl="",
+                )
+            except Exception as exc:
+                logger.warning("[agent] error processing %s: %s", cn_code, exc)
+                result.failed += 1
+                continue
 
             # Upsert result into registry
             node_registry.upsert(axiom_set)
@@ -176,9 +181,15 @@ class ChapterRunner:
     def _append_to_running_tbox(
         self, axiom_set: NodeAxiomSet, running_tbox_path: Path
     ) -> None:
-        """Serialize new classes and properties from axiom_set and append to running.ttl."""
+        """Merge new classes and properties from axiom_set into running.ttl.
+
+        Parses the existing file (if any) into a graph, adds the new triples,
+        then reserializes to avoid duplicate @prefix declarations.
+        """
         eucn_ns = "https://w3id.org/eucn/"
         g = Graph()
+        if running_tbox_path.exists():
+            g.parse(running_tbox_path, format="turtle")
 
         for cls in axiom_set.new_classes:
             iri = URIRef(f"{eucn_ns}{cls.iri_local_name}")
@@ -199,10 +210,5 @@ class ChapterRunner:
         if len(g) == 0:
             return
 
-        running_ttl = g.serialize(format="turtle")
-        if running_tbox_path.exists():
-            existing = running_tbox_path.read_text(encoding="utf-8")
-            running_tbox_path.write_text(existing + "\n" + running_ttl, encoding="utf-8")
-        else:
-            running_tbox_path.parent.mkdir(parents=True, exist_ok=True)
-            running_tbox_path.write_text(running_ttl, encoding="utf-8")
+        running_tbox_path.parent.mkdir(parents=True, exist_ok=True)
+        g.serialize(destination=str(running_tbox_path), format="turtle")
