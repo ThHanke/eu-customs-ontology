@@ -10,6 +10,11 @@ from src.ontology.product_classes_beverages import add_product_classes_beverages
 from src.ontology.process_classes_beverages import add_process_classes_beverages
 from src.ontology.equivalence_axioms_beverages import add_equivalence_axioms_beverages
 
+from src.ontology.discriminating_props_ch23_feed import add_discriminating_props_ch23_feed
+from src.ontology.product_classes_ch23_feed import add_product_classes_ch23_feed
+from src.ontology.process_classes_ch23_feed import add_process_classes_ch23_feed
+from src.ontology.equivalence_axioms_ch23_feed import add_equivalence_axioms_ch23_feed
+
 
 @dataclass
 class ChapterModule:
@@ -29,6 +34,14 @@ CHAPTERS: dict[int, ChapterModule] = {
         add_product_classes=add_product_classes_beverages,
         add_process_classes=add_process_classes_beverages,
         add_equivalence_axioms=add_equivalence_axioms_beverages,
+    ),
+    23: ChapterModule(
+        label="Residues and waste from the food industries; prepared animal fodder",
+        slug="residues-feed",
+        add_discriminating_props=add_discriminating_props_ch23_feed,
+        add_product_classes=add_product_classes_ch23_feed,
+        add_process_classes=add_process_classes_ch23_feed,
+        add_equivalence_axioms=add_equivalence_axioms_ch23_feed,
     ),
 }
 
