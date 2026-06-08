@@ -146,7 +146,7 @@ class TestEquivalenceAxioms:
         store = _build_store(tmp_path)
         for prop_suffix in [
             "alcoholByVolumePercent", "isCarbonated", "isDenatured",
-            "maxContainerVolumeL", "fermentationBase",
+            "maxContainerVolumeL",
         ]:
             result = store.ask(f"""
                 ASK {{
@@ -155,6 +155,16 @@ class TestEquivalenceAxioms:
                 }}
             """)
             assert result, f"eucn:{prop_suffix} not found as DatatypeProperty"
+
+    def test_produced_by_is_object_property(self, tmp_path):
+        store = _build_store(tmp_path)
+        result = store.ask("""
+            ASK {
+                <https://w3id.org/eucn/producedBy>
+                    a <http://www.w3.org/2002/07/owl#ObjectProperty> .
+            }
+        """)
+        assert result, "eucn:producedBy not found as ObjectProperty"
 
 
 class TestCoverageReport:
