@@ -94,16 +94,49 @@ class TestTransformBoolean:
         ]
         assert values, "Expected owl:hasValue true"
 
-    def test_boolean_nein_hasvalue_false(self):
+    def test_boolean_nein_complement_restriction(self):
         triples, coverage = transform(_boolean_nein_tree())
         g = Graph()
         for t in triples:
             g.add(t)
-        values = [
+        # No hasValue false — complement pattern used instead
+        false_values = [
             o for s, p, o in g.triples((None, OWL.hasValue, None))
             if str(o).lower() == "false"
         ]
-        assert values, "Expected owl:hasValue false"
+        assert not false_values, "owl:hasValue false must not be emitted for Nein"
+        # Outer BNode has complementOf pointing to inner restriction
+        complements = list(g.subjects(OWL.complementOf, None))
+        assert complements, "Expected owl:complementOf for Nein path"
+        inner = list(g.objects(complements[0], OWL.complementOf))[0]
+        has_value_triples = list(g.triples((inner, OWL.hasValue, None)))
+        assert has_value_triples, "Inner restriction must have owl:hasValue"
+        assert str(has_value_triples[0][2]).lower() == "true", (
+            "Inner restriction owl:hasValue must be true"
+        )
+
+    def test_boolean_nein_complement_is_owl_class(self):
+        triples, coverage = transform(_boolean_nein_tree())
+        g = Graph()
+        for t in triples:
+            g.add(t)
+        complements = list(g.subjects(OWL.complementOf, None))
+        assert complements
+        assert (complements[0], RDF.type, OWL.Class) in g, (
+            "Outer complement BNode must be typed owl:Class"
+        )
+
+    def test_boolean_nein_inner_is_owl_restriction(self):
+        triples, coverage = transform(_boolean_nein_tree())
+        g = Graph()
+        for t in triples:
+            g.add(t)
+        complements = list(g.subjects(OWL.complementOf, None))
+        assert complements
+        inner = list(g.objects(complements[0], OWL.complementOf))[0]
+        assert (inner, RDF.type, OWL.Restriction) in g, (
+            "Inner BNode must be typed owl:Restriction"
+        )
 
     def test_boolean_tier_in_coverage(self):
         _, coverage = transform(_boolean_tree())
@@ -180,6 +213,31 @@ class TestTransformMultiStep:
             g.add(t)
         intersections = list(g.subjects(OWL.intersectionOf, None))
         assert intersections, "Expected owl:intersectionOf"
+
+    def test_multi_step_nein_complement_in_intersection(self):
+        """The complement BNode (outer) must appear in the intersectionOf list."""
+        triples, _ = transform(_multi_step_tree())
+        g = Graph()
+        for t in triples:
+            g.add(t)
+        # Find complement outer BNode
+        complements = list(g.subjects(OWL.complementOf, None))
+        assert complements, "Expected complement BNode from Nein step"
+        compl_bnode = complements[0]
+        # Walk the intersectionOf list and collect members
+        inter_heads = list(g.subjects(OWL.intersectionOf, None))
+        assert inter_heads
+        members: list = []
+        node = list(g.objects(inter_heads[0], OWL.intersectionOf))[0]
+        while node != RDF.nil:
+            first = list(g.objects(node, RDF.first))
+            if first:
+                members.append(first[0])
+            rest = list(g.objects(node, RDF.rest))
+            node = rest[0] if rest else RDF.nil
+        assert compl_bnode in members, (
+            "Complement BNode must appear in owl:intersectionOf list"
+        )
 
 
 class TestTransformIdempotency:

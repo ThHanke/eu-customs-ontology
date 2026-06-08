@@ -145,8 +145,10 @@ def _classify_question(
 
     # Tier 1: boolean
     if is_yes or is_no:
-        value = True if is_yes else False
-        restr_key = f"restr:bool:{prop}:{value}:{cn_code}"
+        if is_yes:
+            restr_key = f"restr:bool:{prop}:True:{cn_code}"
+        else:
+            restr_key = f"restr:bool:compl:{prop}:{cn_code}"
         restr = _bnode(restr_key)
         analysis = QuestionAnalysis(
             question_text=question_text,
@@ -180,6 +182,7 @@ def _add_restriction_triples(
     threshold: float | None,
     facet_name: str | None,
     restr_key: str,
+    inner_restr_key: str | None = None,
 ) -> None:
     """Add the triples for one OWL restriction to g."""
     is_yes = answer_text.strip().lower() in {"ja", "yes"}
@@ -200,10 +203,18 @@ def _add_restriction_triples(
         g.add((restr, OWL.someValuesFrom, dtype))
 
     elif tier == "boolean":
-        value = RLiteral(is_yes, datatype=XSD.boolean)
-        g.add((restr, RDF.type, OWL.Restriction))
-        g.add((restr, OWL.onProperty, prop))
-        g.add((restr, OWL.hasValue, value))
+        if is_yes:
+            g.add((restr, RDF.type, OWL.Restriction))
+            g.add((restr, OWL.onProperty, prop))
+            g.add((restr, OWL.hasValue, RLiteral(True, datatype=XSD.boolean)))
+        else:
+            # Complement: restr is owl:Class; complementOf inner positive restriction
+            inner = _bnode(inner_restr_key or f"restr:bool:{prop}:True:{restr_key}")
+            g.add((inner, RDF.type, OWL.Restriction))
+            g.add((inner, OWL.onProperty, prop))
+            g.add((inner, OWL.hasValue, RLiteral(True, datatype=XSD.boolean)))
+            g.add((restr, RDF.type, OWL.Class))
+            g.add((restr, OWL.complementOf, inner))
 
     else:  # fallback
         g.add((restr, RDF.type, OWL.Restriction))
@@ -265,11 +276,19 @@ def transform(tree: WizardTree) -> tuple[list[Triple], WizardAxiomCoverage]:
 
             if restr is not None:
                 prop = URIRef(analysis.property_iri)
+                is_bool_nein = (
+                    analysis.tier == "boolean"
+                    and answer_text.strip().lower() in {"nein", "no"}
+                )
+                inner_restr_key = (
+                    f"restr:bool:{prop}:True:{cn_code}" if is_bool_nein else None
+                )
                 _add_restriction_triples(
                     g, restr, prop,
                     analysis.tier, answer_text,
                     analysis.extracted_threshold, analysis.extracted_facet,
                     f"restr:{analysis.tier}:{prop}:{answer_text}:{cn_code}",
+                    inner_restr_key=inner_restr_key,
                 )
                 # Declare the property
                 if analysis.tier == "fallback":

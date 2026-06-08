@@ -35,6 +35,47 @@ def _build_list(g: Graph, items: list[BNode], key: str) -> BNode:
     return head
 
 
+def _neg_hasvalue_from_disjoint_equiv(g: Graph, cls_iri, key: str) -> list[BNode]:
+    """Return NOT(P=v) complement BNodes derived from disjoint siblings' hasValue axioms.
+
+    Generic: for each owl:disjointWith sibling, walks the sibling's equivalentClass
+    intersectionOf list, finds owl:Restriction hasValue members, and emits
+    owl:complementOf [Restriction onProperty P hasValue v] for each.
+    No domain values or class IRIs are hardcoded — all come from the graph.
+
+    Requires that product_classes and earlier equivalence axioms are already in g.
+    Deterministic: siblings and values are sorted by IRI/literal string.
+    """
+    exclusions: list[BNode] = []
+    for j, sibling in enumerate(sorted(g.objects(cls_iri, OWL.disjointWith), key=str)):
+        for inter in g.objects(sibling, OWL.equivalentClass):
+            lst = list(g.objects(inter, OWL.intersectionOf))
+            if not lst:
+                continue
+            node = lst[0]
+            while node != RDF.nil:
+                first = list(g.objects(node, RDF.first))
+                if first:
+                    member = first[0]
+                    if ((member, RDF.type, OWL.Restriction) in g
+                            and (member, OWL.hasValue, None) in g):
+                        for prop in sorted(g.objects(member, OWL.onProperty), key=str):
+                            for val in sorted(g.objects(member, OWL.hasValue), key=str):
+                                neg_key = f"{key}:neg:{j}:{str(prop)}:{str(val)}"
+                                inner = _bnode(f"r:hv:{neg_key}")
+                                g.add((inner, RDF.type, OWL.Restriction))
+                                g.add((inner, OWL.onProperty, prop))
+                                g.add((inner, OWL.hasValue, val))
+                                outer = _bnode(f"r:compl:{neg_key}")
+                                g.add((outer, RDF.type, OWL.Class))
+                                g.add((outer, OWL.complementOf, inner))
+                                if outer not in exclusions:
+                                    exclusions.append(outer)
+                rest = list(g.objects(node, RDF.rest))
+                node = rest[0] if rest else RDF.nil
+    return exclusions
+
+
 def _has_value_restr(g: Graph, prop, value, key: str) -> BNode:
     r = _bnode(f"r:hv:{key}")
     g.add((r, RDF.type, OWL.Restriction))
@@ -71,7 +112,13 @@ def _equiv(g: Graph, cls_iri, parts: list[BNode], key: str) -> None:
 
 
 def add_ch22_equivalence_axioms(graph: Graph) -> None:
-    """Add curated owl:equivalentClass axioms for Ch22 product classes. Idempotent."""
+    """Add curated owl:equivalentClass axioms for Ch22 product classes. Idempotent.
+
+    Two-phase structure:
+      Phase 1 — unconditional axioms (hasValue / someValuesFrom only).
+      Phase 2 — axioms that derive NOT(P=v) complements from sibling equivalentClass
+                axioms already set in Phase 1; must run after Phase 1 completes.
+    """
     g = graph
 
     abv = EUCN.alcoholByVolumePercent
@@ -80,8 +127,9 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     vol = EUCN.maxContainerVolumeL
     ferm = EUCN.fermentationBase
 
-    # ── eucn:Water (CN 2201) ──────────────────────────────────────────────────
-    # Water = Beverage with ABV ≤ 0 (no measurable alcohol) and not fermented
+    # ── Phase 1: unconditional axioms ─────────────────────────────────────────
+
+    # eucn:Water (CN 2201) — ABV ≤ 0 (no measurable alcohol)
     _equiv(
         g, EUCN.Water,
         [
@@ -92,9 +140,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "water",
     )
 
-    # ── eucn:NonAlcoholicBeverage (CN 2202) ────────────────────────────────────
-    # NonAlcoholicBeverage = Beverage with fermentationBase "sweetened-water"
-    # (sweetened/flavoured water, distinct from pure Water CN 2201)
+    # eucn:NonAlcoholicBeverage (CN 2202) — sweetened/flavoured water
     _equiv(
         g, EUCN.NonAlcoholicBeverage,
         [
@@ -105,8 +151,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "nonalco",
     )
 
-    # ── eucn:Beer (CN 2203) ────────────────────────────────────────────────────
-    # Beer = Beverage with fermentationBase "malt" and ABV > 0.5%
+    # eucn:Beer (CN 2203) — malt fermentation, ABV > 0.5%
     _equiv(
         g, EUCN.Beer,
         [
@@ -120,8 +165,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "beer",
     )
 
-    # ── eucn:Wine (CN 2204) ────────────────────────────────────────────────────
-    # Wine = Beverage with fermentationBase "grape"
+    # eucn:Wine (CN 2204) — grape fermentation
     _equiv(
         g, EUCN.Wine,
         [
@@ -132,8 +176,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "wine",
     )
 
-    # ── eucn:SparklingWine (CN 2204 10) ────────────────────────────────────────
-    # SparklingWine = Wine and isCarbonated true
+    # eucn:SparklingWine (CN 2204 10) — grape + carbonated
     _equiv(
         g, EUCN.SparklingWine,
         [
@@ -147,8 +190,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "sparkling",
     )
 
-    # ── eucn:StillWine (CN 2204 21/29) ────────────────────────────────────────
-    # StillWine = Wine and isCarbonated false
+    # eucn:StillWine (CN 2204 21/29) — grape + not carbonated
     _equiv(
         g, EUCN.StillWine,
         [
@@ -162,9 +204,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "stillwine",
     )
 
-    # ── eucn:FlavouredWine (CN 2205) ──────────────────────────────────────────
-    # FlavouredWine = Beverage with fermentationBase "grape-flavoured"
-    # (distinct string distinguishes from plain grape Wine)
+    # eucn:FlavouredWine (CN 2205) — grape-flavoured (distinct from plain grape)
     _equiv(
         g, EUCN.FlavouredWine,
         [
@@ -175,8 +215,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "flavoured",
     )
 
-    # ── eucn:FermentedBeverage (CN 2206) ──────────────────────────────────────
-    # FermentedBeverage = Beverage with fermentationBase "fruit"
+    # eucn:FermentedBeverage (CN 2206) — fruit fermentation
     _equiv(
         g, EUCN.FermentedBeverage,
         [
@@ -187,35 +226,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "fermented",
     )
 
-    # ── eucn:EthylAlcohol (CN 2207) ───────────────────────────────────────────
-    # EthylAlcohol = Beverage with ABV >= 80%
-    _equiv(
-        g, EUCN.EthylAlcohol,
-        [
-            _decimal_range_restr(
-                g, abv, XSD.minInclusive, 80.0, "ethyl:abv"
-            ),
-        ],
-        "ethyl",
-    )
-
-    # ── eucn:Spirit (CN 2208) ─────────────────────────────────────────────────
-    # Spirit = Beverage with ABV < 80% (and > 0.5%, so not non-alcoholic)
-    _equiv(
-        g, EUCN.Spirit,
-        [
-            _decimal_range_restr(
-                g, abv, XSD.minExclusive, 0.5, "spirit:abv_min"
-            ),
-            _decimal_range_restr(
-                g, abv, XSD.maxExclusive, 80.0, "spirit:abv_max"
-            ),
-        ],
-        "spirit",
-    )
-
-    # ── eucn:Vinegar (CN 2209) ────────────────────────────────────────────────
-    # Vinegar = Beverage with fermentationBase "acetic"
+    # eucn:Vinegar (CN 2209) — acetic fermentation
     _equiv(
         g, EUCN.Vinegar,
         [
@@ -224,4 +235,27 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
             ),
         ],
         "vinegar",
+    )
+
+    # ── Phase 2: axioms derived from sibling equivalentClass conditions ────────
+
+    # eucn:EthylAlcohol (CN 2207) — ABV >= 80% + NOT(P=v) for each sibling hasValue
+    _equiv(
+        g, EUCN.EthylAlcohol,
+        [
+            _decimal_range_restr(g, abv, XSD.minInclusive, 80.0, "ethyl:abv"),
+            *_neg_hasvalue_from_disjoint_equiv(g, EUCN.EthylAlcohol, "ethyl"),
+        ],
+        "ethyl",
+    )
+
+    # eucn:Spirit (CN 2208) — 0.5% < ABV < 80% + NOT(P=v) for each sibling hasValue
+    _equiv(
+        g, EUCN.Spirit,
+        [
+            _decimal_range_restr(g, abv, XSD.minExclusive, 0.5, "spirit:abv_min"),
+            _decimal_range_restr(g, abv, XSD.maxExclusive, 80.0, "spirit:abv_max"),
+            *_neg_hasvalue_from_disjoint_equiv(g, EUCN.Spirit, "spirit"),
+        ],
+        "spirit",
     )

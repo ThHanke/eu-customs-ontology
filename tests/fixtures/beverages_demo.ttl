@@ -1,0 +1,55 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix eucn: <https://w3id.org/eucn/> .
+@prefix demo: <https://w3id.org/eucn/demo/> .
+
+# ---------------------------------------------------------------------------
+# Beverage demo individuals — minimal property assertions to trigger
+# eucn:equivalentClass axioms via OWL 2 DL realization (native Konclude).
+# ---------------------------------------------------------------------------
+
+# CN 2204 10 — Sparkling wine (eucn:SparklingWine)
+demo:champagne-brut a owl:NamedIndividual ;
+    eucn:fermentationBase  "grape"^^xsd:string ;
+    eucn:isCarbonated      "true"^^xsd:boolean .
+
+# CN 2204 21/29 — Still wine (eucn:StillWine)
+demo:bordeaux-rouge a owl:NamedIndividual ;
+    eucn:fermentationBase  "grape"^^xsd:string ;
+    eucn:isCarbonated      "false"^^xsd:boolean .
+
+# CN 2206 — Other fermented beverage, apple cider (eucn:FermentedBeverage)
+demo:apple-cider a owl:NamedIndividual ;
+    eucn:fermentationBase  "fruit"^^xsd:string .
+
+# CN 2205 — Flavoured wine, vermouth (eucn:FlavouredWine)
+demo:dry-vermouth a owl:NamedIndividual ;
+    eucn:fermentationBase  "grape-flavoured"^^xsd:string .
+
+# CN 2209 — Vinegar (eucn:Vinegar)
+demo:malt-vinegar a owl:NamedIndividual ;
+    eucn:fermentationBase  "acetic"^^xsd:string .
+
+# CN 2202 — Non-alcoholic beverage, lemonade (eucn:NonAlcoholicBeverage)
+demo:sparkling-lemonade a owl:NamedIndividual ;
+    eucn:fermentationBase  "sweetened-water"^^xsd:string .
+
+# CN 2203 — Beer (eucn:Beer)
+demo:czech-lager a owl:NamedIndividual ;
+    eucn:fermentationBase       "malt"^^xsd:string ;
+    eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
+
+# CN 2208 — Spirit (eucn:Spirit)
+demo:whisky-12y a owl:NamedIndividual ;
+    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
+
+# CN 2207 — Ethyl alcohol (eucn:EthylAlcohol)
+demo:grain-spirit-96 a owl:NamedIndividual ;
+    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
+
+# CN 2201 — Water (eucn:Water)
+demo:still-water a owl:NamedIndividual ;
+    eucn:alcoholByVolumePercent "0.0"^^xsd:decimal .

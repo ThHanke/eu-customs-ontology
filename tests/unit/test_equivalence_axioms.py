@@ -1,7 +1,7 @@
 """Unit tests for Chapter 22 curated equivalence axioms."""
 import pytest
-from rdflib import Graph
-from rdflib.namespace import OWL, RDF
+from rdflib import Graph, Literal
+from rdflib.namespace import OWL, RDF, XSD
 
 from src.ontology.bfo_stubs import add_bfo_stubs
 from src.ontology.discriminating_props import add_discriminating_props
@@ -78,3 +78,77 @@ class TestEquivalenceAxioms:
         add_ch22_equivalence_axioms(g)
         count2 = len(g)
         assert count1 == count2
+
+
+def _hasvalue_complements_in_intersection(g: Graph, cls_iri) -> list[tuple]:
+    """Return (prop, val) pairs from NOT(prop=val) complements in cls_iri's intersection."""
+    inter_bnode = list(g.objects(cls_iri, OWL.equivalentClass))[0]
+    node = list(g.objects(inter_bnode, OWL.intersectionOf))[0]
+    pairs = []
+    while node != RDF.nil:
+        first = list(g.objects(node, RDF.first))
+        if first:
+            member = first[0]
+            for inner in g.objects(member, OWL.complementOf):
+                if (inner, RDF.type, OWL.Restriction) in g:
+                    for prop in g.objects(inner, OWL.onProperty):
+                        for val in g.objects(inner, OWL.hasValue):
+                            pairs.append((prop, val))
+        rest = list(g.objects(node, RDF.rest))
+        node = rest[0] if rest else RDF.nil
+    return pairs
+
+
+def _expected_neg_hasvalue_pairs(g: Graph, cls_iri) -> set[tuple]:
+    """Collect (prop, val) from hasValue restrictions in disjoint siblings' equivalentClass."""
+    pairs = set()
+    for sibling in g.objects(cls_iri, OWL.disjointWith):
+        for inter in g.objects(sibling, OWL.equivalentClass):
+            lst = list(g.objects(inter, OWL.intersectionOf))
+            if not lst:
+                continue
+            node = lst[0]
+            while node != RDF.nil:
+                first = list(g.objects(node, RDF.first))
+                if first:
+                    m = first[0]
+                    if (m, RDF.type, OWL.Restriction) in g and (m, OWL.hasValue, None) in g:
+                        for p in g.objects(m, OWL.onProperty):
+                            for v in g.objects(m, OWL.hasValue):
+                                pairs.add((p, v))
+                rest = list(g.objects(node, RDF.rest))
+                node = rest[0] if rest else RDF.nil
+    return pairs
+
+
+class TestEquivalenceComplementRestrictions:
+    def _graph(self) -> Graph:
+        g = Graph()
+        add_bfo_stubs(g)
+        add_discriminating_props(g)
+        add_product_classes_ch22(g)
+        add_ch22_equivalence_axioms(g)
+        return g
+
+    def test_spirit_neg_hasvalue_covers_all_disjoint_sibling_conditions(self):
+        g = self._graph()
+        expected = _expected_neg_hasvalue_pairs(g, EUCN.Spirit)
+        actual = set(_hasvalue_complements_in_intersection(g, EUCN.Spirit))
+        assert actual == expected, (
+            f"Spirit NOT(P=v) mismatch: actual={actual}, expected={expected}"
+        )
+
+    def test_ethyl_neg_hasvalue_covers_all_disjoint_sibling_conditions(self):
+        g = self._graph()
+        expected = _expected_neg_hasvalue_pairs(g, EUCN.EthylAlcohol)
+        actual = set(_hasvalue_complements_in_intersection(g, EUCN.EthylAlcohol))
+        assert actual == expected, (
+            f"EthylAlcohol NOT(P=v) mismatch: actual={actual}, expected={expected}"
+        )
+
+    def test_complement_bnode_is_owl_class(self):
+        g = self._graph()
+        outer_bnodes = list(g.subjects(OWL.complementOf, None))
+        assert outer_bnodes, "Expected complement BNodes"
+        for b in outer_bnodes:
+            assert (b, RDF.type, OWL.Class) in g, f"Complement BNode {b} not typed owl:Class"

@@ -63,9 +63,15 @@ class TestDiscriminatingProps:
             defs = [o for o in g.objects(p, SKOS.definition) if hasattr(o, "language") and o.language == "de"]
             assert defs, f"{p} missing skos:definition@de"
 
-    def test_no_functional_property(self):
+    def test_fermentation_base_is_functional(self):
+        g = self._graph()
+        assert (EUCN.fermentationBase, RDF.type, OWL.FunctionalProperty) in g
+
+    def test_other_props_not_functional(self):
         g = self._graph()
         for p in PROPS:
+            if p == EUCN.fermentationBase:
+                continue
             assert (p, RDF.type, OWL.FunctionalProperty) not in g, f"{p} must not be FunctionalProperty"
 
     def test_idempotent(self):

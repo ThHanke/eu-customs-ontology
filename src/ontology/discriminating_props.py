@@ -74,3 +74,6 @@ def add_discriminating_props(graph: Graph) -> None:
         "2204/2205 (Traube), 2206 (sonstige) und 2208 (Getreide-/Fruchtdestillate)",
         XSD.string,
     )
+    # Functional: each beverage has exactly one fermentation base.
+    # Required for OWL 2 DL realization: lets the reasoner infer ferm≠X from ferm=Y.
+    g.add((EUCN.fermentationBase, RDF.type, OWL.FunctionalProperty))
