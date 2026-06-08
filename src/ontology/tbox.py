@@ -6,6 +6,9 @@ from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
 from src.ontology.namespaces import DCTERMS, EUCN, ONTOLOGY_IRI, VANN
+from src.ontology.bfo_stubs import add_bfo_stubs
+from src.ontology.discriminating_props import add_discriminating_props
+from src.ontology.product_classes import add_product_classes_ch22
 
 
 def _class(g: Graph, iri: URIRef, label_en: str, label_de: str, def_en: str, def_de: str) -> None:
@@ -95,6 +98,15 @@ def build_tbox(graph: Graph, extract_date: Date | None = None) -> Graph:
            Literal(extract_date.isoformat(), datatype=XSD.date)))
     g.add((ont, VANN.preferredNamespacePrefix, Literal("eucn")))
     g.add((ont, VANN.preferredNamespaceUri, Literal("https://w3id.org/eucn/")))
+
+    # ── BFO stubs ──────────────────────────────────────────────────────────────
+    add_bfo_stubs(g)
+
+    # ── Discriminating properties (Ch22) ───────────────────────────────────────
+    add_discriminating_props(g)
+
+    # ── Product class hierarchy (Ch22) ─────────────────────────────────────────
+    add_product_classes_ch22(g)
 
     # ── Classes ────────────────────────────────────────────────────────────────
     _class(g, EUCN.CNCode, "CN Code", "KN-Code",

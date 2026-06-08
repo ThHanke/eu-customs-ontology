@@ -11,6 +11,8 @@ from src.ontology.iri import (
     taric_measure_iri,
 )
 from src.ontology.namespaces import DCTERMS, EUCN
+from src.ontology.equivalence_axioms import add_ch22_equivalence_axioms
+from src.ontology.wizard_axioms import WizardAxiomCoverage, transform
 from src.schema.taric import ChapterData, TARICMeasure
 from src.schema.wizard import ClassificationNode, WizardTree
 
@@ -88,8 +90,11 @@ def build_abox(
     chapter_data: ChapterData,
     wizard_tree: WizardTree,
     graph: Graph,
-) -> Graph:
-    """Populate ABox from intermediate JSON. Idempotent."""
+) -> tuple[Graph, WizardAxiomCoverage]:
+    """Populate ABox from intermediate JSON. Idempotent.
+
+    Returns (graph, coverage_report).
+    """
     g = graph
     g.bind("eucn", EUCN)
     g.bind("dcterms", DCTERMS)
@@ -113,4 +118,12 @@ def build_abox(
     for node in wizard_tree.nodes.values():
         _add_node(g, node, wizard_tree.nodes, cn_iris)
 
-    return g
+    # Wizard-to-axiom transform
+    wizard_triples, coverage = transform(wizard_tree)
+    for triple in wizard_triples:
+        g.add(triple)
+
+    # Curated equivalence axioms for Ch22 product classes
+    add_ch22_equivalence_axioms(g)
+
+    return g, coverage

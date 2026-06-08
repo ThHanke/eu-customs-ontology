@@ -55,13 +55,13 @@ class TestABoxIntegration:
 
     def test_measure_individuals_present(self):
         cd, wt = _make_fixture()
-        g = build_abox(cd, wt, Graph())
+        g, _ = build_abox(cd, wt, Graph())
         measures = list(g.subjects(RDF.type, EUCN.TARICMeasure))
         assert len(measures) >= 1
 
     def test_serialization_roundtrip(self, tmp_path):
         cd, wt = _make_fixture()
-        g = build_abox(cd, wt, Graph())
+        g, _ = build_abox(cd, wt, Graph())
         out = tmp_path / "test.ttl"
         out.write_text(g.serialize(format="longturtle"))
         g2 = Graph()

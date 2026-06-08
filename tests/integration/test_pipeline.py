@@ -79,6 +79,7 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             no_reasoner=False,
+            no_classify=True,
             extract_date=ed,
         )
         ttl = tmp_path / "eucn-ch22-2026-06-05.ttl"
@@ -87,6 +88,40 @@ class TestPipelineIntegration:
         assert trig.exists(), "eucn-ch22-2026-06-05.trig not produced"
         content = ttl.read_text()
         assert "TARICMeasure" in content or "w3id.org/eucn" in content
+
+    def test_classify_step_writes_inferred_graph(self, tmp_path, monkeypatch):
+        """Step 4.5: classify runs and .trig is written (empty result is OK)."""
+        from datetime import date
+        import src.pipeline as pipeline_mod
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+        ed = date(2026, 6, 5)
+        pipeline_mod.run(
+            chapter=22,
+            skip_fetch=True,
+            skip_scrape=True,
+            no_reasoner=False,
+            no_classify=False,
+            extract_date=ed,
+        )
+        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
+        assert trig.exists(), ".trig must be written even when classify produces empty output"
+
+    def test_no_classify_flag_skips_classify(self, tmp_path, monkeypatch):
+        from datetime import date
+        import src.pipeline as pipeline_mod
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+        ed = date(2026, 6, 5)
+        # Must not raise even with no_classify=True
+        pipeline_mod.run(
+            chapter=22, skip_fetch=True, skip_scrape=True,
+            no_reasoner=True, no_classify=True, extract_date=ed,
+        )
+        trig = tmp_path / "eucn-ch22-2026-06-05.trig"
+        assert trig.exists(), ".trig written from build step regardless of classify"
 
     def test_idempotent_output(self, tmp_path, monkeypatch):
         from datetime import date
@@ -100,14 +135,14 @@ class TestPipelineIntegration:
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
-                         no_reasoner=True, extract_date=ed)
+                         no_reasoner=True, no_classify=True, extract_date=ed)
         nt1 = sorted((out1 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
-                         no_reasoner=True, extract_date=ed)
+                         no_reasoner=True, no_classify=True, extract_date=ed)
         nt2 = sorted((out2 / "eucn-ch22-2026-06-05.ttl").read_text().splitlines())
 
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"

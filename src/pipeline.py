@@ -41,6 +41,7 @@ def run(
     xml_path: Path | None = None,
     xlsx_path: Path | None = None,
     no_reasoner: bool = False,
+    no_classify: bool = False,
     force: bool = False,
     extract_date: Date | None = None,
 ) -> None:
@@ -106,7 +107,7 @@ def run(
             # Build TBox + ABox in default graph
             g = Graph()
             build_tbox(g, extract_date=extract_date)
-            build_abox(chapter_data, wizard_tree, g)
+            g, wizard_coverage = build_abox(chapter_data, wizard_tree, g)
 
             # Provenance in named graph
             ds = Dataset()
@@ -118,6 +119,19 @@ def run(
                 "https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b",
                 "https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do",
             ])
+
+            # Write wizard axiom coverage report
+            coverage_json = DATA_INTERMEDIATE / f"wizard_axiom_coverage_ch{chapter:02d}.json"
+            coverage_json.write_text(wizard_coverage.model_dump_json(indent=2))
+            total_q = len(wizard_coverage.questions)
+            print(
+                f"  [wizard-axioms] ch{chapter:02d}: "
+                f"{wizard_coverage.total_terminal_nodes} terminal nodes, "
+                f"{wizard_coverage.covered_boolean} boolean, "
+                f"{wizard_coverage.covered_quantitative} quantitative, "
+                f"{wizard_coverage.fallback_count} fallback "
+                f"(coverage {wizard_coverage.coverage_pct:.1f}%)"
+            )
 
             # Serialize
             g.serialize(destination=str(ttl_out), format="longturtle")
@@ -138,6 +152,36 @@ def run(
                 sys.exit(1)
     else:
         print("[konclude-check] skipped (--no-reasoner)")
+
+    # ── Step 4.5: Konclude classify → inferred named graph ───────────────────
+    if not no_classify and not no_reasoner:
+        with _step("konclude-classify"):
+            import subprocess
+            from rdflib import URIRef
+            from src.reasoning.konclude import classify
+            try:
+                inferred_ttl = classify(ttl_out)
+                if inferred_ttl.strip():
+                    inferred_g = Graph()
+                    inferred_g.parse(data=inferred_ttl, format="turtle")
+                    inferred_graph_iri = URIRef(
+                        f"https://w3id.org/eucn/inferred/{date_str}"
+                    )
+                    inferred_named = ds.graph(inferred_graph_iri)
+                    for triple in inferred_g:
+                        inferred_named.add(triple)
+                    ds.serialize(destination=str(trig_out), format="trig")
+                    print(f"  Inferred triples: {len(inferred_g)} → {trig_out.name}")
+                else:
+                    print("  classify: empty output (stub TBox — expected)")
+            except subprocess.TimeoutExpired:
+                print("  WARNING: Konclude classify timed out — continuing without inferred graph",
+                      file=sys.stderr)
+            except Exception as exc:
+                print(f"  WARNING: Konclude classify failed: {exc} — continuing",
+                      file=sys.stderr)
+    else:
+        print("[konclude-classify] skipped (--no-classify or --no-reasoner)")
 
     # ── Step 5: SPARQL acceptance test (Chapter 22 only) ─────────────────────
     if chapter == 22:
@@ -184,6 +228,7 @@ def main() -> None:
     p.add_argument("--xml-path", type=Path, default=None)
     p.add_argument("--xlsx-path", type=Path, default=None, help="CIRCABC Duties Import xlsx")
     p.add_argument("--no-reasoner", action="store_true")
+    p.add_argument("--no-classify", action="store_true")
     p.add_argument("--force", action="store_true")
     p.add_argument("--extract-date", type=Date.fromisoformat, default=None,
                    metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
@@ -196,6 +241,7 @@ def main() -> None:
         xml_path=args.xml_path,
         xlsx_path=args.xlsx_path,
         no_reasoner=args.no_reasoner,
+        no_classify=args.no_classify,
         force=args.force,
         extract_date=args.extract_date,
     )

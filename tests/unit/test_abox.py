@@ -53,37 +53,37 @@ def _simple_tree():
 class TestBuildABox:
     def test_cn_code_individual_present(self):
         cd = _chapter_data([_measure()])
-        g = build_abox(_chapter_data([_measure()]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure()]), _simple_tree(), Graph())
         iri = cn_code_iri("22042100")
         assert (iri, RDF.type, EUCN.CNCode) in g
 
     def test_cn_code_string_triple(self):
         from rdflib import Literal
-        g = build_abox(_chapter_data([_measure()]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure()]), _simple_tree(), Graph())
         iri = cn_code_iri("22042100")
         code_strs = list(g.objects(iri, EUCN.codeString))
         assert any(str(c) == "22042100" for c in code_strs)
 
     def test_measure_individual_present(self):
-        g = build_abox(_chapter_data([_measure(sid="999")]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure(sid="999")]), _simple_tree(), Graph())
         m_iri = taric_measure_iri("999")
         assert (m_iri, RDF.type, EUCN.TARICMeasure) in g
 
     def test_cn_links_to_measure(self):
-        g = build_abox(_chapter_data([_measure(sid="999")]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure(sid="999")]), _simple_tree(), Graph())
         cn_iri = cn_code_iri("22042100")
         m_iri = taric_measure_iri("999")
         assert (cn_iri, EUCN.hasMeasure, m_iri) in g
 
     def test_terminal_node_classifies_as(self):
-        g = build_abox(_chapter_data([]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([]), _simple_tree(), Graph())
         node_iri = classification_node_iri(["Yes"])
         cn_iri = cn_code_iri("22042100")
         assert (node_iri, EUCN.classifiesAs, cn_iri) in g
 
     def test_validity_end_none_no_triple(self):
         from rdflib import Literal
-        g = build_abox(_chapter_data([_measure(validity_end=None)]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure(validity_end=None)]), _simple_tree(), Graph())
         m_iri = taric_measure_iri("999")
         end_vals = list(g.objects(m_iri, EUCN.validityEnd))
         assert end_vals == [], f"Expected no validityEnd, got {end_vals}"
@@ -91,8 +91,8 @@ class TestBuildABox:
     def test_determinism(self):
         cd = _chapter_data([_measure()])
         wt = _simple_tree()
-        g1 = build_abox(cd, wt, Graph())
-        g2 = build_abox(cd, wt, Graph())
+        g1, _ = build_abox(cd, wt, Graph())
+        g2, _ = build_abox(cd, wt, Graph())
         nt1 = sorted(g1.serialize(format="nt").splitlines())
         nt2 = sorted(g2.serialize(format="nt").splitlines())
         assert nt1 == nt2
@@ -111,18 +111,18 @@ class TestBuildABox:
         t2 = ClassificationNode(node_id="t2", question_text="", path_from_root=["B"],
                                 answer_options=[], is_terminal=True, cn_code="22042100")
         wt = _wizard_tree({"root": root, "t1": t1, "t2": t2}, "root")
-        g = build_abox(_chapter_data([]), wt, Graph())
+        g, _ = build_abox(_chapter_data([]), wt, Graph())
         cn_individuals = list(g.subjects(RDF.type, EUCN.CNCode))
         # Only one unique CNCode IRI for 22042100
         assert len(set(cn_individuals)) == 1
 
     def test_measure_without_validity_end_no_triple(self):
-        g = build_abox(_chapter_data([_measure(validity_end=None)]), _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure(validity_end=None)]), _simple_tree(), Graph())
         m_iri = taric_measure_iri("999")
         assert list(g.objects(m_iri, EUCN.validityEnd)) == []
 
     def test_measure_with_validity_end_has_triple(self):
-        g = build_abox(_chapter_data([_measure(validity_end=date(2026, 12, 31))]),
-                       _simple_tree(), Graph())
+        g, _ = build_abox(_chapter_data([_measure(validity_end=date(2026, 12, 31))]),
+                          _simple_tree(), Graph())
         m_iri = taric_measure_iri("999")
         assert list(g.objects(m_iri, EUCN.validityEnd)) != []
