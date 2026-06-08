@@ -49,6 +49,7 @@ def run(
     force: bool = False,
     extract_date: Date | None = None,
     run_axiom_agent: bool = False,
+    agent_model: str = "claude-sonnet-4-6",
 ) -> None:
     if extract_date is None:
         extract_date = Date.today()
@@ -117,7 +118,7 @@ def run(
             from src.agent.coverage_reporter import build_report, write_report
             from src.agent.node_registry import NodeRegistry
 
-            runner = ChapterRunner(chapter=chapter, model="claude-opus-4-8", data_root=ROOT)
+            runner = ChapterRunner(chapter=chapter, model=agent_model, data_root=ROOT)
             run_result = runner.run(wizard_tree, force=force)
             print(
                 f"  [axiom-agent] ch{chapter:02d}: total={run_result.total}, "
@@ -145,7 +146,7 @@ def run(
                     chapter,
                     new_iris,
                     flat_ttl_path,
-                    model="claude-opus-4-8",
+                    model=agent_model,
                     out_path=node_registry_dir / "harmonization.jsonl",
                 )
 
@@ -353,6 +354,8 @@ def main() -> None:
                    metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
     p.add_argument("--run-axiom-agent", action="store_true",
                    help="Run LLM-based axiom agent (requires ANTHROPIC_API_KEY)")
+    p.add_argument("--agent-model", default="claude-sonnet-4-6",
+                   metavar="MODEL", help="Model for --run-axiom-agent (default: claude-sonnet-4-6)")
     args = p.parse_args()
 
     run(
@@ -367,6 +370,7 @@ def main() -> None:
         force=args.force,
         extract_date=args.extract_date,
         run_axiom_agent=args.run_axiom_agent,
+        agent_model=args.agent_model,
     )
 
 
