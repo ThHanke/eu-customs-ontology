@@ -8,6 +8,10 @@ from src.ontology.namespaces import BFO, BFO_OBJECT, BFO_PROCESS, RO_HAS_OUTPUT
 BFO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl")
 RO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/ro.owl")
 
+# BFO 2020 parent classes
+BFO_INDEPENDENT_CONTINUANT = BFO["BFO_0000040"]  # parent of material entity (BFO_0000030)
+BFO_OCCURRENT = BFO["BFO_0000003"]               # parent of process (BFO_0000015)
+
 
 def add_bfo_stubs(graph: Graph) -> None:
     """Declare BFO:Object stub. Idempotent."""
@@ -27,6 +31,22 @@ def add_bfo_stubs(graph: Graph) -> None:
         "kontinuierender Teil einer anderen materiellen Entität ist",
         lang="de",
     )))
+    # BFO_0000030 parent: independent continuant (BFO_0000040)
+    g.add((BFO_OBJECT, RDFS.subClassOf, BFO_INDEPENDENT_CONTINUANT))
+    g.add((BFO_INDEPENDENT_CONTINUANT, RDF.type, OWL.Class))
+    g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.label, Literal("independent continuant", lang="en")))
+    g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.label, Literal("unabhängige Kontinuante", lang="de")))
+    g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_INDEPENDENT_CONTINUANT, SKOS.definition, Literal(
+        "continuant that is a bearer of quality and realizable entity where the bearer "
+        "is independent of whether or not there is any realization",
+        lang="en",
+    )))
+    g.add((BFO_INDEPENDENT_CONTINUANT, SKOS.definition, Literal(
+        "Kontinuante, die Träger einer Qualität oder realisierbaren Entität ist, "
+        "unabhängig davon, ob eine Realisierung vorliegt",
+        lang="de",
+    )))
     # BFO:Process
     g.add((BFO_PROCESS, RDF.type, OWL.Class))
     g.add((BFO_PROCESS, RDFS.label, Literal("process", lang="en")))
@@ -38,6 +58,20 @@ def add_bfo_stubs(graph: Graph) -> None:
     )))
     g.add((BFO_PROCESS, SKOS.definition, Literal(
         "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat",
+        lang="de",
+    )))
+    # BFO_0000015 parent: occurrent (BFO_0000003)
+    g.add((BFO_PROCESS, RDFS.subClassOf, BFO_OCCURRENT))
+    g.add((BFO_OCCURRENT, RDF.type, OWL.Class))
+    g.add((BFO_OCCURRENT, RDFS.label, Literal("occurrent", lang="en")))
+    g.add((BFO_OCCURRENT, RDFS.label, Literal("Okkurrent", lang="de")))
+    g.add((BFO_OCCURRENT, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_OCCURRENT, SKOS.definition, Literal(
+        "entity that unfolds itself in time or it is the instantaneous boundary of such an entity",
+        lang="en",
+    )))
+    g.add((BFO_OCCURRENT, SKOS.definition, Literal(
+        "Entität, die sich in der Zeit entfaltet oder die momentane Grenze einer solchen Entität ist",
         lang="de",
     )))
     # RO:has_output

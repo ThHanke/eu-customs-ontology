@@ -21,11 +21,11 @@ class TestBuildStaticContext:
         g.parse(data=ttl, format="turtle")
         assert len(g) > 0
 
-    def test_happy_path_chapter22_under_500_triples(self):
+    def test_happy_path_chapter22_under_600_triples(self):
         ttl = build_static_context(22)
         g = Graph()
         g.parse(data=ttl, format="turtle")
-        assert len(g) <= 500
+        assert len(g) <= 600
 
     def test_chapter_with_no_specific_props_still_valid(self):
         """A chapter that has no chapter-specific props must still return valid Turtle."""
@@ -41,6 +41,22 @@ class TestBuildStaticContext:
     def test_turtle_contains_bfo_classes(self):
         ttl = build_static_context(22)
         assert "BFO_0000030" in ttl or "bfo" in ttl.lower()
+
+    def test_turtle_contains_bfo_subclass_triples(self):
+        """BFO stubs must include rdfs:subClassOf for hierarchy (spec requirement)."""
+        ttl = build_static_context(22)
+        g = Graph()
+        g.parse(data=ttl, format="turtle")
+        from rdflib.namespace import RDFS
+        from src.ontology.namespaces import BFO
+        bfo_object = BFO["BFO_0000030"]
+        bfo_process = BFO["BFO_0000015"]
+        bfo_ind_cont = BFO["BFO_0000040"]
+        bfo_occurrent = BFO["BFO_0000003"]
+        assert (bfo_object, RDFS.subClassOf, bfo_ind_cont) in g, \
+            "BFO_0000030 must have rdfs:subClassOf BFO_0000040 (independent continuant)"
+        assert (bfo_process, RDFS.subClassOf, bfo_occurrent) in g, \
+            "BFO_0000015 must have rdfs:subClassOf BFO_0000003 (occurrent)"
 
 
 # ── compute_tbox_hash ─────────────────────────────────────────────────────────
