@@ -1,0 +1,314 @@
+# ==============================================================================
+# WORKFLOW: Generate & Deploy Versioned Documentation
+# ==============================================================================
+# Purpose: Build Widoco HTML documentation from a chapter TTL and deploy it
+#          to the gh-pages branch with full version history preserved.
+#
+# ┌─────────────────────────────────────────────────────────────────────┐
+# │  Resulting GitHub Pages structure                                   │
+# │  ─────────────────────────────────────────────────────────────────  │
+# │  /                  root index — lists all releases                 │
+# │  /dev/doc/          latest build from most recent release           │
+# │  /ontology-YYYY-MM-DD-rN/doc/   specific release (preserved)       │
+# └─────────────────────────────────────────────────────────────────────┘
+#
+# Triggers:
+#   - repository_dispatch "trigger-docs" from build-release.yml (after release)
+#     Payload: {"version": "ontology-2026-06-08-r1", "chapter": "22"}
+#   - workflow_dispatch: manually specify version + chapter
+#
+# One-time repository setup required:
+#   Settings → Pages → Build and deployment → Source
+#   Change from "GitHub Actions" → "Deploy from a branch"
+#   Branch: gh-pages / (root)
+#
+# Customisation:
+#   - Widoco language: edit -lang en-de (supports: en, de, es, fr, it, ...)
+#   - Widoco version:  update the JAR download URL
+#   - Memory:          set JAVA_OPTS=-Xmx4G if Widoco runs out of memory
+# ==============================================================================
+
+name: Generate Versioned Documentation
+
+on:
+  repository_dispatch:
+    types: [trigger-docs]
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >
+          Release tag to document (e.g. ontology-2026-06-08-r1).
+          Leave empty to rebuild /dev/ from the latest committed TTL.
+        required: false
+        type: string
+        default: ''
+      chapter:
+        description: 'Chapter to document'
+        required: true
+        type: string
+        default: '22'
+
+permissions:
+  contents: write
+
+# Serialize deployments — concurrent gh-pages pushes corrupt the branch.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+
+  # ============================================================================
+  # JOB 1: check
+  # ============================================================================
+  # Resolve the version string and chapter number for this build.
+  # Priority: repository_dispatch payload → workflow_dispatch input → "latest"
+  # ============================================================================
+  check:
+    name: Pre-flight check
+    runs-on: ubuntu-latest
+
+    outputs:
+      version:    ${{ steps.resolve.outputs.version }}
+      chapter:    ${{ steps.resolve.outputs.chapter }}
+      is-release: ${{ steps.resolve.outputs.is-release }}
+
+    steps:
+      - name: Resolve version and chapter
+        id: resolve
+        run: |
+          PAYLOAD_VERSION="${{ github.event.client_payload.version }}"
+          PAYLOAD_CHAPTER="${{ github.event.client_payload.chapter }}"
+          INPUT_VERSION="${{ inputs.version }}"
+          INPUT_CHAPTER="${{ inputs.chapter || '22' }}"
+
+          VERSION="${PAYLOAD_VERSION:-${INPUT_VERSION:-latest}}"
+          CHAPTER="${PAYLOAD_CHAPTER:-$INPUT_CHAPTER}"
+
+          echo "version=$VERSION"  >> "$GITHUB_OUTPUT"
+          echo "chapter=$CHAPTER"  >> "$GITHUB_OUTPUT"
+
+          if [ "$VERSION" = "latest" ]; then
+            echo "is-release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-release=true"  >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "Building docs for version=$VERSION chapter=$CHAPTER"
+
+  # ============================================================================
+  # JOB 2: build-and-deploy
+  # ============================================================================
+  # Fetches the TTL, runs Widoco, assembles the Pages site, and deploys.
+  # peaceiris/actions-gh-pages with keep_files: true accumulates version
+  # directories without overwriting older ones.
+  # ============================================================================
+  build-and-deploy:
+    name: Build & deploy docs
+    needs: check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── Fetch existing gh-pages so we can rebuild the version index ────────
+      - name: Fetch existing gh-pages content
+        run: |
+          git fetch origin gh-pages:gh-pages 2>/dev/null || true
+          if git show-ref --verify --quiet refs/heads/gh-pages; then
+            git worktree add ./gh-pages-existing gh-pages
+          else
+            mkdir -p ./gh-pages-existing
+            echo "gh-pages branch does not exist yet — first deployment."
+          fi
+
+      # ── Resolve TTL source ─────────────────────────────────────────────────
+      # For release builds: download TTL from the GitHub Release assets.
+      # For dev builds ("latest"): use the TTL committed in the repo.
+      # This avoids needing to re-run the pipeline inside the docs workflow.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Resolve TTL file
+        id: ttl
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          CH="${{ needs.check.outputs.chapter }}"
+
+          if [ "$VERSION" = "latest" ]; then
+            TTL=$(ls -t data/ontology/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
+            if [ -z "$TTL" ]; then
+              echo "::error::No committed TTL found in data/ontology/ for chapter $CH"
+              exit 1
+            fi
+          else
+            mkdir -p /tmp/release-ttl
+            gh release download "$VERSION" \
+              --pattern "eucn-ch${CH}-*.ttl" \
+              --dir /tmp/release-ttl/
+            TTL=$(ls -t /tmp/release-ttl/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
+            if [ -z "$TTL" ]; then
+              echo "::error::No TTL found in release $VERSION for chapter $CH"
+              exit 1
+            fi
+          fi
+
+          echo "ttl=$TTL" >> "$GITHUB_OUTPUT"
+          echo "Using: $TTL"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Download Widoco ────────────────────────────────────────────────────
+      # Pinned to v1.4.25 with JDK-11 build.
+      # To upgrade: update the URL and filename below.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Download Widoco
+        run: |
+          wget -q -O widoco.jar \
+            https://github.com/dgarijo/Widoco/releases/download/v1.4.25/widoco-1.4.25-jar-with-dependencies_JDK-11.jar
+
+      # ── Build Widoco HTML documentation ───────────────────────────────────
+      # Flags:
+      #   -lang en-de               English + German (change as needed)
+      #   -uniteSections            All sections in one page per language
+      #   -includeAnnotationProperties  Document OWL annotation properties
+      #   -getOntologyMetadata      Read title/creator/version from the TTL
+      #   -noPlaceHolderText        Remove Widoco template placeholder text
+      #   -rewriteAll               Always regenerate (don't skip existing)
+      #   -webVowl                  Include interactive WebVOWL diagram
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Build Widoco docs
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          TTL="${{ steps.ttl.outputs.ttl }}"
+          mkdir -p "./_site/${VERSION}/doc"
+
+          java -jar widoco.jar \
+            -ontFile "$TTL" \
+            -outFolder "./_site/${VERSION}/doc" \
+            -uniteSections \
+            -includeAnnotationProperties \
+            -lang en-de \
+            -getOntologyMetadata \
+            -noPlaceHolderText \
+            -rewriteAll \
+            -webVowl
+
+          # Widoco emits index-en.html when multiple languages are requested.
+          cp "./_site/${VERSION}/doc/index-en.html" "./_site/${VERSION}/doc/index.html" 2>/dev/null || true
+
+      # ── Mirror under /dev/ ─────────────────────────────────────────────────
+      # /dev/ always reflects the latest build so the current state of the
+      # ontology is browsable without knowing the exact release tag.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Update /dev/
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          rm -rf ./_site/dev
+          cp -r "./_site/${VERSION}" ./_site/dev
+
+      # ── Regenerate root index.html (releases only) ─────────────────────────
+      # Dev builds only update /dev/ — no index update, no versioned dir kept.
+      # Release builds add the new version and regenerate the listing page.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Build root index.html
+        if: needs.check.outputs.is-release == 'true'
+        env:
+          CURRENT_VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, re
+
+          current = os.environ["CURRENT_VERSION"]
+
+          # Collect already-published version directories from existing gh-pages.
+          existing = set()
+          for d in os.listdir("./gh-pages-existing"):
+              if os.path.isdir(f"./gh-pages-existing/{d}") and d not in ("dev", ".git"):
+                  existing.add(d)
+          existing.add(current)
+
+          def sort_key(v):
+              # ontology-YYYY-MM-DD-rN: sort newest first
+              m = re.match(r'^ontology-(\d{4}-\d{2}-\d{2})-r(\d+)$', v)
+              if m:
+                  return (0, m.group(1), -int(m.group(2)))
+              # Semver fallback
+              m = re.match(r'^(\d+)\.(\d+)\.(\d+)$', v)
+              return (1, -int(m.group(1)), -int(m.group(2)), -int(m.group(3))) if m else (2, v)
+
+          versions = sorted(existing, key=sort_key)
+
+          rows = ""
+          for v in versions:
+              tag = "&nbsp;&larr;&nbsp;latest" if v == current else ""
+              rows += f"""
+                <tr>
+                  <td><strong>{v}</strong>{tag}</td>
+                  <td><a href="{v}/doc/">HTML docs</a></td>
+                </tr>"""
+
+          html = f"""<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>EU Customs Ontology — Documentation</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+              body {{ font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }}
+              h1 {{ border-bottom: 2px solid #333; padding-bottom: .5rem; }}
+              table {{ border-collapse: collapse; width: 100%; margin-top: 1rem; }}
+              th, td {{ border: 1px solid #ddd; padding: .6rem 1rem; text-align: left; }}
+              th {{ background: #f5f5f5; }}
+              a {{ color: #0066cc; }}
+            </style>
+          </head>
+          <body>
+            <h1>EU Customs Ontology — Documentation</h1>
+            <p>
+              Development build: <a href="dev/doc/">dev/doc/</a>
+              &mdash; updated on every release.
+            </p>
+            <h2>Releases</h2>
+            <table>
+              <thead><tr><th>Version</th><th>Documentation</th></tr></thead>
+              <tbody>{rows}</tbody>
+            </table>
+          </body>
+          </html>
+          """
+
+          os.makedirs("./_site", exist_ok=True)
+          with open("./_site/index.html", "w") as f:
+              f.write(html)
+          print("root index.html written with", len(versions), "version(s).")
+          PYEOF
+
+      # ── Drop dev-build directory before deploy ─────────────────────────────
+      # For dev builds the version directory is e.g. _site/latest/ — not wanted
+      # as a permanent page. /dev/ already has the content.
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Drop build dir for dev deploys
+        if: needs.check.outputs.is-release == 'false'
+        run: rm -rf ./_site/latest
+
+      # ── Deploy to gh-pages branch ──────────────────────────────────────────
+      # keep_files: true → existing version directories are NOT deleted.
+      # Only new/updated files are written. This preserves old release docs.
+      #
+      # To manually delete a version from Pages:
+      #   git clone <repo> --branch gh-pages
+      #   rm -rf <version>/
+      #   git commit -am "Remove <version>" && git push
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          keep_files: true
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "docs: publish ${{ needs.check.outputs.version }}"

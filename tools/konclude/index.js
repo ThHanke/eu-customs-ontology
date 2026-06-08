@@ -1,0 +1,1781 @@
+/**
+ * Main thread TypeScript wrapper for the Konclude OWL-DL reasoner.
+ *
+ * `RdfReasoner` is the public API. It spawns a Web Worker running the WASM
+ * reasoning kernel and exposes:
+ *   - `ready` — resolves when the Worker has finished loading the WASM module
+ *   - `reason(quads, opts?)` — runs OWL-DL inference over the input quads
+ *   - `classify(quads)` — alias for reason(quads, {mode:'classify'})
+ *   - `checkConsistency(quads)` — checks whether the ontology is consistent
+ *   - `terminate()` — terminates the underlying Worker
+ *
+ * Named graphs in the input quads are silently dropped (NTriples is
+ * triple-only). All returned quads are placed in the DefaultGraph.
+ */
+import { Store, DataFactory } from "n3";
+import { encodeToBuffers, decodeBuffers, computeStoreFingerprint } from "./intern.js";
+export { INFERRED_GRAPH_IRI, HYPOTHETICAL_IRI } from "./types.js";
+import { INFERRED_GRAPH_IRI, HYPOTHETICAL_IRI } from "./types.js";
+// ---------------------------------------------------------------------------
+// OWL/RDF predicate IRIs used by explain
+// ---------------------------------------------------------------------------
+const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+const RDFS_SUB_CLASS_OF = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
+const OWL_DISJOINT_UNION_OF = "http://www.w3.org/2002/07/owl#disjointUnionOf";
+const RDF_FIRST = "http://www.w3.org/1999/02/22-rdf-syntax-ns#first";
+const RDF_REST = "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest";
+const RDF_NIL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil";
+const RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
+const OWL_EQUIVALENT_CLASS = "http://www.w3.org/2002/07/owl#equivalentClass";
+const OWL_EQUIVALENT_PROPERTY = "http://www.w3.org/2002/07/owl#equivalentProperty";
+const OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
+const OWL_OBJECT_PROPERTY = "http://www.w3.org/2002/07/owl#ObjectProperty";
+const OWL_DATATYPE_PROPERTY = "http://www.w3.org/2002/07/owl#DatatypeProperty";
+const OWL_ANNOTATION_PROPERTY = "http://www.w3.org/2002/07/owl#AnnotationProperty";
+const OWL_ONTOLOGY = "http://www.w3.org/2002/07/owl#Ontology";
+const RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
+const OWL_THING = "http://www.w3.org/2002/07/owl#Thing";
+const OWL_NOTHING = "http://www.w3.org/2002/07/owl#Nothing";
+const OWL_DIFFERENT_FROM = "http://www.w3.org/2002/07/owl#differentFrom";
+const OWL_COMPLEMENT_OF = "http://www.w3.org/2002/07/owl#complementOf";
+const OWL_ON_PROPERTY = "http://www.w3.org/2002/07/owl#onProperty";
+const OWL_SOME_VALUES_FROM = "http://www.w3.org/2002/07/owl#someValuesFrom";
+const OWL_RESTRICTION = "http://www.w3.org/2002/07/owl#Restriction";
+const OWL_FUNCTIONAL_PROPERTY = "http://www.w3.org/2002/07/owl#FunctionalProperty";
+const OWL_INVERSE_FUNCTIONAL_PROPERTY = "http://www.w3.org/2002/07/owl#InverseFunctionalProperty";
+const OWL_SAME_AS = "http://www.w3.org/2002/07/owl#sameAs";
+// ---------------------------------------------------------------------------
+// Helper: walk an RDF list (rdf:first / rdf:rest) and return member IRIs
+// ---------------------------------------------------------------------------
+function expandRdfList(head, quadsArr) {
+    const members = [];
+    const seen = new Set();
+    let current = head;
+    while (current && current !== RDF_NIL) {
+        if (seen.has(current))
+            break; // cycle guard
+        seen.add(current);
+        const firstTriple = quadsArr.find(q => q.subject.value === current && q.predicate.value === RDF_FIRST);
+        if (!firstTriple || firstTriple.object.termType !== "NamedNode")
+            break;
+        members.push(firstTriple.object.value);
+        const restTriple = quadsArr.find(q => q.subject.value === current && q.predicate.value === RDF_REST);
+        if (!restTriple)
+            break;
+        current = restTriple.object.value;
+    }
+    return members;
+}
+function buildSomeValuesFromIndex(quadsArr) {
+    // Step 1: collect all blank nodes that are owl:Restriction with someValuesFrom
+    // bnodeId → { property, fillerClass }
+    const restrictionMap = new Map();
+    // Collect rdf:type owl:Restriction assertions
+    const restrictionBNodes = new Set();
+    for (const q of quadsArr) {
+        if (q.predicate.value === RDF_TYPE &&
+            q.object.value === OWL_RESTRICTION &&
+            q.subject.termType === "BlankNode") {
+            restrictionBNodes.add(q.subject.value);
+        }
+    }
+    // For each restriction blank node, collect onProperty + someValuesFrom
+    const onPropertyMap = new Map();
+    const someValuesFromMap = new Map();
+    for (const q of quadsArr) {
+        if (q.subject.termType !== "BlankNode")
+            continue;
+        if (!restrictionBNodes.has(q.subject.value))
+            continue;
+        if (q.predicate.value === OWL_ON_PROPERTY && q.object.termType === "NamedNode") {
+            onPropertyMap.set(q.subject.value, q.object.value);
+        }
+        if (q.predicate.value === OWL_SOME_VALUES_FROM && q.object.termType === "NamedNode") {
+            someValuesFromMap.set(q.subject.value, q.object.value);
+        }
+    }
+    for (const bnodeId of restrictionBNodes) {
+        const prop = onPropertyMap.get(bnodeId);
+        const filler = someValuesFromMap.get(bnodeId);
+        if (prop !== undefined && filler !== undefined) {
+            restrictionMap.set(bnodeId, { property: prop, fillerClass: filler });
+        }
+    }
+    // Step 2: link named classes to restrictions via equivalentClass or subClassOf
+    const index = new Map();
+    const linkClassToRestriction = (classIRI, bnodeId) => {
+        const entry = restrictionMap.get(bnodeId);
+        if (entry === undefined)
+            return;
+        const arr = index.get(classIRI);
+        if (arr === undefined) {
+            index.set(classIRI, [entry]);
+        }
+        else {
+            // Avoid duplicates
+            if (!arr.some(e => e.property === entry.property && e.fillerClass === entry.fillerClass)) {
+                arr.push(entry);
+            }
+        }
+    };
+    for (const q of quadsArr) {
+        if ((q.predicate.value === OWL_EQUIVALENT_CLASS || q.predicate.value === RDFS_SUB_CLASS_OF)) {
+            if (q.subject.termType === "NamedNode" && q.object.termType === "BlankNode") {
+                linkClassToRestriction(q.subject.value, q.object.value);
+            }
+            // symmetric direction for equivalentClass: _:r owl:equivalentClass C
+            if (q.predicate.value === OWL_EQUIVALENT_CLASS &&
+                q.subject.termType === "BlankNode" &&
+                q.object.termType === "NamedNode") {
+                linkClassToRestriction(q.object.value, q.subject.value);
+            }
+        }
+    }
+    return index;
+}
+// ---------------------------------------------------------------------------
+// Helper: propagate someValuesFrom filler types to fixpoint
+//
+// Given:
+//   - someValuesFromIndex: class IRI → [{property, fillerClass}]
+//   - inputQuadsArr: the base (ABox + TBox) quads
+//   - resultQuads: the current inferred quads (modified in-place)
+//   - existingKeys: Set of "s\0p\0o" keys already in resultQuads (updated in-place)
+//   - defaultGraph: the graph to use for new quads
+// ---------------------------------------------------------------------------
+function propagateSomeValuesFromFillers(someValuesFromIndex, inputQuadsArr, resultQuads, existingKeys, defaultGraph) {
+    if (someValuesFromIndex.size === 0)
+        return;
+    // Build a quick lookup for role assertions from input quads: "subject\0property" → [object IRIs]
+    const roleIndex = new Map();
+    for (const q of inputQuadsArr) {
+        if (q.subject.termType !== "NamedNode" || q.predicate.termType !== "NamedNode" || q.object.termType !== "NamedNode")
+            continue;
+        const key = `${q.subject.value}\0${q.predicate.value}`;
+        const arr = roleIndex.get(key);
+        if (arr === undefined) {
+            roleIndex.set(key, [q.object.value]);
+        }
+        else {
+            arr.push(q.object.value);
+        }
+    }
+    const rdfTypeNode = DataFactory.namedNode(RDF_TYPE);
+    // Fixpoint loop: keep propagating until no new quads are added
+    let changed = true;
+    while (changed) {
+        changed = false;
+        // Collect all current type assertions (from resultQuads snapshot + inputQuadsArr)
+        // We need to scan both since newly inferred types may trigger further propagation.
+        const typeAssertions = [];
+        for (const q of inputQuadsArr) {
+            if (q.predicate.value === RDF_TYPE && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                typeAssertions.push({ subject: q.subject.value, type: q.object.value });
+            }
+        }
+        for (const q of resultQuads) {
+            if (q.predicate.value === RDF_TYPE && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                typeAssertions.push({ subject: q.subject.value, type: q.object.value });
+            }
+        }
+        for (const { subject: indivIRI, type: classIRI } of typeAssertions) {
+            const entries = someValuesFromIndex.get(classIRI);
+            if (!entries)
+                continue;
+            for (const { property, fillerClass } of entries) {
+                const roleKey = `${indivIRI}\0${property}`;
+                const fillers = roleIndex.get(roleKey);
+                if (!fillers)
+                    continue;
+                for (const fillerIRI of fillers) {
+                    const newKey = `${fillerIRI}\0${RDF_TYPE}\0${fillerClass}`;
+                    if (!existingKeys.has(newKey)) {
+                        existingKeys.add(newKey);
+                        resultQuads.push(DataFactory.quad(DataFactory.namedNode(fillerIRI), rdfTypeNode, DataFactory.namedNode(fillerClass), defaultGraph));
+                        changed = true;
+                    }
+                }
+            }
+        }
+    }
+}
+// ---------------------------------------------------------------------------
+// RdfReasoner
+// ---------------------------------------------------------------------------
+export class RdfReasoner {
+    /** Resolves when the Worker WASM module is ready; rejects on init failure. */
+    ready;
+    worker;
+    nextId = 0;
+    pending = new Map();
+    /**
+     * Serialization queue: each reason() / checkConsistency() call chains onto
+     * this promise so that concurrent calls never interleave their
+     * loadTripleBuffer → realization → getInferredTripleBuffer sequences.
+     */
+    _queue = Promise.resolve();
+    // Per-operation fingerprint caches. Each slot stores the last input hash and
+    // result so that identical consecutive calls skip the Worker round-trip.
+    _classifyCache = null;
+    _materializeCache = null;
+    _classifyPropertiesCache = null;
+    _consistencyCache = null;
+    constructor() {
+        this.worker = new Worker(new URL("./worker.js", import.meta.url), {
+            type: "module",
+        });
+        // Store the readyReject handle so the onerror handler can use it if the
+        // Worker crashes before posting {type:'ready'}.
+        let readyReject;
+        let readySettled = false;
+        this.ready = new Promise((resolve, reject) => {
+            readyReject = reject;
+            const onInit = (event) => {
+                const msg = event.data;
+                if ("type" in msg) {
+                    if (msg.type === "ready") {
+                        this.worker.removeEventListener("message", onInit);
+                        readySettled = true;
+                        resolve();
+                    }
+                    else if (msg.type === "error") {
+                        this.worker.removeEventListener("message", onInit);
+                        readySettled = true;
+                        reject(new Error(msg.error));
+                    }
+                }
+            };
+            this.worker.addEventListener("message", onInit);
+        });
+        // Route all subsequent (non-init) messages to the pending-call map.
+        this.worker.addEventListener("message", (event) => {
+            const msg = event.data;
+            // Skip init-lifecycle messages (handled by the one-shot listener above).
+            if ("type" in msg)
+                return;
+            const response = msg;
+            const entry = this.pending.get(response.id);
+            if (!entry)
+                return;
+            this.pending.delete(response.id);
+            if (response.error !== undefined) {
+                entry.reject(new Error(response.error));
+            }
+            else {
+                entry.resolve(response.result);
+            }
+        });
+        // Handle Worker crashes: reject ready (if still pending) and drain all
+        // pending calls so their callers get a meaningful rejection instead of
+        // hanging forever.
+        this.worker.addEventListener("error", (event) => {
+            const err = new Error(event.message ?? "Worker error");
+            if (!readySettled) {
+                readySettled = true;
+                readyReject(err);
+            }
+            for (const entry of this.pending.values()) {
+                entry.reject(err);
+            }
+            this.pending.clear();
+        });
+    }
+    /**
+     * Send a method call to the Worker and return a Promise for the result.
+     * Pass `transfer` to transfer ownership of ArrayBuffers (zero-copy).
+     */
+    _call(method, args, transfer) {
+        return new Promise((resolve, reject) => {
+            const id = this.nextId++;
+            this.pending.set(id, { resolve, reject });
+            const request = { id, method, args };
+            if (transfer && transfer.length > 0) {
+                this.worker.postMessage(request, transfer);
+            }
+            else {
+                this.worker.postMessage(request);
+            }
+        });
+    }
+    reason(input, opts) {
+        if (input instanceof Store) {
+            return this._reasonOnStore(input, opts);
+        }
+        return this._reasonOnQuads(input, opts);
+    }
+    _reasonOnStore(store, opts) {
+        // Known limitation: fingerprint always covers all graphs, including any
+        // custom inferredGraph. If the caller uses a non-default inferredGraph,
+        // the cache may incorrectly report a hit when the inferred graph has
+        // changed between calls. Acceptable for the current use-cases.
+        const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+        const result = this._queue.then(async () => {
+            // Cache hit: same store content as last classify call
+            if (this._classifyCache !== null && this._classifyCache.hash === fingerprint) {
+                return;
+            }
+            const inferredGraphNode = DataFactory.namedNode(opts?.inferredGraph ?? INFERRED_GRAPH_IRI);
+            store.removeQuads(store.getQuads(null, null, null, inferredGraphNode));
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(store.getQuads(null, null, null, null));
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            // Always uses classification (TBox-only); opts.mode is reserved for future use.
+            await this._call("classification", []);
+            const resultBuf = (await this._call("getInferredTripleBuffer", []));
+            const inferredQuads = decodeBuffers(resultBuf);
+            for (const q of inferredQuads) {
+                store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, inferredGraphNode));
+            }
+            // OWL 2 DL: C owl:disjointUnionOf (A B ...) ⇒ A rdfs:subClassOf C, B rdfs:subClassOf C, ...
+            // The WASM kernel does not emit these edges; synthesize them from base quads.
+            const subClassNode = DataFactory.namedNode(RDFS_SUB_CLASS_OF);
+            const allBaseQuads = store.getQuads(null, null, null, null);
+            for (const q of store.getQuads(null, DataFactory.namedNode(OWL_DISJOINT_UNION_OF), null, null)) {
+                if (q.graph.value === inferredGraphNode.value)
+                    continue;
+                if (q.subject.termType !== "NamedNode" || q.object.termType !== "BlankNode")
+                    continue;
+                const unionClassIRI = q.subject.value;
+                const members = expandRdfList(q.object.value, allBaseQuads);
+                for (const memberIRI of members) {
+                    if (store.countQuads(DataFactory.namedNode(memberIRI), subClassNode, DataFactory.namedNode(unionClassIRI), inferredGraphNode) === 0) {
+                        store.addQuad(DataFactory.quad(DataFactory.namedNode(memberIRI), subClassNode, DataFactory.namedNode(unionClassIRI), inferredGraphNode));
+                    }
+                }
+            }
+            this._classifyCache = { hash: fingerprint, result: undefined };
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    _reasonOnQuads(quads, opts) {
+        const result = this._queue.then(async () => {
+            const mode = opts?.mode ?? "classify";
+            // Materialize iterable so we can both encode it and post-process it.
+            const inputQuads = Array.isArray(quads) ? quads : [...quads];
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(inputQuads);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            if (mode === "consistency") {
+                // Consistency mode: no inferred quads are returned via reason().
+                // Callers wanting a boolean should use checkConsistency().
+                await this._call("realization", []);
+                return [];
+            }
+            // "classify" (default) → TBox-only classification; "full" → full TBox+ABox realization.
+            await this._call(mode === "full" ? "realization" : "classification", []);
+            const resultBuf = (await this._call("getInferredTripleBuffer", []));
+            const resultQuads = decodeBuffers(resultBuf);
+            // OWL 2 DL: C owl:disjointUnionOf (A B ...) ⇒ A rdfs:subClassOf C, B rdfs:subClassOf C, ...
+            // The WASM kernel does not emit these edges; synthesize them from input quads.
+            if (mode !== "full") {
+                const existingKeys = new Set(resultQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                const defaultGraph = DataFactory.defaultGraph();
+                const subClassNode = DataFactory.namedNode(RDFS_SUB_CLASS_OF);
+                for (const q of inputQuads) {
+                    if (q.predicate.value !== OWL_DISJOINT_UNION_OF)
+                        continue;
+                    if (q.subject.termType !== "NamedNode" || q.object.termType !== "BlankNode")
+                        continue;
+                    const unionClassIRI = q.subject.value;
+                    const members = expandRdfList(q.object.value, inputQuads);
+                    for (const memberIRI of members) {
+                        const key = `${memberIRI}\0${RDFS_SUB_CLASS_OF}\0${unionClassIRI}`;
+                        if (!existingKeys.has(key)) {
+                            existingKeys.add(key);
+                            resultQuads.push(DataFactory.quad(DataFactory.namedNode(memberIRI), subClassNode, DataFactory.namedNode(unionClassIRI), defaultGraph));
+                        }
+                    }
+                }
+            }
+            return resultQuads;
+        });
+        // Swallow errors so a failed call doesn't stall the queue for subsequent
+        // callers; each caller still receives the rejection on their own promise.
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    classify(input, opts) {
+        if (input instanceof Store) {
+            return this.reason(input, opts);
+        }
+        return this.reason(input, { mode: "classify" });
+    }
+    checkConsistency(input) {
+        const isStore = input instanceof Store;
+        // Compute fingerprint before entering the queue (snapshot of current store state)
+        const fingerprint = isStore
+            ? computeStoreFingerprint(input.getQuads(null, null, null, null))
+            : null;
+        const quads = isStore
+            ? input.getQuads(null, null, null, null)
+            : input;
+        // Pre-check: materialise quads once so we can scan and encode from the same array.
+        const quadsArray = Array.isArray(quads) ? quads : Array.from(quads);
+        const result = this._queue.then(async () => {
+            // Cache hit: only available for Store-based calls
+            if (fingerprint !== null && this._consistencyCache !== null && this._consistencyCache.hash === fingerprint) {
+                return this._consistencyCache.result;
+            }
+            // Trivial inconsistency: `x owl:differentFrom x` is always a clash (x ≠ x).
+            // Konclude v0.7.0 does not detect this, so we short-circuit here.
+            for (const q of quadsArray) {
+                if (q.predicate.termType === "NamedNode" &&
+                    q.predicate.value === OWL_DIFFERENT_FROM &&
+                    q.subject.termType === q.object.termType &&
+                    q.subject.value === q.object.value) {
+                    if (fingerprint !== null) {
+                        this._consistencyCache = { hash: fingerprint, result: false };
+                    }
+                    return false;
+                }
+            }
+            // complementOf ABox clash: if individual typed as both A and B where
+            // `A owl:complementOf B`, the ontology is trivially inconsistent.
+            // Konclude v0.7.0 does not detect the named-class path; we short-circuit here.
+            // Only named-class pairs (both subject and object are NamedNodes) are handled;
+            // anonymous complements (restrictions as object) are left to the WASM kernel.
+            {
+                const complementPairs = [];
+                for (const q of quadsArray) {
+                    if (q.predicate.termType === "NamedNode" &&
+                        q.predicate.value === OWL_COMPLEMENT_OF &&
+                        q.subject.termType === "NamedNode" &&
+                        q.object.termType === "NamedNode") {
+                        complementPairs.push([q.subject.value, q.object.value]);
+                    }
+                }
+                if (complementPairs.length > 0) {
+                    // Build a map: individual IRI → set of named-class IRIs it is typed as
+                    const typeMap = new Map();
+                    for (const q of quadsArray) {
+                        if (q.predicate.termType === "NamedNode" &&
+                            q.predicate.value === RDF_TYPE &&
+                            q.subject.termType === "NamedNode" &&
+                            q.object.termType === "NamedNode") {
+                            let types = typeMap.get(q.subject.value);
+                            if (types === undefined) {
+                                types = new Set();
+                                typeMap.set(q.subject.value, types);
+                            }
+                            types.add(q.object.value);
+                        }
+                    }
+                    for (const [classA, classB] of complementPairs) {
+                        for (const types of typeMap.values()) {
+                            if (types.has(classA) && types.has(classB)) {
+                                if (fingerprint !== null) {
+                                    this._consistencyCache = { hash: fingerprint, result: false };
+                                }
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(quadsArray);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("classification", []);
+            const consistent = (await this._call("consistency", []));
+            if (fingerprint !== null) {
+                this._consistencyCache = { hash: fingerprint, result: consistent };
+            }
+            return consistent;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    materialize(input, opts) {
+        if (input instanceof Store) {
+            return this._materializeOnStore(input, opts);
+        }
+        return this._materializeOnQuads(input, opts);
+    }
+    _materializeOnStore(store, opts) {
+        // Known limitation: fingerprint always covers all graphs, including any
+        // custom inferredGraph. If the caller uses a non-default inferredGraph,
+        // the cache may incorrectly report a hit when the inferred graph has
+        // changed between calls. Acceptable for the current use-cases.
+        const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+        const returnDelta = opts?.returnDelta === true;
+        const result = this._queue.then(async () => {
+            const inferredGraphNode = DataFactory.namedNode(opts?.inferredGraph ?? INFERRED_GRAPH_IRI);
+            // Cache hit: same store content as last materialize call
+            if (this._materializeCache !== null && this._materializeCache.hash === fingerprint) {
+                if (returnDelta) {
+                    return { delta: { added: [], removed: [] } };
+                }
+                return;
+            }
+            // Capture "before" snapshot of current inferred quads for delta computation.
+            // Must happen BEFORE removeQuads.
+            const beforeSet = new Map();
+            if (returnDelta) {
+                for (const q of store.getQuads(null, null, null, inferredGraphNode)) {
+                    const key = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                    beforeSet.set(key, q);
+                }
+            }
+            store.removeQuads(store.getQuads(null, null, null, inferredGraphNode));
+            // Capture base quads BEFORE writing inferred quads so the someValuesFrom scan
+            // only sees the original store contents (base ABox assertions).
+            const baseQuads = store.getQuads(null, null, null, null);
+            // FP/IFP workaround: compute JS sameAs pairs + strip FP/IFP declarations
+            // before sending to WASM to prevent the ALIF+ precompute hang.
+            const storeFpSameAsQuads = [];
+            const sameAsNode = DataFactory.namedNode(OWL_SAME_AS);
+            const storeFpProps = new Set(baseQuads
+                .filter(q => q.predicate.value === RDF_TYPE && q.object.value === OWL_FUNCTIONAL_PROPERTY)
+                .map(q => q.subject.value));
+            const storeFpPropsToStrip = new Set();
+            if (storeFpProps.size > 0) {
+                for (const prop of storeFpProps) {
+                    const bySubject = new Map();
+                    for (const q of baseQuads) {
+                        if (q.predicate.value === prop && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                            const arr = bySubject.get(q.subject.value);
+                            if (arr === undefined)
+                                bySubject.set(q.subject.value, [q.object]);
+                            else
+                                arr.push(q.object);
+                        }
+                    }
+                    const hasMultiFiller = [...bySubject.values()].some(arr => arr.length >= 2);
+                    if (hasMultiFiller)
+                        storeFpPropsToStrip.add(prop);
+                    for (const objects of bySubject.values()) {
+                        if (objects.length >= 2) {
+                            for (let i = 0; i < objects.length; i++) {
+                                for (let j = i + 1; j < objects.length; j++) {
+                                    storeFpSameAsQuads.push(DataFactory.quad(objects[i], sameAsNode, objects[j], inferredGraphNode));
+                                    storeFpSameAsQuads.push(DataFactory.quad(objects[j], sameAsNode, objects[i], inferredGraphNode));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const storeIfpProps = new Set(baseQuads
+                .filter(q => q.predicate.value === RDF_TYPE && q.object.value === OWL_INVERSE_FUNCTIONAL_PROPERTY)
+                .map(q => q.subject.value));
+            const storeIfpPropsToStrip = new Set();
+            if (storeIfpProps.size > 0) {
+                for (const prop of storeIfpProps) {
+                    const byObject = new Map();
+                    for (const q of baseQuads) {
+                        if (q.predicate.value === prop && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                            const arr = byObject.get(q.object.value);
+                            if (arr === undefined)
+                                byObject.set(q.object.value, [q.subject]);
+                            else
+                                arr.push(q.subject);
+                        }
+                    }
+                    const hasMultiFiller = [...byObject.values()].some(arr => arr.length >= 2);
+                    if (hasMultiFiller)
+                        storeIfpPropsToStrip.add(prop);
+                    for (const subjects of byObject.values()) {
+                        if (subjects.length >= 2) {
+                            for (let i = 0; i < subjects.length; i++) {
+                                for (let j = i + 1; j < subjects.length; j++) {
+                                    storeFpSameAsQuads.push(DataFactory.quad(subjects[i], sameAsNode, subjects[j], inferredGraphNode));
+                                    storeFpSameAsQuads.push(DataFactory.quad(subjects[j], sameAsNode, subjects[i], inferredGraphNode));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const storeHasPropsToStrip = storeFpPropsToStrip.size > 0 || storeIfpPropsToStrip.size > 0;
+            const storeWasmQuads = storeHasPropsToStrip
+                ? baseQuads.filter(q => !(q.predicate.value === RDF_TYPE &&
+                    ((q.object.value === OWL_FUNCTIONAL_PROPERTY && storeFpPropsToStrip.has(q.subject.value)) ||
+                        (q.object.value === OWL_INVERSE_FUNCTIONAL_PROPERTY && storeIfpPropsToStrip.has(q.subject.value)))))
+                : baseQuads;
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(storeWasmQuads);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("realization", []);
+            const resultBuf = (await this._call("getInferredTripleBuffer", []));
+            const allQuads = decodeBuffers(resultBuf);
+            // OWL 2 DL: someValuesFrom filler type propagation.
+            // Konclude v0.7.0 does not propagate rdf:type to named individual fillers;
+            // handle it at the JS layer.
+            const someValuesFromIndex = buildSomeValuesFromIndex(baseQuads);
+            if (someValuesFromIndex.size > 0) {
+                const existingKeys = new Set(allQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                propagateSomeValuesFromFillers(someValuesFromIndex, baseQuads, allQuads, existingKeys, inferredGraphNode);
+            }
+            // Merge JS-computed FP/IFP sameAs pairs (deduplicate by SPO key).
+            if (storeFpSameAsQuads.length > 0) {
+                const existingKeys = new Set(allQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                for (const q of storeFpSameAsQuads) {
+                    // storeFpSameAsQuads already carry inferredGraphNode as graph; compare SPO only
+                    const key = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                    if (!existingKeys.has(key)) {
+                        existingKeys.add(key);
+                        // allQuads graph is set to inferredGraphNode in the loop below via addQuad
+                        allQuads.push(DataFactory.quad(q.subject, q.predicate, q.object));
+                    }
+                }
+            }
+            const inferredQuads = opts?.includeClassHierarchy === true
+                ? allQuads
+                : allQuads.filter((q) => q.predicate.value !== "http://www.w3.org/2000/01/rdf-schema#subClassOf" &&
+                    q.predicate.value !== "http://www.w3.org/2002/07/owl#equivalentClass");
+            for (const q of inferredQuads) {
+                store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, inferredGraphNode));
+            }
+            this._materializeCache = { hash: fingerprint, result: undefined };
+            this._classifyCache = null;
+            this._classifyPropertiesCache = null;
+            if (returnDelta) {
+                // Build after set from what was just written.
+                // Wrap each quad with inferredGraphNode so delta.added and delta.removed
+                // are both consistently in the inferred named graph.
+                const afterSet = new Map();
+                for (const q of inferredQuads) {
+                    const key = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                    afterSet.set(key, DataFactory.quad(q.subject, q.predicate, q.object, inferredGraphNode));
+                }
+                const added = [];
+                const removed = [];
+                for (const [key, q] of afterSet) {
+                    if (!beforeSet.has(key))
+                        added.push(q);
+                }
+                for (const [key, q] of beforeSet) {
+                    if (!afterSet.has(key))
+                        removed.push(q);
+                }
+                return { delta: { added, removed } };
+            }
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    _materializeOnQuads(quads, opts) {
+        const result = this._queue.then(async () => {
+            // Materialize iterable so we can both encode it and post-process it.
+            const inputQuads = Array.isArray(quads) ? quads : [...quads];
+            // FP/IFP workaround: JS pre-computation of owl:sameAs entailments.
+            //
+            // Native Konclude v0.7.0 hangs on ALIF+ (FunctionalProperty + ABox individuals
+            // forcing sameAs inference).  We compute the sameAs pairs in JS, strip the
+            // FP/IFP declarations before sending to WASM, and merge the JS-computed sameAs
+            // triples into the final result.
+            //
+            // FunctionalProperty: if ?P is functional and two assertions `s ?P o1` and
+            // `s ?P o2` exist, then `o1 owl:sameAs o2` (and symmetrically).
+            //
+            // InverseFunctionalProperty: if ?P is inverse-functional and two assertions
+            // `s1 ?P o` and `s2 ?P o` exist, then `s1 owl:sameAs s2` (and symmetrically).
+            const fpSameAsQuads = [];
+            const defaultGraph = DataFactory.defaultGraph();
+            const sameAsNode = DataFactory.namedNode(OWL_SAME_AS);
+            const fpProps = new Set(inputQuads
+                .filter(q => q.predicate.value === RDF_TYPE && q.object.value === OWL_FUNCTIONAL_PROPERTY)
+                .map(q => q.subject.value));
+            const fpPropsToStrip = new Set();
+            if (fpProps.size > 0) {
+                for (const prop of fpProps) {
+                    // Group ABox assertions by subject: subject → [object, ...]
+                    const bySubject = new Map();
+                    for (const q of inputQuads) {
+                        if (q.predicate.value === prop && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                            const arr = bySubject.get(q.subject.value);
+                            if (arr === undefined) {
+                                bySubject.set(q.subject.value, [q.object]);
+                            }
+                            else {
+                                arr.push(q.object);
+                            }
+                        }
+                    }
+                    // Determine stripping from the same bySubject data; no second scan needed.
+                    const hasMultiFiller = [...bySubject.values()].some(arr => arr.length >= 2);
+                    if (hasMultiFiller)
+                        fpPropsToStrip.add(prop);
+                    // For each subject with 2+ objects, all objects are owl:sameAs each other
+                    for (const objects of bySubject.values()) {
+                        if (objects.length >= 2) {
+                            for (let i = 0; i < objects.length; i++) {
+                                for (let j = i + 1; j < objects.length; j++) {
+                                    fpSameAsQuads.push(DataFactory.quad(objects[i], sameAsNode, objects[j], defaultGraph));
+                                    fpSameAsQuads.push(DataFactory.quad(objects[j], sameAsNode, objects[i], defaultGraph));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const ifpProps = new Set(inputQuads
+                .filter(q => q.predicate.value === RDF_TYPE && q.object.value === OWL_INVERSE_FUNCTIONAL_PROPERTY)
+                .map(q => q.subject.value));
+            // Strip FP/IFP declarations ONLY for properties that have multi-filler ABox
+            // assertions (i.e., patterns that would trigger the ALIF+ precompute hang in
+            // native Konclude v0.7.0).  Properties with 0 or 1 filler are passed through
+            // intact so WASM can handle them normally (e.g., for inverse-of inference,
+            // domain/range, or FP data-property inconsistency detection).
+            const ifpPropsToStrip = new Set();
+            if (ifpProps.size > 0) {
+                for (const prop of ifpProps) {
+                    // Group ABox assertions by object: object → [subject, ...]
+                    const byObject = new Map();
+                    for (const q of inputQuads) {
+                        if (q.predicate.value === prop && q.subject.termType === "NamedNode" && q.object.termType === "NamedNode") {
+                            const arr = byObject.get(q.object.value);
+                            if (arr === undefined) {
+                                byObject.set(q.object.value, [q.subject]);
+                            }
+                            else {
+                                arr.push(q.subject);
+                            }
+                        }
+                    }
+                    // Determine stripping from the same byObject data; no second scan needed.
+                    const hasMultiFiller = [...byObject.values()].some(arr => arr.length >= 2);
+                    if (hasMultiFiller)
+                        ifpPropsToStrip.add(prop);
+                    // For each object with 2+ subjects, all subjects are owl:sameAs each other
+                    for (const subjects of byObject.values()) {
+                        if (subjects.length >= 2) {
+                            for (let i = 0; i < subjects.length; i++) {
+                                for (let j = i + 1; j < subjects.length; j++) {
+                                    fpSameAsQuads.push(DataFactory.quad(subjects[i], sameAsNode, subjects[j], defaultGraph));
+                                    fpSameAsQuads.push(DataFactory.quad(subjects[j], sameAsNode, subjects[i], defaultGraph));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const hasPropsToStrip = fpPropsToStrip.size > 0 || ifpPropsToStrip.size > 0;
+            const wasmQuads = hasPropsToStrip
+                ? inputQuads.filter(q => !(q.predicate.value === RDF_TYPE &&
+                    ((q.object.value === OWL_FUNCTIONAL_PROPERTY && fpPropsToStrip.has(q.subject.value)) ||
+                        (q.object.value === OWL_INVERSE_FUNCTIONAL_PROPERTY && ifpPropsToStrip.has(q.subject.value)))))
+                : inputQuads;
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(wasmQuads);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("realization", []);
+            const resultBuf = (await this._call("getInferredTripleBuffer", []));
+            const allQuads = decodeBuffers(resultBuf);
+            // OWL 2 DL: someValuesFrom filler type propagation.
+            // Konclude v0.7.0 does not propagate rdf:type to named individual fillers;
+            // handle it at the JS layer.
+            const someValuesFromIndex = buildSomeValuesFromIndex(inputQuads);
+            if (someValuesFromIndex.size > 0) {
+                const existingKeys = new Set(allQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                propagateSomeValuesFromFillers(someValuesFromIndex, inputQuads, allQuads, existingKeys, DataFactory.defaultGraph());
+            }
+            // Merge JS-computed FP/IFP sameAs pairs (deduplicate by SPO key).
+            if (fpSameAsQuads.length > 0) {
+                const existingKeys = new Set(allQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                for (const q of fpSameAsQuads) {
+                    const key = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                    if (!existingKeys.has(key)) {
+                        existingKeys.add(key);
+                        allQuads.push(q);
+                    }
+                }
+            }
+            if (opts?.includeClassHierarchy === true) {
+                return allQuads;
+            }
+            return allQuads.filter((q) => q.predicate.value !== "http://www.w3.org/2000/01/rdf-schema#subClassOf" &&
+                q.predicate.value !== "http://www.w3.org/2002/07/owl#equivalentClass");
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    classifyProperties(input, opts) {
+        if (input instanceof Store) {
+            return this._classifyPropertiesOnStore(input, opts);
+        }
+        return this._classifyPropertiesOnQuads(input);
+    }
+    _classifyPropertiesOnStore(store, opts) {
+        // Known limitation: fingerprint always covers all graphs, including any
+        // custom inferredGraph. If the caller uses a non-default inferredGraph,
+        // the cache may incorrectly report a hit when the inferred graph has
+        // changed between calls. Acceptable for the current use-cases.
+        const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+        const result = this._queue.then(async () => {
+            // Cache hit: same store content as last classifyProperties call
+            if (this._classifyPropertiesCache !== null && this._classifyPropertiesCache.hash === fingerprint) {
+                return;
+            }
+            const inferredGraphNode = DataFactory.namedNode(opts?.inferredGraph ?? INFERRED_GRAPH_IRI);
+            store.removeQuads(store.getQuads(null, null, null, inferredGraphNode));
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(store.getQuads(null, null, null, null));
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("classification", []);
+            const resultBuf = (await this._call("getPropertyTripleBuffer", []));
+            const inferredQuads = decodeBuffers(resultBuf);
+            for (const q of inferredQuads) {
+                store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, inferredGraphNode));
+            }
+            // OWL 2 DL: p owl:equivalentProperty q ⇒ p rdfs:subPropertyOf q AND q rdfs:subPropertyOf p.
+            // The WASM kernel does not emit these edges; synthesize them from base quads.
+            const subPropNode = DataFactory.namedNode(RDFS_SUB_PROPERTY_OF);
+            for (const q of store.getQuads(null, DataFactory.namedNode(OWL_EQUIVALENT_PROPERTY), null, null)) {
+                // Skip quads from the inferred graph itself
+                if (q.graph.value === inferredGraphNode.value)
+                    continue;
+                if (q.subject.termType !== "NamedNode" || q.object.termType !== "NamedNode")
+                    continue;
+                const forward = DataFactory.quad(q.subject, subPropNode, q.object, inferredGraphNode);
+                const backward = DataFactory.quad(q.object, subPropNode, q.subject, inferredGraphNode);
+                if (store.countQuads(q.subject, subPropNode, q.object, inferredGraphNode) === 0) {
+                    store.addQuad(forward);
+                }
+                if (store.countQuads(q.object, subPropNode, q.subject, inferredGraphNode) === 0) {
+                    store.addQuad(backward);
+                }
+            }
+            this._classifyPropertiesCache = { hash: fingerprint, result: undefined };
+            this._classifyCache = null;
+            this._materializeCache = null;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    _classifyPropertiesOnQuads(quads) {
+        const result = this._queue.then(async () => {
+            // Materialize iterable so we can both encode it and post-process it.
+            const inputQuads = Array.isArray(quads) ? quads : [...quads];
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(inputQuads);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("classification", []);
+            const resultBuf = (await this._call("getPropertyTripleBuffer", []));
+            const resultQuads = decodeBuffers(resultBuf);
+            // OWL 2 DL: p owl:equivalentProperty q ⇒ p rdfs:subPropertyOf q AND q rdfs:subPropertyOf p.
+            // The WASM kernel does not emit these edges; synthesize them from input quads.
+            const existingKeys = new Set(resultQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const defaultGraph = DataFactory.defaultGraph();
+            const subPropNode = DataFactory.namedNode(RDFS_SUB_PROPERTY_OF);
+            for (const q of inputQuads) {
+                if (q.predicate.value !== OWL_EQUIVALENT_PROPERTY)
+                    continue;
+                if (q.subject.termType !== "NamedNode" || q.object.termType !== "NamedNode")
+                    continue;
+                const fwdKey = `${q.subject.value}\0${RDFS_SUB_PROPERTY_OF}\0${q.object.value}`;
+                const bwdKey = `${q.object.value}\0${RDFS_SUB_PROPERTY_OF}\0${q.subject.value}`;
+                if (!existingKeys.has(fwdKey)) {
+                    existingKeys.add(fwdKey);
+                    resultQuads.push(DataFactory.quad(q.subject, subPropNode, q.object, defaultGraph));
+                }
+                if (!existingKeys.has(bwdKey)) {
+                    existingKeys.add(bwdKey);
+                    resultQuads.push(DataFactory.quad(q.object, subPropNode, q.subject, defaultGraph));
+                }
+            }
+            return resultQuads;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    // -------------------------------------------------------------------------
+    // isEntailed()
+    // -------------------------------------------------------------------------
+    _opForPredicate(iri) {
+        switch (iri) {
+            case "http://www.w3.org/2000/01/rdf-schema#subClassOf":
+            case "http://www.w3.org/2002/07/owl#equivalentClass":
+                return "classify";
+            case "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":
+                return "materialize";
+            case "http://www.w3.org/2000/01/rdf-schema#subPropertyOf":
+                return "classifyProperties";
+            default:
+                return null;
+        }
+    }
+    async _classifyInline(store, fingerprint) {
+        if (this._classifyCache?.hash === fingerprint)
+            return;
+        const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+        store.removeQuads(store.getQuads(null, null, null, ig));
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(store.getQuads(null, null, null, null));
+        await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._call("classification", []);
+        const buf = (await this._call("getInferredTripleBuffer", []));
+        // Capture base quads BEFORE writing inferred quads so the disjointUnionOf scan
+        // only sees the original store contents, not the newly added inferred triples.
+        const allQuads = store.getQuads(null, null, null, null);
+        for (const q of decodeBuffers(buf))
+            store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, ig));
+        // OWL 2 DL: C owl:disjointUnionOf (A B ...) ⇒ A rdfs:subClassOf C, B rdfs:subClassOf C, ...
+        // The WASM kernel does not emit these edges; synthesize them from base quads.
+        const subClassNode = DataFactory.namedNode(RDFS_SUB_CLASS_OF);
+        for (const q of store.getQuads(null, DataFactory.namedNode(OWL_DISJOINT_UNION_OF), null, null)) {
+            if (q.graph.value === ig.value)
+                continue;
+            if (q.subject.termType !== "NamedNode" || q.object.termType !== "BlankNode")
+                continue;
+            const unionClassIRI = q.subject.value;
+            const members = expandRdfList(q.object.value, allQuads);
+            for (const memberIRI of members) {
+                if (store.countQuads(DataFactory.namedNode(memberIRI), subClassNode, DataFactory.namedNode(unionClassIRI), ig) === 0)
+                    store.addQuad(DataFactory.quad(DataFactory.namedNode(memberIRI), subClassNode, DataFactory.namedNode(unionClassIRI), ig));
+            }
+        }
+        this._classifyCache = { hash: fingerprint, result: undefined };
+        this._materializeCache = null; // cross-invalidate
+        this._classifyPropertiesCache = null; // cross-invalidate
+    }
+    async _materializeInline(store, fingerprint) {
+        if (this._materializeCache?.hash === fingerprint)
+            return;
+        const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+        store.removeQuads(store.getQuads(null, null, null, ig));
+        // Capture base quads BEFORE writing inferred quads so someValuesFrom scan
+        // only sees the original store contents.
+        const baseQuads = store.getQuads(null, null, null, null);
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(baseQuads);
+        await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._call("realization", []);
+        const buf = (await this._call("getInferredTripleBuffer", []));
+        const allQuads = decodeBuffers(buf);
+        // OWL 2 DL: someValuesFrom filler type propagation.
+        const someValuesFromIndex = buildSomeValuesFromIndex(baseQuads);
+        if (someValuesFromIndex.size > 0) {
+            const existingKeys = new Set(allQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            propagateSomeValuesFromFillers(someValuesFromIndex, baseQuads, allQuads, existingKeys, ig);
+        }
+        // Write ALL results (including subClassOf) so rdf:type AND subClassOf checks work
+        for (const q of allQuads)
+            store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, ig));
+        this._materializeCache = { hash: fingerprint, result: undefined };
+        this._classifyCache = null; // cross-invalidate
+        this._classifyPropertiesCache = null; // cross-invalidate
+    }
+    async _classifyPropertiesInline(store, fingerprint) {
+        if (this._classifyPropertiesCache?.hash === fingerprint)
+            return;
+        const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+        store.removeQuads(store.getQuads(null, null, null, ig));
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(store.getQuads(null, null, null, null));
+        await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._call("classification", []);
+        const buf = (await this._call("getPropertyTripleBuffer", []));
+        for (const q of decodeBuffers(buf))
+            store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, ig));
+        // OWL 2 DL: p owl:equivalentProperty q ⇒ p rdfs:subPropertyOf q AND q rdfs:subPropertyOf p.
+        // The WASM kernel does not emit these edges; synthesize them from base quads.
+        const subPropNode = DataFactory.namedNode(RDFS_SUB_PROPERTY_OF);
+        for (const q of store.getQuads(null, DataFactory.namedNode(OWL_EQUIVALENT_PROPERTY), null, null)) {
+            if (q.graph.value === ig.value)
+                continue;
+            if (q.subject.termType !== "NamedNode" || q.object.termType !== "NamedNode")
+                continue;
+            if (store.countQuads(q.subject, subPropNode, q.object, ig) === 0)
+                store.addQuad(DataFactory.quad(q.subject, subPropNode, q.object, ig));
+            if (store.countQuads(q.object, subPropNode, q.subject, ig) === 0)
+                store.addQuad(DataFactory.quad(q.object, subPropNode, q.subject, ig));
+        }
+        this._classifyPropertiesCache = { hash: fingerprint, result: undefined };
+        this._classifyCache = null; // cross-invalidate
+        this._materializeCache = null; // cross-invalidate
+    }
+    // -------------------------------------------------------------------------
+    // _getUnsatisfiableClassesInternal (safe for use inside _queue body)
+    // -------------------------------------------------------------------------
+    /**
+     * Private helper — like _classifyInline but also calls getUnsatisfiableClassBuffer
+     * and returns the list of unsatisfiable class IRIs.  Updates _classifyCache and
+     * writes inferred triples into the store on cache miss (same invariant as
+     * _classifyInline).  Must be called from inside a _queue slot only.
+     */
+    async _getUnsatisfiableClassesInternal(store) {
+        const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+        if (this._classifyCache?.hash !== fingerprint) {
+            const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+            store.removeQuads(store.getQuads(null, null, null, ig));
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(store.getQuads(null, null, null, null));
+            await this._callDirect("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._callDirect("classification", []);
+            const buf = (await this._callDirect("getInferredTripleBuffer", []));
+            for (const q of decodeBuffers(buf))
+                store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, ig));
+            this._classifyCache = { hash: fingerprint, result: undefined };
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+        }
+        const raw = (await this._callDirect("getUnsatisfiableClassBuffer", []));
+        return raw.split('\n').filter(Boolean);
+    }
+    // -------------------------------------------------------------------------
+    // getUnsatisfiableClasses() / isSatisfiable()
+    // -------------------------------------------------------------------------
+    /** Return the IRIs of all classes that are unsatisfiable (equivalent to
+     *  owl:Nothing) in the ontology.  owl:Nothing itself is excluded.
+     *  Classes absent from the taxonomy are NOT included (open-world). */
+    getUnsatisfiableClasses(store) {
+        const result = this._queue.then(async () => this._getUnsatisfiableClassesInternal(store));
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    /** Return `false` if `classIRI` is equivalent to owl:Nothing in the ontology.
+     *  Returns `true` for any class absent from the taxonomy (open-world assumption).
+     *  owl:Nothing is always unsatisfiable; returns `false` without a Worker call. */
+    isSatisfiable(store, classIRI) {
+        if (classIRI === OWL_NOTHING)
+            return Promise.resolve(false);
+        const result = this._queue.then(async () => {
+            const unsatSet = await this._getUnsatisfiableClassesInternal(store);
+            return !unsatSet.includes(classIRI);
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    isEntailed(store, axiomOrAxioms) {
+        const isBatch = Array.isArray(axiomOrAxioms);
+        const axioms = isBatch ? axiomOrAxioms : [axiomOrAxioms];
+        // Fast-path unsupported check for single axiom (no queue entry needed)
+        if (!isBatch) {
+            const op = this._opForPredicate(axiomOrAxioms.predicate.value);
+            if (op === null) {
+                console.warn(`isEntailed: unsupported predicate <${axiomOrAxioms.predicate.value}>`);
+                return Promise.resolve(null);
+            }
+        }
+        const result = this._queue.then(async () => {
+            const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+            const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+            // Determine which operations are needed
+            const needsClassify = axioms.some(a => this._opForPredicate(a.predicate.value) === "classify");
+            const needsMaterialize = axioms.some(a => this._opForPredicate(a.predicate.value) === "materialize");
+            const needsClassifyProps = axioms.some(a => this._opForPredicate(a.predicate.value) === "classifyProperties");
+            // Run needed operations in order; each cross-invalidates others
+            // Check classify axioms immediately after classify runs (before materialize overwrites INFERRED_GRAPH_IRI)
+            const classifyResults = new Map();
+            if (needsClassify) {
+                await this._classifyInline(store, fingerprint);
+                for (const a of axioms) {
+                    if (this._opForPredicate(a.predicate.value) === "classify") {
+                        classifyResults.set(a, store.has(DataFactory.quad(a.subject, a.predicate, a.object, ig)));
+                    }
+                }
+            }
+            const materializeResults = new Map();
+            if (needsMaterialize) {
+                await this._materializeInline(store, fingerprint);
+                for (const a of axioms) {
+                    if (this._opForPredicate(a.predicate.value) === "materialize") {
+                        materializeResults.set(a, store.has(DataFactory.quad(a.subject, a.predicate, a.object, ig)));
+                    }
+                }
+            }
+            const classifyPropsResults = new Map();
+            if (needsClassifyProps) {
+                await this._classifyPropertiesInline(store, fingerprint);
+                for (const a of axioms) {
+                    if (this._opForPredicate(a.predicate.value) === "classifyProperties") {
+                        classifyPropsResults.set(a, store.has(DataFactory.quad(a.subject, a.predicate, a.object, ig)));
+                    }
+                }
+            }
+            // Assemble results
+            if (!isBatch) {
+                const axiom = axioms[0];
+                const op = this._opForPredicate(axiom.predicate.value);
+                if (op === "classify")
+                    return classifyResults.get(axiom) ?? false;
+                if (op === "materialize")
+                    return materializeResults.get(axiom) ?? false;
+                if (op === "classifyProperties")
+                    return classifyPropsResults.get(axiom) ?? false;
+                return null;
+            }
+            return axioms.map(a => {
+                const op = this._opForPredicate(a.predicate.value);
+                if (op === null) {
+                    console.warn(`isEntailed: unsupported predicate <${a.predicate.value}>`);
+                    return null;
+                }
+                if (op === "classify")
+                    return classifyResults.get(a) ?? false;
+                if (op === "materialize")
+                    return materializeResults.get(a) ?? false;
+                return classifyPropsResults.get(a) ?? false;
+            });
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    // -------------------------------------------------------------------------
+    // whatIf()
+    // -------------------------------------------------------------------------
+    /** Reason over a hypothetical extension of the store without mutating it.
+     *
+     * Computes full-materialize inferences over `store ∪ additions \ removals`
+     * without changing the store's base triples or INFERRED_GRAPH_IRI.
+     *
+     * Returns `{ added, removed }` relative to the current INFERRED_GRAPH_IRI
+     * content (both quads carry `graph = INFERRED_GRAPH_IRI` named node).
+     *
+     * If `opts.outputGraph` is provided the hypothetical inferences are also
+     * written to that named graph in the store (must not equal INFERRED_GRAPH_IRI).
+     */
+    whatIf(store, additions, opts) {
+        if (opts?.outputGraph === INFERRED_GRAPH_IRI) {
+            return Promise.reject(new Error(`whatIf: outputGraph must not equal INFERRED_GRAPH_IRI`));
+        }
+        if (opts?.outputGraph === HYPOTHETICAL_IRI) {
+            return Promise.reject(new Error(`whatIf: outputGraph must not equal HYPOTHETICAL_IRI`));
+        }
+        const result = this._queue.then(async () => {
+            const ig = DataFactory.namedNode(INFERRED_GRAPH_IRI);
+            // Snapshot before: current INFERRED_GRAPH_IRI quads (these quads have graph=ig)
+            const before = store.getQuads(null, null, null, ig);
+            // Build hypothetical quad set: base quads excluding INFERRED/HYPOTHETICAL graphs
+            const removalKeys = new Set((opts?.removals ?? []).map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const baseQuads = store.getQuads(null, null, null, null).filter(q => {
+                const g = q.graph.value;
+                if (g === INFERRED_GRAPH_IRI || g === HYPOTHETICAL_IRI)
+                    return false;
+                const key = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                return !removalKeys.has(key);
+            });
+            // Merge additions (deduplicate by SPO key)
+            const seen = new Set(baseQuads.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const hypothetical = [...baseQuads];
+            for (const a of additions) {
+                const key = `${a.subject.value}\0${a.predicate.value}\0${a.object.value}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    hypothetical.push(a);
+                }
+            }
+            // Encode and run the full materialize pipeline
+            const { tripleBuffer, strTableBuffer } = encodeToBuffers(hypothetical);
+            await this._call("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+            await this._call("realization", []);
+            const buf = (await this._call("getInferredTripleBuffer", []));
+            const afterQuads = decodeBuffers(buf);
+            // Wrap after quads with ig so both sides have consistent graph
+            const after = afterQuads.map(q => DataFactory.quad(q.subject, q.predicate, q.object, ig));
+            // Compute delta relative to before (keyed by SPO)
+            const beforeKeys = new Set(before.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const afterKeys = new Set(after.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const added = after.filter(q => !beforeKeys.has(`${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            const removed = before.filter(q => !afterKeys.has(`${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+            // Write to outputGraph if provided (never touch INFERRED_GRAPH_IRI)
+            if (opts?.outputGraph) {
+                const outNode = DataFactory.namedNode(opts.outputGraph);
+                for (const q of after) {
+                    store.addQuad(DataFactory.quad(q.subject, q.predicate, q.object, outNode));
+                }
+            }
+            // Invalidate all operation caches: WASM state now reflects hypothetical input,
+            // not the real store. Next real call must re-load.
+            this._classifyCache = null;
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+            this._consistencyCache = null;
+            return { added, removed };
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    // -------------------------------------------------------------------------
+    // _callDirect (safe for use inside _queue body)
+    // -------------------------------------------------------------------------
+    /**
+     * Identical to _call. Named separately to mark it safe for use inside a
+     * _queue.then() body (no queue gating — callers must already hold the slot).
+     * Calling the public methods (classify, materialize, etc.) from inside a
+     * _queue body would deadlock.
+     */
+    _callDirect(method, args, transfer) {
+        return new Promise((resolve, reject) => {
+            const id = this.nextId++;
+            this.pending.set(id, { resolve, reject });
+            const request = { id, method, args };
+            if (transfer && transfer.length > 0) {
+                this.worker.postMessage(request, transfer);
+            }
+            else {
+                this.worker.postMessage(request);
+            }
+        });
+    }
+    // -------------------------------------------------------------------------
+    // explain helpers
+    // -------------------------------------------------------------------------
+    _isBuiltInDeclaration(q) {
+        if (q.predicate.value !== RDF_TYPE)
+            return false;
+        const obj = q.object.value;
+        return (obj === OWL_CLASS ||
+            obj === OWL_OBJECT_PROPERTY ||
+            obj === OWL_DATATYPE_PROPERTY ||
+            obj === OWL_ANNOTATION_PROPERTY ||
+            obj === OWL_ONTOLOGY ||
+            obj === RDFS_CLASS);
+    }
+    _opForAxiom(predicateIri) {
+        switch (predicateIri) {
+            case RDFS_SUB_CLASS_OF:
+            case OWL_EQUIVALENT_CLASS:
+                return { op: "classification", bufferMethod: "getInferredTripleBuffer" };
+            case RDF_TYPE:
+                return { op: "realization", bufferMethod: "getInferredTripleBuffer" };
+            case RDFS_SUB_PROPERTY_OF:
+                return { op: "classification", bufferMethod: "getPropertyTripleBuffer" };
+            default:
+                return null;
+        }
+    }
+    async _checkEntailmentDirect(candidates, axiom, opInfo, background = []) {
+        // Always include background triples (e.g. rdf:type owl:Class declarations) so
+        // Konclude can recognise classes/properties even when they are excluded from the
+        // justification candidate set. background triples do not appear in justifications.
+        const tripleSet = background.length > 0 ? [...candidates, ...background] : candidates;
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(tripleSet);
+        await this._callDirect("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._callDirect(opInfo.op, []);
+        const buf = (await this._callDirect(opInfo.bufferMethod, []));
+        const quads = decodeBuffers(buf);
+        return quads.some(q => q.subject.value === axiom.subject.value &&
+            q.predicate.value === axiom.predicate.value &&
+            q.object.value === axiom.object.value);
+    }
+    /**
+     * Returns true if the candidate subset is inconsistent.
+     * Uses the consistency Worker pipeline (not triple lookup).
+     * Safe to call from inside a _queue body.
+     */
+    async _checkInconsistencyDirect(candidates) {
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(candidates);
+        await this._callDirect("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._callDirect("classification", []);
+        const consistent = (await this._callDirect("consistency", []));
+        return !consistent;
+    }
+    /**
+     * Returns true if `classIRI` is unsatisfiable in the candidate set.
+     * Uses buildUnsatisfiableClassBuffer as the oracle (not _checkEntailmentDirect,
+     * because buildInferredTripleBuffer suppresses `X rdfs:subClassOf owl:Nothing`).
+     * Safe to call from inside a _queue body.
+     */
+    async _checkUnsatisfiabilityDirect(candidates, classIRI) {
+        const { tripleBuffer, strTableBuffer } = encodeToBuffers(candidates);
+        await this._callDirect("loadTripleBuffer", [tripleBuffer, strTableBuffer], [tripleBuffer, strTableBuffer]);
+        await this._callDirect("classification", []);
+        const raw = (await this._callDirect("getUnsatisfiableClassBuffer", []));
+        return raw.split('\n').filter(Boolean).includes(classIRI);
+    }
+    // -------------------------------------------------------------------------
+    // explain()
+    // -------------------------------------------------------------------------
+    /** Compute minimal justifications for an axiom using the BlackBox algorithm.
+     *
+     * Returns a list of minimal subsets of the store's base quads, each of which
+     * alone entails the axiom. Returns [] if the axiom is not entailed.
+     * Each inner Quad[] is a minimal justification.
+     *
+     * Throws for unsupported predicates (unlike isEntailed which returns null).
+     *
+     * All BlackBox sub-calls run inside this method's single _queue slot using
+     * _callDirect. Do NOT call the public methods classify/materialize from inside.
+     */
+    explain(store, axiom, opts) {
+        const maxJustifications = opts?.maxJustifications ?? 1;
+        // Fast-path: maxJustifications === 0
+        if (maxJustifications === 0) {
+            return Promise.resolve([]);
+        }
+        const opInfo = this._opForAxiom(axiom.predicate.value);
+        if (opInfo === null) {
+            return Promise.reject(new Error(`explain: unsupported predicate <${axiom.predicate.value}>`));
+        }
+        const result = this._queue.then(async () => {
+            // Partition base quads into:
+            //   allCandidates — justification candidates (built-in declarations excluded)
+            //   background    — built-in declarations always passed to WASM so Konclude
+            //                   can recognise classes/properties, but never returned as
+            //                   part of a justification
+            const allCandidates = [];
+            const background = [];
+            for (const q of store.getQuads(null, null, null, null)) {
+                const g = q.graph.value;
+                if (g === INFERRED_GRAPH_IRI || g === HYPOTHETICAL_IRI)
+                    continue;
+                if (this._isBuiltInDeclaration(q)) {
+                    background.push(q);
+                    continue;
+                }
+                if (opts?.axiomFilter && !opts.axiomFilter(q))
+                    continue;
+                allCandidates.push(q);
+            }
+            // Invalidate all caches (sub-calls use WASM directly)
+            this._classifyCache = null;
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+            this._consistencyCache = null;
+            // Fast-path: axiom not entailed at all
+            const entailedByAll = await this._checkEntailmentDirect(allCandidates, axiom, opInfo, background);
+            if (!entailedByAll)
+                return [];
+            const justifications = [];
+            // Find one MUS via binary-partition shrink + deletion pass
+            const findOneJustification = async (candidates) => {
+                let working = [...candidates];
+                // Shrink phase: binary partition
+                let changed = true;
+                while (changed && working.length > 1) {
+                    changed = false;
+                    const mid = Math.floor(working.length / 2);
+                    const firstHalf = working.slice(0, mid);
+                    const secondHalf = working.slice(mid);
+                    const firstEntails = await this._checkEntailmentDirect(firstHalf, axiom, opInfo, background);
+                    if (firstEntails) {
+                        working = firstHalf;
+                        changed = true;
+                        continue;
+                    }
+                    const secondEntails = await this._checkEntailmentDirect(secondHalf, axiom, opInfo, background);
+                    if (secondEntails) {
+                        working = secondHalf;
+                        changed = true;
+                        continue;
+                    }
+                    // Neither half alone entails — need both; stop shrinking
+                    break;
+                }
+                // Deletion pass: remove each axiom that is not individually required
+                let i = 0;
+                while (i < working.length) {
+                    if (working.length === 1)
+                        break; // single axiom must stay
+                    const without = [...working.slice(0, i), ...working.slice(i + 1)];
+                    const stillEntails = await this._checkEntailmentDirect(without, axiom, opInfo, background);
+                    if (stillEntails) {
+                        working = without;
+                        // don't increment i — next element shifted into position i
+                    }
+                    else {
+                        i++;
+                    }
+                }
+                return working;
+            };
+            // First justification
+            const j1 = await findOneJustification(allCandidates);
+            if (!j1 || j1.length === 0)
+                return [];
+            justifications.push(j1);
+            // HSDAG for additional justifications
+            if (maxJustifications > 1) {
+                // HSDAG queue: pairs of (excluded set, justification to expand from)
+                const hsQueue = [
+                    { excluded: new Set(), justification: j1 },
+                ];
+                const exploredExclusions = new Set();
+                while (hsQueue.length > 0 && justifications.length < maxJustifications) {
+                    const { excluded, justification: currentJ } = hsQueue.shift();
+                    const excludedKey = [...excluded].sort().join("|");
+                    if (exploredExclusions.has(excludedKey))
+                        continue;
+                    exploredExclusions.add(excludedKey);
+                    for (const axiomInJ of currentJ) {
+                        const newExcluded = new Set(excluded);
+                        const axKey = `${axiomInJ.subject.value}\0${axiomInJ.predicate.value}\0${axiomInJ.object.value}`;
+                        newExcluded.add(axKey);
+                        const newExcludedKey = [...newExcluded].sort().join("|");
+                        if (exploredExclusions.has(newExcludedKey))
+                            continue;
+                        const reduced = allCandidates.filter(q => {
+                            const k = `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`;
+                            return !newExcluded.has(k);
+                        });
+                        const entailed = await this._checkEntailmentDirect(reduced, axiom, opInfo, background);
+                        if (!entailed)
+                            continue;
+                        const jNew = await findOneJustification(reduced);
+                        if (!jNew || jNew.length === 0)
+                            continue;
+                        const jKey = jNew.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|");
+                        const alreadyFound = justifications.some(j => {
+                            const k = j.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|");
+                            return k === jKey;
+                        });
+                        if (!alreadyFound) {
+                            justifications.push(jNew);
+                            if (justifications.length >= maxJustifications)
+                                break;
+                            hsQueue.push({ excluded: newExcluded, justification: jNew });
+                        }
+                    }
+                }
+            }
+            return justifications;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    // -------------------------------------------------------------------------
+    // explainInconsistency()
+    // -------------------------------------------------------------------------
+    /** Compute minimal inconsistent sub-ontologies (MIPS) for an inconsistent
+     *  ontology. Returns [] if the ontology is consistent.
+     *
+     * Uses the consistency oracle directly (loadTripleBuffer → classification →
+     * consistency) for all BlackBox iterations. Does not depend on
+     * owl:Thing rdfs:subClassOf owl:Nothing being emitted as an inferred triple.
+     */
+    explainInconsistency(store, opts) {
+        const result = this._queue.then(async () => {
+            // Build base quads (exclude inferred/hypothetical graphs)
+            const allBase = store.getQuads(null, null, null, null).filter(q => {
+                const g = q.graph.value;
+                return g !== INFERRED_GRAPH_IRI && g !== HYPOTHETICAL_IRI;
+            });
+            // Fast-path: check consistency using existing cache or direct Worker call
+            const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+            let consistent;
+            if (this._consistencyCache?.hash === fingerprint) {
+                consistent = this._consistencyCache.result;
+            }
+            else {
+                consistent = !(await this._checkInconsistencyDirect(allBase));
+                this._consistencyCache = { hash: fingerprint, result: consistent };
+            }
+            // Invalidate other caches (sub-calls modify WASM state)
+            this._classifyCache = null;
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+            if (consistent)
+                return [];
+            const maxJustifications = opts?.maxJustifications ?? 1;
+            if (maxJustifications === 0)
+                return [];
+            // Build candidates: exclude only inferred/hypothetical graphs and user filter.
+            // Unlike explain(), we do NOT apply _isBuiltInDeclaration here because
+            // rdf:type owl:Class declarations are semantically meaningful for
+            // ABox inconsistency (Konclude requires them to recognize disjoint classes).
+            const allCandidates = store.getQuads(null, null, null, null).filter(q => {
+                const g = q.graph.value;
+                if (g === INFERRED_GRAPH_IRI || g === HYPOTHETICAL_IRI)
+                    return false;
+                if (opts?.axiomFilter && !opts.axiomFilter(q))
+                    return false;
+                return true;
+            });
+            // Invalidate caches before BlackBox sub-calls (we already ran one consistency check)
+            this._classifyCache = null;
+            this._materializeCache = null;
+            this._classifyPropertiesCache = null;
+            this._consistencyCache = null;
+            // Verify full candidate set is indeed inconsistent (axiomFilter may have changed the set)
+            if (!(await this._checkInconsistencyDirect(allCandidates)))
+                return [];
+            const justifications = [];
+            const findOneJustification = async (candidates) => {
+                let working = [...candidates];
+                let changed = true;
+                while (changed && working.length > 1) {
+                    changed = false;
+                    const mid = Math.floor(working.length / 2);
+                    const firstHalf = working.slice(0, mid);
+                    const secondHalf = working.slice(mid);
+                    if (await this._checkInconsistencyDirect(firstHalf)) {
+                        working = firstHalf;
+                        changed = true;
+                        continue;
+                    }
+                    if (await this._checkInconsistencyDirect(secondHalf)) {
+                        working = secondHalf;
+                        changed = true;
+                        continue;
+                    }
+                    break;
+                }
+                let i = 0;
+                while (i < working.length) {
+                    if (working.length === 1)
+                        break;
+                    const without = [...working.slice(0, i), ...working.slice(i + 1)];
+                    if (await this._checkInconsistencyDirect(without)) {
+                        working = without;
+                    }
+                    else {
+                        i++;
+                    }
+                }
+                return working;
+            };
+            const j1 = await findOneJustification(allCandidates);
+            if (!j1 || j1.length === 0)
+                return [];
+            justifications.push(j1);
+            if (maxJustifications > 1) {
+                // HSDAG queue: pairs of (excluded set, justification to expand from)
+                const hsQueue = [
+                    { excluded: new Set(), justification: j1 },
+                ];
+                const exploredExclusions = new Set();
+                while (hsQueue.length > 0 && justifications.length < maxJustifications) {
+                    const { excluded, justification: currentJ } = hsQueue.shift();
+                    const excludedKey = [...excluded].sort().join("|");
+                    if (exploredExclusions.has(excludedKey))
+                        continue;
+                    exploredExclusions.add(excludedKey);
+                    for (const axiomInJ of currentJ) {
+                        const newExcluded = new Set(excluded);
+                        const axKey = `${axiomInJ.subject.value}\0${axiomInJ.predicate.value}\0${axiomInJ.object.value}`;
+                        newExcluded.add(axKey);
+                        const newExcludedKey = [...newExcluded].sort().join("|");
+                        if (exploredExclusions.has(newExcludedKey))
+                            continue;
+                        const reduced = allCandidates.filter(q => !newExcluded.has(`${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                        if (!(await this._checkInconsistencyDirect(reduced)))
+                            continue;
+                        const jNew = await findOneJustification(reduced);
+                        if (!jNew || jNew.length === 0)
+                            continue;
+                        const jKey = jNew.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|");
+                        const alreadyFound = justifications.some(j => j.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|") === jKey);
+                        if (!alreadyFound) {
+                            justifications.push(jNew);
+                            if (justifications.length >= maxJustifications)
+                                break;
+                            hsQueue.push({ excluded: newExcluded, justification: jNew });
+                        }
+                    }
+                }
+            }
+            return justifications;
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    // -------------------------------------------------------------------------
+    // validate()
+    // -------------------------------------------------------------------------
+    /** Run a combined diagnostic: check consistency, find unsatisfiable classes,
+     *  and (optionally) compute minimal justifications for each.
+     *
+     *  Returns `{ consistent, errors, warnings }` where:
+     *  - `consistent` — `true` when the ontology has at least one model
+     *  - `errors` — MIPS (minimal inconsistent sub-ontologies); non-empty only when inconsistent
+     *  - `warnings` — one `ClassWarning` per unsatisfiable class (owl:Nothing excluded)
+     *
+     *  All BlackBox iterations run inside this method's single _queue slot.
+     *  Do NOT call public methods from inside — use private helpers only.
+     */
+    validate(store, opts) {
+        const result = this._queue.then(async () => {
+            const maxErr = opts?.maxJustificationsPerError ?? 1;
+            const maxWarn = opts?.maxJustificationsPerWarning ?? 1;
+            const allBase = store.getQuads(null, null, null, null).filter(q => q.graph.value !== INFERRED_GRAPH_IRI && q.graph.value !== HYPOTHETICAL_IRI);
+            const makeCandidates = () => store.getQuads(null, null, null, null).filter(q => {
+                const g = q.graph.value;
+                if (g === INFERRED_GRAPH_IRI || g === HYPOTHETICAL_IRI)
+                    return false;
+                if (opts?.axiomFilter && !opts.axiomFilter(q))
+                    return false;
+                return true;
+            });
+            // ── Step 1: consistency ───────────────────────────────────────────────
+            const fingerprint = computeStoreFingerprint(store.getQuads(null, null, null, null));
+            let consistent;
+            if (this._consistencyCache?.hash === fingerprint) {
+                consistent = this._consistencyCache.result;
+            }
+            else {
+                consistent = !(await this._checkInconsistencyDirect(allBase));
+                this._consistencyCache = { hash: fingerprint, result: consistent };
+            }
+            // ── Step 2: error justifications ─────────────────────────────────────
+            const errors = [];
+            if (!consistent && maxErr > 0) {
+                const allCandidates = makeCandidates();
+                this._classifyCache = null;
+                this._materializeCache = null;
+                this._classifyPropertiesCache = null;
+                this._consistencyCache = null;
+                if (await this._checkInconsistencyDirect(allCandidates)) {
+                    const findOneIncons = async (cands) => {
+                        let w = [...cands];
+                        let changed = true;
+                        while (changed && w.length > 1) {
+                            changed = false;
+                            const mid = Math.floor(w.length / 2);
+                            const [fh, sh] = [w.slice(0, mid), w.slice(mid)];
+                            if (await this._checkInconsistencyDirect(fh)) {
+                                w = fh;
+                                changed = true;
+                                continue;
+                            }
+                            if (await this._checkInconsistencyDirect(sh)) {
+                                w = sh;
+                                changed = true;
+                                continue;
+                            }
+                            break;
+                        }
+                        let i = 0;
+                        while (i < w.length) {
+                            if (w.length === 1)
+                                break;
+                            const without = [...w.slice(0, i), ...w.slice(i + 1)];
+                            if (await this._checkInconsistencyDirect(without)) {
+                                w = without;
+                            }
+                            else {
+                                i++;
+                            }
+                        }
+                        return w;
+                    };
+                    const j1 = await findOneIncons(allCandidates);
+                    if (j1 && j1.length > 0) {
+                        errors.push(j1);
+                        if (maxErr > 1) {
+                            const hsQ = [{ excluded: new Set(), justification: j1 }];
+                            const explored = new Set();
+                            outer: while (hsQ.length > 0 && errors.length < maxErr) {
+                                const { excluded, justification: curJ } = hsQ.shift();
+                                const eKey = [...excluded].sort().join("|");
+                                if (explored.has(eKey))
+                                    continue;
+                                explored.add(eKey);
+                                for (const ax of curJ) {
+                                    const newExcl = new Set(excluded);
+                                    newExcl.add(`${ax.subject.value}\0${ax.predicate.value}\0${ax.object.value}`);
+                                    const nKey = [...newExcl].sort().join("|");
+                                    if (explored.has(nKey))
+                                        continue;
+                                    const reduced = allCandidates.filter(q => !newExcl.has(`${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                                    if (!(await this._checkInconsistencyDirect(reduced)))
+                                        continue;
+                                    const jN = await findOneIncons(reduced);
+                                    if (!jN || jN.length === 0)
+                                        continue;
+                                    const jNKey = jN.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|");
+                                    if (!errors.some(j => j.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|") === jNKey)) {
+                                        errors.push(jN);
+                                        if (errors.length >= maxErr)
+                                            break outer;
+                                        hsQ.push({ excluded: newExcl, justification: jN });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // ── Step 3: unsatisfiable classes ─────────────────────────────────────
+            const unsatIRIs = await this._getUnsatisfiableClassesInternal(store);
+            // ── Step 4: warning justifications ────────────────────────────────────
+            const warnings = [];
+            if (unsatIRIs.length > 0) {
+                const warnCands = makeCandidates();
+                for (const classIRI of unsatIRIs) {
+                    if (maxWarn === 0) {
+                        warnings.push({ classIRI, justifications: [] });
+                        continue;
+                    }
+                    this._classifyCache = null;
+                    this._materializeCache = null;
+                    this._classifyPropertiesCache = null;
+                    this._consistencyCache = null;
+                    // Use _checkUnsatisfiabilityDirect as oracle: buildInferredTripleBuffer
+                    // suppresses `X rdfs:subClassOf owl:Nothing`, so _checkEntailmentDirect
+                    // cannot detect per-class unsatisfiability.
+                    if (!(await this._checkUnsatisfiabilityDirect(warnCands, classIRI))) {
+                        warnings.push({ classIRI, justifications: [] });
+                        continue;
+                    }
+                    const findOneWarning = async (cands) => {
+                        let w = [...cands];
+                        let changed = true;
+                        while (changed && w.length > 1) {
+                            changed = false;
+                            const mid = Math.floor(w.length / 2);
+                            const [fh, sh] = [w.slice(0, mid), w.slice(mid)];
+                            if (await this._checkUnsatisfiabilityDirect(fh, classIRI)) {
+                                w = fh;
+                                changed = true;
+                                continue;
+                            }
+                            if (await this._checkUnsatisfiabilityDirect(sh, classIRI)) {
+                                w = sh;
+                                changed = true;
+                                continue;
+                            }
+                            break;
+                        }
+                        let i = 0;
+                        while (i < w.length) {
+                            if (w.length === 1)
+                                break;
+                            const without = [...w.slice(0, i), ...w.slice(i + 1)];
+                            if (await this._checkUnsatisfiabilityDirect(without, classIRI)) {
+                                w = without;
+                            }
+                            else {
+                                i++;
+                            }
+                        }
+                        return w;
+                    };
+                    const justs = [];
+                    const j1 = await findOneWarning(warnCands);
+                    if (j1 && j1.length > 0) {
+                        justs.push(j1);
+                        if (maxWarn > 1) {
+                            const hsQ = [{ excluded: new Set(), justification: j1 }];
+                            const explored = new Set();
+                            outer: while (hsQ.length > 0 && justs.length < maxWarn) {
+                                const { excluded, justification: curJ } = hsQ.shift();
+                                const eKey = [...excluded].sort().join("|");
+                                if (explored.has(eKey))
+                                    continue;
+                                explored.add(eKey);
+                                for (const ax of curJ) {
+                                    const newExcl = new Set(excluded);
+                                    newExcl.add(`${ax.subject.value}\0${ax.predicate.value}\0${ax.object.value}`);
+                                    const nKey = [...newExcl].sort().join("|");
+                                    if (explored.has(nKey))
+                                        continue;
+                                    const reduced = warnCands.filter(q => !newExcl.has(`${q.subject.value}\0${q.predicate.value}\0${q.object.value}`));
+                                    if (!(await this._checkUnsatisfiabilityDirect(reduced, classIRI)))
+                                        continue;
+                                    const jN = await findOneWarning(reduced);
+                                    if (!jN || jN.length === 0)
+                                        continue;
+                                    const jNKey = jN.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|");
+                                    if (!justs.some(j => j.map(q => `${q.subject.value}\0${q.predicate.value}\0${q.object.value}`).sort().join("|") === jNKey)) {
+                                        justs.push(jN);
+                                        if (justs.length >= maxWarn)
+                                            break outer;
+                                        hsQ.push({ excluded: newExcl, justification: jN });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    warnings.push({ classIRI, justifications: justs });
+                }
+            }
+            return { consistent, errors, warnings };
+        });
+        this._queue = result.then(() => { }, () => { });
+        return result;
+    }
+    /** Terminate the underlying Worker and reject all pending calls. */
+    terminate() {
+        this.worker.terminate();
+        const err = new Error("Worker terminated");
+        for (const entry of this.pending.values()) {
+            entry.reject(err);
+        }
+        this.pending.clear();
+    }
+}
+//# sourceMappingURL=index.js.map
