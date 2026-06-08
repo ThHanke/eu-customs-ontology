@@ -140,4 +140,32 @@ def build_abox(
         if approved:
             build_equivalence_axioms_from_candidates(g, approved)
 
+    # Node registry (LLM agent output) — additive on top of hand-authored
+    node_registry_dir = (
+        Path(__file__).parent.parent.parent
+        / "data"
+        / "axiom_candidates"
+        / f"ch{wizard_tree.chapter:02d}"
+    )
+    if node_registry_dir.exists():
+        from src.agent.node_registry import NodeRegistry
+        from src.agent.axiom_builder import build_equivalence_axioms_from_candidates
+        node_registry = NodeRegistry(node_registry_dir)
+        approved_sets = [s for s in node_registry.iter_all() if s.status == "approved"]
+        if approved_sets:
+            import tempfile
+            flat_path = Path(tempfile.mktemp(suffix=".jsonl"))
+            try:
+                node_registry.flatten_to_candidates(flat_path)
+                from src.agent.candidate_registry import CandidateRegistry
+                candidate_reg = CandidateRegistry(flat_path)
+                candidate_reg.load()
+                # Candidates from flatten_to_candidates are "proposed"; approved
+                # status was already validated at NodeAxiomSet level (approved_sets).
+                active = candidate_reg.get_active()
+                if active:
+                    build_equivalence_axioms_from_candidates(g, active)
+            finally:
+                flat_path.unlink(missing_ok=True)
+
     return g, coverage

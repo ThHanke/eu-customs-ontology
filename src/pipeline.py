@@ -48,6 +48,7 @@ def run(
     no_classify: bool = False,
     force: bool = False,
     extract_date: Date | None = None,
+    run_axiom_agent: bool = False,
 ) -> None:
     if extract_date is None:
         extract_date = Date.today()
@@ -94,7 +95,67 @@ def run(
     else:
         print(f"[scrape-wizard] skipped (using existing {wizard_jsonl.name})")
 
-    # ── Step 2.6: Fetch legal text and extract axiom candidates ─────────────
+    # ── Load wizard tree (needed for run-axiom-agent and build-ontology) ─────
+    wizard_tree = None
+    if wizard_jsonl.exists():
+        from src.schema.wizard import ClassificationNode, WizardTree
+        from src.scraper.checkpoint import load_nodes_jsonl
+        raw_nodes = load_nodes_jsonl(wizard_jsonl)
+        nodes = {n["node_id"]: ClassificationNode.model_validate(n) for n in raw_nodes}
+        root_id = next((n["node_id"] for n in raw_nodes if not n["path_from_root"]), "")
+        wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
+
+    # ── Step 2.6a: Run axiom agent (LLM-based) ──────────────────────────────
+    if run_axiom_agent:
+        with _step("run-axiom-agent"):
+            import os
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                raise EnvironmentError(
+                    "ANTHROPIC_API_KEY environment variable is required for --run-axiom-agent"
+                )
+            from src.agent.chapter_runner import ChapterRunner
+            from src.agent.coverage_reporter import build_report, write_report
+            from src.agent.node_registry import NodeRegistry
+
+            runner = ChapterRunner(chapter=chapter, model="claude-opus-4-8", data_root=ROOT)
+            run_result = runner.run(wizard_tree, force=force)
+            print(
+                f"  [axiom-agent] ch{chapter:02d}: total={run_result.total}, "
+                f"proposed={run_result.proposed}, failed={run_result.failed}, "
+                f"skipped={run_result.skipped}"
+            )
+
+            # Harmonization pass
+            node_registry_dir = ROOT / "data" / "axiom_candidates" / f"ch{chapter:02d}"
+            node_reg = NodeRegistry(node_registry_dir)
+            new_iris = [
+                {
+                    "iri": f"https://w3id.org/eucn/{cls.iri_local_name}",
+                    "label": cls.label_en,
+                    "definition": cls.definition_en,
+                    "class_or_property": "class",
+                }
+                for aset in node_reg.iter_all() if aset.status == "proposed"
+                for cls in aset.new_classes
+            ]
+            flat_ttl_path = DATA_ONTOLOGY / f"eucn-ch{chapter:02d}-{slug}-latest-flat.ttl"
+            if flat_ttl_path.exists():
+                from src.agent.harmonizer import harmonize
+                harmonize(
+                    chapter,
+                    new_iris,
+                    flat_ttl_path,
+                    model="claude-opus-4-8",
+                    out_path=node_registry_dir / "harmonization.jsonl",
+                )
+
+            # Coverage report
+            reports_dir = ROOT / "data" / "reports"
+            reports_dir.mkdir(parents=True, exist_ok=True)
+            report = build_report(chapter, node_reg, run_result)
+            write_report(report, reports_dir / f"ch{chapter:02d}_coverage.json")
+
+    # ── Step 2.6b: Fetch legal text and extract axiom candidates ────────────
     legal_text_dir = ROOT / "data" / "legal_text" / f"ch{chapter:02d}"
     candidates_path = ROOT / "data" / "axiom_candidates" / f"ch{chapter:02d}.jsonl"
 
@@ -162,18 +223,20 @@ def run(
             from src.ontology.provenance import build_provenance
             from src.ontology.tbox import build_tbox
             from src.schema.taric import ChapterData
-            from src.schema.wizard import ClassificationNode, WizardTree
-            from src.scraper.checkpoint import load_nodes_jsonl
 
             # Load intermediate data
             chapter_data = ChapterData.model_validate_json(taric_json.read_text())
 
-            raw_nodes = load_nodes_jsonl(wizard_jsonl)
-            nodes = {n["node_id"]: ClassificationNode.model_validate(n) for n in raw_nodes}
-            root_id = next(
-                (n["node_id"] for n in raw_nodes if not n["path_from_root"]), ""
-            )
-            wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
+            # Re-use wizard_tree loaded earlier; fall back to loading from disk if needed
+            if wizard_tree is None:
+                from src.schema.wizard import ClassificationNode, WizardTree
+                from src.scraper.checkpoint import load_nodes_jsonl
+                raw_nodes = load_nodes_jsonl(wizard_jsonl)
+                nodes = {n["node_id"]: ClassificationNode.model_validate(n) for n in raw_nodes}
+                root_id = next(
+                    (n["node_id"] for n in raw_nodes if not n["path_from_root"]), ""
+                )
+                wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
 
             # Build TBox + ABox in default graph
             g = Graph()
@@ -288,6 +351,8 @@ def main() -> None:
     p.add_argument("--force", action="store_true")
     p.add_argument("--extract-date", type=Date.fromisoformat, default=None,
                    metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
+    p.add_argument("--run-axiom-agent", action="store_true",
+                   help="Run LLM-based axiom agent (requires ANTHROPIC_API_KEY)")
     args = p.parse_args()
 
     run(
@@ -301,6 +366,7 @@ def main() -> None:
         no_classify=args.no_classify,
         force=args.force,
         extract_date=args.extract_date,
+        run_axiom_agent=args.run_axiom_agent,
     )
 
 
