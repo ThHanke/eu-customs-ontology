@@ -11,3 +11,4 @@ venv/
 # Large intermediate downloads (re-downloadable)
 data/intermediate/*.xlsx
 data/intermediate/*.json
+data/legal_text/
