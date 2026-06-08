@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import datetime
+import io
 import json
+import logging
 import time
 from pathlib import Path
 
 import httpx
 
 from src.schema.legal_text import LegalSection
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "https://webgate.ec.europa.eu/class-public-ui-rest/api"
 CLASS_SOURCE_URL = "https://webgate.ec.europa.eu/class-public-ui-web/#/search"
@@ -131,10 +136,11 @@ def _decode_note_response(resp: httpx.Response) -> str:
 
     if isinstance(payload, dict):
         if "base64" in payload:
-            pdf_bytes = base64.b64decode(payload["base64"])
             try:
-                import io
-
+                pdf_bytes = base64.b64decode(payload["base64"])
+            except (binascii.Error, ValueError) as exc:
+                raise ValueError(f"Failed to decode base64 note content: {exc}") from exc
+            try:
                 from pdfminer.high_level import extract_text
 
                 return extract_text(io.BytesIO(pdf_bytes))
@@ -175,6 +181,8 @@ def fetch_full_note_text(
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     cache_path = out_dir / f"{note_id}.txt"
+    if not cache_path.resolve().is_relative_to(out_dir.resolve()):
+        raise ValueError(f"Unsafe note_id escapes out_dir: {note_id!r}")
 
     if cache_path.exists() and not force:
         return cache_path.read_text(encoding="utf-8")
@@ -186,10 +194,8 @@ def fetch_full_note_text(
             params={"referenceId": note_id},
         )
 
-    if resp.status_code >= 400:
-        raise ValueError(
-            f"CLASS API error {resp.status_code} for note {note_id}"
-        )
+    if resp.status_code != 200:
+        raise ValueError(f"CLASS API error {resp.status_code} for note {note_id}")
 
     text = _decode_note_response(resp)
     cache_path.write_text(text, encoding="utf-8")
@@ -197,7 +203,6 @@ def fetch_full_note_text(
 
 
 def fetch_all_full_notes(
-    chapter: int,
     out_dir: Path,
     note_ids: list[str],
     *,
@@ -205,16 +210,25 @@ def fetch_all_full_notes(
 ) -> dict[str, str]:
     """Batch-fetch full note texts for a list of note IDs.
 
+    Errors for individual notes are logged and accumulated; the remaining
+    notes are still fetched and returned.
+
     Args:
-        chapter: Chapter number (informational; used only for logging context).
         out_dir: Directory passed to :func:`fetch_full_note_text`.
         note_ids: List of note reference IDs to fetch.
         force: Re-fetch even when cached files exist.
 
     Returns:
-        Mapping of ``note_id → plain-text content``.
+        Mapping of ``note_id → plain-text content`` for successful fetches.
     """
     results: dict[str, str] = {}
+    errors: list[str] = []
     for note_id in note_ids:
-        results[note_id] = fetch_full_note_text(note_id, out_dir, force=force)
+        try:
+            results[note_id] = fetch_full_note_text(note_id, out_dir, force=force)
+        except (ValueError, OSError) as exc:
+            logger.warning("Failed to fetch note %s: %s", note_id, exc)
+            errors.append(note_id)
+    if errors:
+        logger.warning("fetch_all_full_notes: %d notes failed: %s", len(errors), errors)
     return results

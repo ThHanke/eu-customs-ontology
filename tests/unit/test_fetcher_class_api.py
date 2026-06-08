@@ -226,3 +226,71 @@ def test_full_note_empty_response_returns_empty_string(mock_client_cls, mock_sle
     assert result == ""
     cache_file = tmp_path / "NOTE004.txt"
     assert cache_file.exists()
+
+
+# ---------------------------------------------------------------------------
+# Issue 1: Path traversal guard
+# ---------------------------------------------------------------------------
+
+
+def test_path_traversal_raises_value_error(tmp_path):
+    """note_id with path traversal sequences raises ValueError."""
+    with pytest.raises(ValueError, match="Unsafe note_id"):
+        fetch_full_note_text("../evil", tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Issue 2: Bad base64 raises ValueError (not binascii.Error)
+# ---------------------------------------------------------------------------
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_bad_base64_raises_value_error(mock_client_cls, mock_sleep, tmp_path):
+    """Invalid base64 in API response raises ValueError, not binascii.Error."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+    mock_client.get.return_value = _make_get_response({"base64": "not-valid-base64!!!"})
+
+    with pytest.raises(ValueError, match="Failed to decode base64"):
+        fetch_full_note_text("NOTE005", tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Issue 3: 3xx responses are rejected (not silently cached)
+# ---------------------------------------------------------------------------
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_3xx_response_raises_value_error(mock_client_cls, mock_sleep, tmp_path):
+    """HTTP 301 response raises ValueError containing the note_id."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+    mock_client.get.return_value = _make_get_response(status_code=301)
+
+    with pytest.raises(ValueError, match="NOTE006"):
+        fetch_full_note_text("NOTE006", tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Issue 4: fetch_all_full_notes continues after partial errors
+# ---------------------------------------------------------------------------
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_fetch_all_full_notes_partial_failure(mock_client_cls, mock_sleep, tmp_path):
+    """fetch_all_full_notes returns partial results when one note fails."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+
+    ok_resp = _make_get_response({"text": "good note text"})
+    bad_resp = _make_get_response(status_code=500)
+    mock_client.get.side_effect = [ok_resp, bad_resp]
+
+    results = fetch_all_full_notes(tmp_path, ["NOTE_OK", "NOTE_BAD"])
+
+    assert "NOTE_OK" in results
+    assert results["NOTE_OK"] == "good note text"
+    assert "NOTE_BAD" not in results
