@@ -9,6 +9,7 @@ Usage:
 
 import argparse
 import json
+import logging
 import shutil
 import sys
 import time
@@ -21,6 +22,19 @@ from rdflib.namespace import OWL, RDF
 ROOT = Path(__file__).parent.parent
 DATA_INTERMEDIATE = ROOT / "data" / "intermediate"
 DATA_ONTOLOGY = ROOT / "data" / "ontology"
+LOG_FILE = ROOT / "data" / "logs" / "pipeline.log"
+
+
+def _configure_logging() -> None:
+    fmt = "%(asctime)s %(levelname)-8s %(name)s — %(message)s"
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format=fmt,
+        handlers=[logging.StreamHandler(sys.stderr)],
+    )
+    # Quiet noisy third-party loggers
+    for noisy in ("httpcore", "httpx", "anthropic._base_client"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
 def _step(name: str):
@@ -53,6 +67,10 @@ def run(
 ) -> None:
     if extract_date is None:
         extract_date = Date.today()
+
+    _configure_logging()
+    logger = logging.getLogger(__name__)
+    logger.info("Pipeline start: chapter=%d model=%s", chapter, agent_model if run_axiom_agent else "n/a")
 
     DATA_INTERMEDIATE.mkdir(parents=True, exist_ok=True)
     DATA_ONTOLOGY.mkdir(parents=True, exist_ok=True)
@@ -118,7 +136,7 @@ def run(
             from src.agent.coverage_reporter import build_report, write_report
             from src.agent.node_registry import NodeRegistry
 
-            runner = ChapterRunner(chapter=chapter, model=agent_model, data_root=ROOT)
+            runner = ChapterRunner(chapter=chapter, model=agent_model, data_root=ROOT / "data")
             run_result = runner.run(wizard_tree, force=force)
             print(
                 f"  [axiom-agent] ch{chapter:02d}: total={run_result.total}, "
