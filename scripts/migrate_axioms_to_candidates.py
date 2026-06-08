@@ -44,17 +44,17 @@ def migrate_ch22() -> list[AxiomCandidate]:
     t = lambda text: f"Hand-authored: {text}. Migrated from {CH22_SOURCE}."
     candidates = [
         _cand(22, "Water", "decimalRange", "eucn:alcoholByVolumePercent", "0.0", "maxInclusive", t("CN 2201: ABV ≤ 0")),
-        _cand(22, "NonAlcoholicBeverage", "someValuesFrom", "eucn:producedBy", "eucn:SweetenedWaterProcess", None, t("CN 2202: sweetened/flavoured water process")),
-        _cand(22, "Beer", "someValuesFrom", "eucn:producedBy", "eucn:MaltFermentation", None, t("CN 2203: malt fermentation")),
+        _cand(22, "NonAlcoholicBeverage", "someValuesFrom", "eucn:producedBy", "SweetenedWaterProcess", None, t("CN 2202: sweetened/flavoured water process")),
+        _cand(22, "Beer", "someValuesFrom", "eucn:producedBy", "MaltFermentation", None, t("CN 2203: malt fermentation")),
         _cand(22, "Beer", "decimalRange", "eucn:alcoholByVolumePercent", "0.5", "minExclusive", t("CN 2203: ABV > 0.5%")),
-        _cand(22, "Wine", "someValuesFrom", "eucn:producedBy", "eucn:GrapeFermentation", None, t("CN 2204: grape fermentation")),
-        _cand(22, "SparklingWine", "someValuesFrom", "eucn:producedBy", "eucn:GrapeFermentation", None, t("CN 2204 10: grape fermentation")),
+        _cand(22, "Wine", "someValuesFrom", "eucn:producedBy", "GrapeFermentation", None, t("CN 2204: grape fermentation")),
+        _cand(22, "SparklingWine", "someValuesFrom", "eucn:producedBy", "GrapeFermentation", None, t("CN 2204 10: grape fermentation")),
         _cand(22, "SparklingWine", "hasValue", "eucn:isCarbonated", "true", None, t("CN 2204 10: carbonated")),
-        _cand(22, "StillWine", "someValuesFrom", "eucn:producedBy", "eucn:GrapeFermentation", None, t("CN 2204 21/29: grape fermentation")),
+        _cand(22, "StillWine", "someValuesFrom", "eucn:producedBy", "GrapeFermentation", None, t("CN 2204 21/29: grape fermentation")),
         _cand(22, "StillWine", "hasValue", "eucn:isCarbonated", "false", None, t("CN 2204 21/29: not carbonated")),
-        _cand(22, "FlavouredWine", "someValuesFrom", "eucn:producedBy", "eucn:GrapeFlavouringProcess", None, t("CN 2205: grape flavouring process")),
-        _cand(22, "FermentedBeverage", "someValuesFrom", "eucn:producedBy", "eucn:FruitFermentation", None, t("CN 2206: fruit fermentation")),
-        _cand(22, "Vinegar", "someValuesFrom", "eucn:producedBy", "eucn:AceticFermentation", None, t("CN 2209: acetic fermentation")),
+        _cand(22, "FlavouredWine", "someValuesFrom", "eucn:producedBy", "GrapeFlavouringProcess", None, t("CN 2205: grape flavouring process")),
+        _cand(22, "FermentedBeverage", "someValuesFrom", "eucn:producedBy", "FruitFermentation", None, t("CN 2206: fruit fermentation")),
+        _cand(22, "Vinegar", "someValuesFrom", "eucn:producedBy", "AceticFermentation", None, t("CN 2209: acetic fermentation")),
         _cand(22, "EthylAlcohol", "decimalRange", "eucn:alcoholByVolumePercent", "80.0", "minInclusive", t("CN 2207: ABV ≥ 80%")),
         _cand(22, "Spirit", "decimalRange", "eucn:alcoholByVolumePercent", "0.5", "minExclusive", t("CN 2208: ABV > 0.5%")),
         _cand(22, "Spirit", "decimalRange", "eucn:alcoholByVolumePercent", "80.0", "maxExclusive", t("CN 2208: ABV < 80%")),
@@ -65,15 +65,15 @@ def migrate_ch22() -> list[AxiomCandidate]:
 def migrate_ch23() -> list[AxiomCandidate]:
     t = lambda text: f"Hand-authored: {text}. Migrated from {CH23_SOURCE}."
     candidates = [
-        _cand(23, "AnimalByProductMeal", "someValuesFrom", "eucn:producedBy", "eucn:AnimalMealRendering", None, t("CN 2301: animal meal rendering")),
-        _cand(23, "CerealMillingResidue", "someValuesFrom", "eucn:producedBy", "eucn:GrainMillingProcess", None, t("CN 2302: grain milling")),
-        _cand(23, "StarchManufactureResidue", "someValuesFrom", "eucn:producedBy", "eucn:StarchExtractionProcess", None, t("CN 2303: starch extraction")),
-        _cand(23, "SoybeanOilcake", "someValuesFrom", "eucn:producedBy", "eucn:SoybeanOilExtraction", None, t("CN 2304: soybean oil extraction")),
-        _cand(23, "GroundnutOilcake", "someValuesFrom", "eucn:producedBy", "eucn:GroundnutOilExtraction", None, t("CN 2305: groundnut oil extraction")),
-        _cand(23, "VegetableOilcake", "someValuesFrom", "eucn:producedBy", "eucn:OtherOilseedExtraction", None, t("CN 2306: other oilseed extraction")),
-        _cand(23, "WineLees", "someValuesFrom", "eucn:producedBy", "eucn:WineLeesByproduction", None, t("CN 2307: wine lees byproduction")),
-        _cand(23, "PlantResidue", "someValuesFrom", "eucn:producedBy", "eucn:PlantResidueCollection", None, t("CN 2308: plant residue collection")),
-        _cand(23, "AnimalFeedPreparation", "someValuesFrom", "eucn:producedBy", "eucn:AnimalFeedMixing", None, t("CN 2309: animal feed mixing")),
+        _cand(23, "AnimalByProductMeal", "someValuesFrom", "eucn:producedBy", "AnimalMealRendering", None, t("CN 2301: animal meal rendering")),
+        _cand(23, "CerealMillingResidue", "someValuesFrom", "eucn:producedBy", "GrainMillingProcess", None, t("CN 2302: grain milling")),
+        _cand(23, "StarchManufactureResidue", "someValuesFrom", "eucn:producedBy", "StarchExtractionProcess", None, t("CN 2303: starch extraction")),
+        _cand(23, "SoybeanOilcake", "someValuesFrom", "eucn:producedBy", "SoybeanOilExtraction", None, t("CN 2304: soybean oil extraction")),
+        _cand(23, "GroundnutOilcake", "someValuesFrom", "eucn:producedBy", "GroundnutOilExtraction", None, t("CN 2305: groundnut oil extraction")),
+        _cand(23, "VegetableOilcake", "someValuesFrom", "eucn:producedBy", "OtherOilseedExtraction", None, t("CN 2306: other oilseed extraction")),
+        _cand(23, "WineLees", "someValuesFrom", "eucn:producedBy", "WineLeesByproduction", None, t("CN 2307: wine lees byproduction")),
+        _cand(23, "PlantResidue", "someValuesFrom", "eucn:producedBy", "PlantResidueCollection", None, t("CN 2308: plant residue collection")),
+        _cand(23, "AnimalFeedPreparation", "someValuesFrom", "eucn:producedBy", "AnimalFeedMixing", None, t("CN 2309: animal feed mixing")),
     ]
     return candidates
 

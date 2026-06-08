@@ -78,6 +78,7 @@ class TestPipelineIntegration:
             chapter=22,
             skip_fetch=True,
             skip_scrape=True,
+            skip_legal_text=True,
             no_reasoner=False,
             no_classify=True,
             extract_date=ed,
@@ -101,6 +102,7 @@ class TestPipelineIntegration:
             chapter=22,
             skip_fetch=True,
             skip_scrape=True,
+            skip_legal_text=True,
             no_reasoner=False,
             no_classify=False,
             extract_date=ed,
@@ -117,7 +119,7 @@ class TestPipelineIntegration:
         ed = date(2026, 6, 5)
         # Must not raise even with no_classify=True
         pipeline_mod.run(
-            chapter=22, skip_fetch=True, skip_scrape=True,
+            chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
             no_reasoner=True, no_classify=True, extract_date=ed,
         )
         trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
@@ -134,14 +136,14 @@ class TestPipelineIntegration:
         out1 = tmp_path / "run1"
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
-        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
+        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
                          no_reasoner=True, no_classify=True, extract_date=ed)
         nt1 = sorted((out1 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
-        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True,
+        pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
                          no_reasoner=True, no_classify=True, extract_date=ed)
         nt2 = sorted((out2 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
