@@ -1120,7 +1120,8 @@ eucn:hasMeasure
     a eucn:ClassificationNode ;
     dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
     rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
-    eucn:questionText "Ist das Erzeugnis ein Rückstand der Lebensmittelindustrie oder Futtermittel (Kapitel 23)?"^^xsd:string ;
+    eucn:hasAnswer <https://w3id.org/eucn/ind/c0f2a9da-ab45-584b-9a25-b90bf710fd5f> ;
+    eucn:questionText "RÜCKSTÄNDE UND ABFÄLLE DER LEBENSMITTELINDUSTRIE; ZUBEREITETES FUTTER"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/3a3db8d4-aa4a-58d4-bb54-3ce27dd94fcd>
@@ -3840,6 +3841,36 @@ bfo:RO_0002234
     eucn:validityStart "2014-08-04"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/04570b0d-9bd3-539c-9f45-8b91dd055480>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099070"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099070"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/047ef7a9-8925-54e1-af5e-e9afdc55a82f>
     a eucn:TARICMeasure ;
     eucn:codeString "2309109000"^^xsd:string ;
@@ -4035,6 +4066,18 @@ bfo:RO_0002234
     eucn:measureTypeId "570"^^xsd:string ;
     eucn:regulationId "Decision 0142/96"^^xsd:string ;
     eucn:validityStart "2025-12-20"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/06c12a0e-a0c1-5402-bfed-e568360f57d0>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/31252cd8-aa8c-5739-86c7-b3f861fff0d7> ,
+        <https://w3id.org/eucn/ind/d7111101-01b2-50fb-8ad6-761a0eeb29a4> ;
+    eucn:questionText
+        "Mehl und Pellets von Fischen oder von Krebstieren, von Weichtieren oder anderen wirbellosen Wassertieren"^^xsd:string ,
+        "Mehl und Pellets von Fleisch oder von Schlachtnebenerzeugnissen; Grieben/Grammeln"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/06c35ec7-7de9-5940-9935-fc494382cc02>
@@ -4472,6 +4515,36 @@ bfo:RO_0002234
     eucn:validityStart "2024-07-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/0ba35d8d-9458-5a3d-a44c-13a2266fc9d5>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091033"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091033"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/0ba3ffe0-d55e-509a-8155-891399ca4e89>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904100"^^xsd:string ;
@@ -4651,6 +4724,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Regulation 0978/12"^^xsd:string ;
     eucn:validityStart "2015-01-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/0cc56d8b-b66a-5221-ae57-8b06db82a700>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099059"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099059"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/0cd4716d-eae7-504a-a774-c4fcd1b18c71>
@@ -4978,6 +5081,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1875/19"^^xsd:string ;
     eucn:validityStart "2024-11-21"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/0f8ffb17-e4c2-5848-b555-41bc303cbfa6>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23030000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23032000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23032000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/0f927f35-c72c-5c39-8549-a93c08b0983c>
@@ -5484,6 +5611,36 @@ bfo:RO_0002234
     eucn:validityStart "2016-11-06"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/158d7ae8-90fc-5c0d-b5f0-28f2f5d33021>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099033"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099033"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/1599d7a4-d73f-57a3-94f8-95f118616362>
     a eucn:TARICMeasure ;
     eucn:codeString "2309107000"^^xsd:string ;
@@ -5806,6 +5963,20 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0152/09"^^xsd:string ;
     eucn:validityStart "2014-08-04"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/1adbe33e-d5b3-5a31-a0ec-d88378972b34>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/5eb4aae5-59fa-5708-90bb-008c4b97fe16> ,
+        <https://w3id.org/eucn/ind/6c50b683-a3cd-51dd-a230-29a1f27f504a> ,
+        <https://w3id.org/eucn/ind/b0937f50-df4e-50fc-aba6-a282af8e606e> ;
+    eucn:questionText
+        "Weinstein, roh"^^xsd:string ,
+        "anderer"^^xsd:string ,
+        "mit einem Gesamtalkoholgehalt von 7,9 % mas oder weniger und einem Trockenmassegehalt von 25 GHT oder mehr"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/1adcb259-3307-5def-ba35-b1d66dc44921>
@@ -6161,6 +6332,30 @@ bfo:RO_0002234
     eucn:validityStart "2016-12-15"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/1f3963c0-9409-51d6-8525-df7bd26d77f8>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23065000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23065000"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/1f45d83d-7f4d-5c59-94b6-2ea80f3e17c6>
     a eucn:TARICMeasure ;
     eucn:codeString "2308001900"^^xsd:string ;
@@ -6282,6 +6477,18 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0036/10"^^xsd:string ;
     eucn:validityStart "2010-02-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/20e19a15-01d8-51d5-b7cc-099894d4bda7>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/4d2a673a-7edc-5eca-a21f-6e6f75d831e0> ,
+        <https://w3id.org/eucn/ind/8bf293a0-4a32-53cc-98d6-a7e02db7356c> ;
+    eucn:questionText
+        "andere"^^xsd:string ,
+        "mit einem Gehalt an Stärke von 35 GHT oder weniger"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/20f5bf26-4fc4-5de8-a1a8-a71c8ae6c54b>
@@ -6578,6 +6785,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0729/09"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/2498642d-5deb-50e7-9654-6daa5b083d04>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080019"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/378b03ab-49d5-5ed7-b1cd-2bd38e503d50> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23080019"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/24a2c5ea-0de5-551f-920c-1169ea11f0f2>
@@ -6968,6 +7199,36 @@ bfo:RO_0002234
     eucn:validityStart "2024-07-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/28d1845d-482e-5729-a1c0-84e30301c3b4>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091015"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091015"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/28d68dec-8102-5e61-a389-58210ee0e2e9>
     a eucn:TARICMeasure ;
     eucn:codeString "2309101900"^^xsd:string ;
@@ -7083,6 +7344,36 @@ bfo:RO_0002234
     eucn:measureTypeId "755"^^xsd:string ;
     eucn:regulationId "Regulation 1157/24"^^xsd:string ;
     eucn:validityStart "2026-05-21"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/2a66cec3-5708-595a-941f-7bde0c5665a0>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099053"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099053"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/2a7af6cc-46f3-569f-a1bf-9083fdecc3aa>
@@ -7266,6 +7557,36 @@ bfo:RO_0002234
     eucn:validityStart "2016-04-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/2d26d094-1c20-55af-be96-e7952f7b9c0c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/19fc17d7-98f4-576f-8595-cd0dc6e5ee45> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23024090"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/2d3403a5-f483-5c4f-b683-58f1af59dc80>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904300"^^xsd:string ;
@@ -7330,6 +7651,48 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0036/10"^^xsd:string ;
     eucn:validityStart "2010-02-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/2db9b838-36b1-5cdb-a28b-1e0f573f82f2>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23069005"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23069005"^^xsd:string ;
+.
+
+<https://w3id.org/eucn/ind/2dbdec5d-58de-5c30-9c90-b3dfad84563c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23040000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23040000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/2dd6b0a7-f959-59f6-b0ab-86e8ab91b6b0>
@@ -7589,6 +7952,36 @@ bfo:RO_0002234
     eucn:validityStart "2024-08-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/3090966e-6c88-5afa-b018-9e489f80a883>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099041"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099041"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/30ad59c3-bb05-547a-8274-00d2108be822>
     a eucn:TARICMeasure ;
     eucn:codeString "2309907000"^^xsd:string ;
@@ -7598,6 +7991,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0474/08"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/31252cd8-aa8c-5739-86c7-b3f861fff0d7>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23010000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23011000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/0933da53-5996-5b6d-a0c9-603a32f3c32c> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23011000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/314f878b-48d1-560d-9158-eb4376533c5d>
@@ -8104,6 +8521,39 @@ bfo:RO_0002234
     eucn:validityStart "2000-07-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/38c54850-e260-5295-a1af-0380646673fa>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/04570b0d-9bd3-539c-9f45-8b91dd055480> ,
+        <https://w3id.org/eucn/ind/0cc56d8b-b66a-5221-ae57-8b06db82a700> ,
+        <https://w3id.org/eucn/ind/158d7ae8-90fc-5c0d-b5f0-28f2f5d33021> ,
+        <https://w3id.org/eucn/ind/2a66cec3-5708-595a-941f-7bde0c5665a0> ,
+        <https://w3id.org/eucn/ind/3090966e-6c88-5afa-b018-9e489f80a883> ,
+        <https://w3id.org/eucn/ind/47775845-0535-5328-a8ef-5a3592e70922> ,
+        <https://w3id.org/eucn/ind/507e1d00-182c-5d20-9bc3-3b322237ad03> ,
+        <https://w3id.org/eucn/ind/55e94670-dbc3-5daa-adf5-56dc67777d49> ,
+        <https://w3id.org/eucn/ind/66f4a582-cea0-5864-b3c2-29af22ce047d> ,
+        <https://w3id.org/eucn/ind/6f41dfe3-d6c3-5116-980a-672d86a3bf96> ,
+        <https://w3id.org/eucn/ind/8792b6e3-a906-5cc7-b4a4-4b7a4eba9e4f> ,
+        <https://w3id.org/eucn/ind/8bcac5f6-22db-5bae-a9a4-c327af81ad04> ,
+        <https://w3id.org/eucn/ind/bc608f88-430c-576d-9634-c3fa6030848d> ,
+        <https://w3id.org/eucn/ind/d2173a6c-4476-5142-91fd-cebd22b2b243> ,
+        <https://w3id.org/eucn/ind/fd31264d-7aaa-5afd-8044-a1d8102de8fd> ;
+    eucn:questionText
+        "Erzeugnisse gemäß der Zusätzlichen Anmerkung 5 zu diesem Kapitel"^^xsd:string ,
+        "Solubles von Fischen oder Meeressäugetieren"^^xsd:string ,
+        "andere"^^xsd:string ,
+        "ausgelaugte Rübenschnitzel, melassiert"^^xsd:string ,
+        "keine Milcherzeugnisse enthaltend oder mit einem Gehalt an Milcherzeugnissen von weniger als 10 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 10 oder mehr, jedoch weniger als 50 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 50 GHT oder mehr"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 50 oder mehr, jedoch weniger als 75 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 75 GHT oder mehr"^^xsd:string ,
+        "weder Stärke, Glucose, Glucosesirup, Maltodextrin noch Maltodextrinsirup, jedoch Milcherzeugnisse enthaltend"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/3945a29c-7ddd-509e-959d-dc686388a170>
     a eucn:TARICMeasure ;
     eucn:codeString "2309107000"^^xsd:string ;
@@ -8511,6 +8961,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Regulation 0978/12"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/3ed0b3f9-c753-5335-b788-8b4edb509cec>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23063000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23063000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/3eec8661-9da8-5adf-beac-4b79fc113618>
@@ -9155,6 +9629,36 @@ bfo:RO_0002234
     eucn:validityStart "2012-01-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/471f03ba-faea-5ed9-90d2-98a12329dfec>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024010"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/19fc17d7-98f4-576f-8595-cd0dc6e5ee45> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23024010"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/4757ebd9-8d85-52b8-9143-0ef73e5b1330>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904900"^^xsd:string ;
@@ -9164,6 +9668,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1850/16"^^xsd:string ;
     eucn:validityStart "2016-12-15"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/47775845-0535-5328-a8ef-5a3592e70922>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099039"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099039"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/47b8b911-b295-5b8d-8a00-db2192b2321a>
@@ -9404,6 +9938,30 @@ bfo:RO_0002234
     eucn:validityStart "2025-01-15"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/4a740d8c-2908-5371-9ef7-f923ead4e40c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23061000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23061000"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/4a783868-0c97-536b-ac03-d12684c64548>
     a eucn:TARICMeasure ;
     eucn:codeString "2309105100"^^xsd:string ;
@@ -9637,6 +10195,36 @@ bfo:RO_0002234
     eucn:validityStart "2013-08-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/4d2a673a-7edc-5eca-a21f-6e6f75d831e0>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23021000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23021090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a84db38a-2a5e-5702-9a92-76e41512c29d> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23021090"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/4d3fc1ed-fbc7-5d96-99c5-221374acec1b>
     a eucn:TARICMeasure ;
     eucn:codeString "2309105300"^^xsd:string ;
@@ -9849,6 +10437,36 @@ bfo:RO_0002234
     eucn:measureTypeId "410"^^xsd:string ;
     eucn:regulationId "Regulation 0632/21"^^xsd:string ;
     eucn:validityStart "2024-08-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/507e1d00-182c-5d20-9bc3-3b322237ad03>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099096"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099096"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/50971aea-b9a0-5956-a7c3-b3887f129d08>
@@ -10286,6 +10904,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Regulation 0978/12"^^xsd:string ;
     eucn:validityStart "2014-01-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/55e94670-dbc3-5daa-adf5-56dc67777d49>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099020"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099020"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/5608af5e-2eea-5ac9-a0b4-b4bc4955155c>
@@ -10877,6 +11525,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1647/24"^^xsd:string ;
     eucn:validityStart "2024-07-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/5eb4aae5-59fa-5708-90bb-008c4b97fe16>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/8cc5da3e-b22e-5a90-b5c0-e3fca480d5bd> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23070090"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/5eb5146d-8114-5893-b636-cbc92fe58e94>
@@ -11617,6 +12289,36 @@ bfo:RO_0002234
     eucn:validityStart "2017-09-21"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/66f4a582-cea0-5864-b3c2-29af22ce047d>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099091"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099091"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/674b5f6e-3641-547e-9325-d9af7e518db2>
     a eucn:TARICMeasure ;
     eucn:codeString "2309903310"^^xsd:string ;
@@ -11666,6 +12368,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0295/14"^^xsd:string ;
     eucn:validityStart "2016-01-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/67c84762-13d4-5de4-b0fa-e1a482f5e827>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091090"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/67cb82ef-ab99-5093-8870-9afa59da7c85>
@@ -12021,6 +12753,30 @@ bfo:RO_0002234
     eucn:validityStart "2016-11-06"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/6c50b683-a3cd-51dd-a230-29a1f27f504a>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070019"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/8cc5da3e-b22e-5a90-b5c0-e3fca480d5bd> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23070019"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/6c5ba139-fe3f-50f3-977c-90f4ffc6fa22>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904390"^^xsd:string ;
@@ -12216,6 +12972,36 @@ bfo:RO_0002234
     eucn:validityStart "2016-11-06"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/6ee06523-d946-56b5-b0f3-eeca890ae5a6>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091059"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091059"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/6ee57db5-02c7-55ce-8a06-e9ea35b8c68c>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904300"^^xsd:string ;
@@ -12271,6 +13057,36 @@ bfo:RO_0002234
     eucn:validityStart "2016-01-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/6f41dfe3-d6c3-5116-980a-672d86a3bf96>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099043"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099043"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/6f687aad-bbd6-5518-9b62-8eed1e005c10>
     a eucn:TARICMeasure ;
     eucn:codeString "2309903151"^^xsd:string ;
@@ -12312,6 +13128,54 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0036/10"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/6fa0510b-acfe-5c46-a139-317495f67d03>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23069090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23069090"^^xsd:string ;
+.
+
+<https://w3id.org/eucn/ind/70089b47-964a-568b-a442-722771b9353c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23069011"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23069011"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/702cc29d-7238-5746-828a-d3606033e2bd>
@@ -12515,6 +13379,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1647/24"^^xsd:string ;
     eucn:validityStart "2024-07-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/729c8116-1833-527a-9671-8cd9646bc38e>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091013"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091013"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/72f0b7be-9672-5bbb-96dc-38b48e90fca9>
@@ -14208,6 +15102,30 @@ bfo:RO_0002234
     eucn:validityStart "2008-07-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/84a6dcd4-172b-51d0-a00f-d90daab5fbb7>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23062000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23062000"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/84c0160c-198b-518a-ba6f-b45af8bed020>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904900"^^xsd:string ;
@@ -14335,6 +15253,30 @@ bfo:RO_0002234
     eucn:validityStart "2013-08-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/86220a38-05bc-595f-b2fc-7d25ee48bf10>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23064100"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23064100"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/864cb9b2-0bb0-595f-a187-d912404df330>
     a eucn:TARICMeasure ;
     eucn:codeString "2309904900"^^xsd:string ;
@@ -14431,6 +15373,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0729/09"^^xsd:string ;
     eucn:validityStart "2014-07-28"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/8792b6e3-a906-5cc7-b4a4-4b7a4eba9e4f>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099051"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099051"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/87a889b8-3d58-5f3c-b380-29b32dd82575>
@@ -14585,6 +15557,30 @@ bfo:RO_0002234
     eucn:validityStart "2018-12-31"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/8971944b-2a6a-5cc1-aea6-b417d4127edd>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23030000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23031011"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23031011"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/89737ced-b521-5880-aab1-359d50f9c295>
     a eucn:TARICMeasure ;
     eucn:codeString "2309905900"^^xsd:string ;
@@ -14594,6 +15590,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0729/09"^^xsd:string ;
     eucn:validityStart "2018-12-31"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/8996b0a3-0574-5e2a-b200-ccc5701ad1ab>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091011"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091011"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/89f6164b-e1e8-5772-b879-b63d07673840>
@@ -14673,6 +15699,30 @@ bfo:RO_0002234
     eucn:validityStart "2016-11-06"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/8abbdf6a-7e75-5944-9eb0-f336d1accca1>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23025000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23025000"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/8acacdde-6740-5207-9970-120cf66b90d0>
     a eucn:TARICMeasure ;
     eucn:codeString "2309903100"^^xsd:string ;
@@ -14741,6 +15791,36 @@ bfo:RO_0002234
     eucn:validityStart "2014-07-28"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/8bcac5f6-22db-5bae-a9a4-c327af81ad04>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099010"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099010"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/8bd08a8a-f07e-5582-9c55-c23f5865306b>
     a eucn:TARICMeasure ;
     eucn:codeString "2309101300"^^xsd:string ;
@@ -14750,6 +15830,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0494/14"^^xsd:string ;
     eucn:validityStart "2014-09-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/8bf293a0-4a32-53cc-98d6-a7e02db7356c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23021000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23021010"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a84db38a-2a5e-5702-9a92-76e41512c29d> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23021010"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/8c0f361b-b316-5807-be7f-ae4c158d3a8b>
@@ -15065,6 +16175,36 @@ bfo:RO_0002234
     eucn:validityStart "2025-01-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/8fcbb724-ff8f-5a3b-b519-fb21b78037d6>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23023000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23023010"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ba0aa3a7-9355-5000-a10e-dfb2e5276a9b> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23023010"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/8fd03e41-ca54-5081-9829-bd43ebc481da>
     a eucn:TARICMeasure ;
     eucn:codeString "2306100000"^^xsd:string ;
@@ -15094,6 +16234,46 @@ bfo:RO_0002234
     eucn:measureTypeId "570"^^xsd:string ;
     eucn:regulationId "Decision 0142/96"^^xsd:string ;
     eucn:validityStart "2026-04-29"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/905d8c23-8126-50f4-9b1e-d3261d29d970>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/378b03ab-49d5-5ed7-b1cd-2bd38e503d50> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23080090"^^xsd:string ;
+.
+
+<https://w3id.org/eucn/ind/90637fb5-f2e2-57f4-9144-9810e968822d>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/2498642d-5deb-50e7-9654-6daa5b083d04> ,
+        <https://w3id.org/eucn/ind/905d8c23-8126-50f4-9b1e-d3261d29d970> ,
+        <https://w3id.org/eucn/ind/c75a308d-441d-502d-8858-04ad894a3077> ,
+        <https://w3id.org/eucn/ind/ecb159f4-773f-50db-8da1-f5dc066a0e98> ;
+    eucn:questionText
+        "Eicheln und Rosskastanien; Trester (ausgenommen Traubentrester)"^^xsd:string ,
+        "andere"^^xsd:string ,
+        "anderer"^^xsd:string ,
+        "mit einem Gesamtalkoholgehalt von 4,3 % mas oder weniger und einem Trockenmassegehalt von 40 GHT oder mehr"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/90745e2a-b4d5-5842-a3a1-671d09958db8>
@@ -15276,6 +16456,24 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0805/08"^^xsd:string ;
     eucn:validityStart "2008-12-29"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/9283639c-5d9b-500a-924d-f809d13bad08>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23050000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23050000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/928cbf89-69aa-5581-b36d-46d0e90d1f87>
@@ -15833,6 +17031,24 @@ bfo:RO_0002234
     eucn:validityStart "2013-03-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/99ada5ac-3de7-57df-9335-0613685ab08f>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/0f8ffb17-e4c2-5848-b555-41bc303cbfa6> ,
+        <https://w3id.org/eucn/ind/8971944b-2a6a-5cc1-aea6-b417d4127edd> ,
+        <https://w3id.org/eucn/ind/d5c2f524-9d5e-5f3d-ad14-554fd604b7cd> ,
+        <https://w3id.org/eucn/ind/f0bb211b-dee6-5bcb-adda-ff485ef5fe1a> ,
+        <https://w3id.org/eucn/ind/f9b02299-cda9-52ed-b7f7-ddce7c0a0e8b> ;
+    eucn:questionText
+        "40 GHT oder weniger"^^xsd:string ,
+        "Treber, Schlempen und Abfälle aus Brauereien oder Brennereien"^^xsd:string ,
+        "andere"^^xsd:string ,
+        "ausgelaugte Rübenschnitzel, Bagasse und andere Abfälle aus der Zuckergewinnung"^^xsd:string ,
+        "mehr als 40 GHT"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/99e300e3-6b32-5c25-ad1d-bbb8dcc349ef>
     a eucn:TARICMeasure ;
     eucn:codeString "2308004000"^^xsd:string ;
@@ -16000,6 +17216,36 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0729/09"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/9c2e6a9e-6c84-53ad-a34d-827173d99aea>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091053"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091053"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/9c5700b5-d050-556e-a23e-cae9b74347f9>
@@ -17078,6 +18324,36 @@ bfo:RO_0002234
     eucn:validityStart "2023-05-16"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/a64086cc-20c8-5818-9844-c59e93c4583c>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091070"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091070"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/a647f4a8-580c-57a7-afe2-6d96587f829d>
     a eucn:TARICMeasure ;
     eucn:codeString "2302400200"^^xsd:string ;
@@ -17157,6 +18433,22 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0680/90"^^xsd:string ;
     eucn:validityStart "2008-07-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/a7138315-82d0-5aef-84d7-491abe1d4f14>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs <https://w3id.org/eucn/ind/8abbdf6a-7e75-5944-9eb0-f336d1accca1> ;
+    eucn:hasAnswer
+        <https://w3id.org/eucn/ind/20e19a15-01d8-51d5-b7cc-099894d4bda7> ,
+        <https://w3id.org/eucn/ind/af5512b9-3dff-5557-b23b-29e7e5a0b4d9> ,
+        <https://w3id.org/eucn/ind/ca67de88-da5a-5008-b30f-47d0e9a1a179> ;
+    eucn:questionText
+        "von Hülsenfrüchten"^^xsd:string ,
+        "von Mais"^^xsd:string ,
+        "von Weizen"^^xsd:string ,
+        "von anderem Getreide"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/a71445ff-325a-58c9-ad2e-4c3fb18051f5>
@@ -17419,6 +18711,36 @@ bfo:RO_0002234
     eucn:measureTypeId "746"^^xsd:string ;
     eucn:regulationId "Regulation 1850/15"^^xsd:string ;
     eucn:validityStart "2015-10-18"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/a8e1f044-999b-58be-a196-4703910ffa37>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091031"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091031"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/a8e2c6fb-fdd1-56f3-a25e-7b5462122144>
@@ -18072,6 +19394,21 @@ bfo:RO_0002234
     eucn:validityStart "2014-01-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/af5512b9-3dff-5557-b23b-29e7e5a0b4d9>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/2d26d094-1c20-55af-be96-e7952f7b9c0c> ,
+        <https://w3id.org/eucn/ind/471f03ba-faea-5ed9-90d2-98a12329dfec> ,
+        <https://w3id.org/eucn/ind/e11ac1a0-6495-5ab3-a44a-cda831ff17b7> ,
+        <https://w3id.org/eucn/ind/f66ebb87-8030-5028-8fab-f068b13001bd> ;
+    eucn:questionText
+        "andere"^^xsd:string ,
+        "mit einem Gehalt an Stärke von 28 GHT oder weniger, vorausgesetzt, dass entweder 10 GHT oder weniger der Ware durch ein Sieb mit einer Maschenweite von 0,2 mm hindurchgehen oder bei einem Siebdurchgang von mehr als 10 GHT der auf die Trockenmasse bezogene Aschegehalt des Siebdurchgangs 1,5 GHT oder mehr beträgt"^^xsd:string ,
+        "mit einem Gehalt an Stärke von 35 GHT oder weniger"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/af61ceb4-ea9f-527b-97e9-ff477c76eb6f>
     a eucn:TARICMeasure ;
     eucn:codeString "2309105900"^^xsd:string ;
@@ -18214,6 +19551,30 @@ bfo:RO_0002234
     eucn:measureTypeId "410"^^xsd:string ;
     eucn:regulationId "Regulation 0632/21"^^xsd:string ;
     eucn:validityStart "2024-08-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/b0937f50-df4e-50fc-aba6-a282af8e606e>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23070011"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/8cc5da3e-b22e-5a90-b5c0-e3fca480d5bd> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23070011"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/b0b7870f-1bf0-53da-9039-155b4bf633eb>
@@ -19189,6 +20550,36 @@ bfo:RO_0002234
     eucn:validityStart "2019-12-02"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/bc608f88-430c-576d-9634-c3fa6030848d>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099035"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099035"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/bc8475fc-d232-5d61-a065-0bbc58c5e90a>
     a eucn:TARICMeasure ;
     eucn:codeString "2309905300"^^xsd:string ;
@@ -19264,6 +20655,18 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1850/16"^^xsd:string ;
     eucn:validityStart "2016-12-15"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/bcf702b9-19bf-52ce-ad87-75709b5433c7>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:hasAnswer
+        <https://w3id.org/eucn/ind/38c54850-e260-5295-a1af-0380646673fa> ,
+        <https://w3id.org/eucn/ind/d278537c-9287-553c-a031-ce95797be650> ;
+    eucn:questionText
+        "Hunde- und Katzenfutter, in Aufmachungen für den Einzelverkauf"^^xsd:string ,
+        "andere"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/bcfa892d-c56c-5c62-932f-9b08901c9e85>
@@ -19556,6 +20959,33 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0494/14"^^xsd:string ;
     eucn:validityStart "2014-09-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/c0f2a9da-ab45-584b-9a25-b90bf710fd5f>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/2dbdec5d-58de-5c30-9c90-b3dfad84563c> ,
+        <https://w3id.org/eucn/ind/9283639c-5d9b-500a-924d-f809d13bad08> ;
+    eucn:hasAnswer
+        <https://w3id.org/eucn/ind/06c12a0e-a0c1-5402-bfed-e568360f57d0> ,
+        <https://w3id.org/eucn/ind/1adbe33e-d5b3-5a31-a0ec-d88378972b34> ,
+        <https://w3id.org/eucn/ind/90637fb5-f2e2-57f4-9144-9810e968822d> ,
+        <https://w3id.org/eucn/ind/99ada5ac-3de7-57df-9335-0613685ab08f> ,
+        <https://w3id.org/eucn/ind/a7138315-82d0-5aef-84d7-491abe1d4f14> ,
+        <https://w3id.org/eucn/ind/bcf702b9-19bf-52ce-ad87-75709b5433c7> ,
+        <https://w3id.org/eucn/ind/dfe0f170-5f5c-5241-b304-ba0665a3d299> ;
+    eucn:questionText
+        "Kleie und andere Rückstände, auch in Form von Pellets, vom Sichten, Mahlen oder von anderen Bearbeitungen von Getreide oder Hülsenfrüchten"^^xsd:string ,
+        "Mehl und Pellets von Fleisch, von Schlachtnebenerzeugnissen, von Fischen oder von Krebstieren, von Weichtieren oder anderen wirbellosen Wassertieren, ungenießbar; Grieben/Grammeln"^^xsd:string ,
+        "Pflanzliche Stoffe und pflanzliche Abfälle, pflanzliche Rückstände und pflanzliche Nebenerzeugnisse der zur Fütterung verwendeten Art, auch in Form von Pellets, anderweit weder genannt noch inbegriffen"^^xsd:string ,
+        "Rückstände aus der Stärkegewinnung und ähnliche Rückstände, ausgelaugte Rübenschnitzel, Bagasse und andere Abfälle aus der Zuckergewinnung, Treber, Schlempen und Abfälle aus Brauereien oder Brennereien, auch in Form von Pellets"^^xsd:string ,
+        "Weintrub/Weingeläger; Weinstein, roh"^^xsd:string ,
+        "Zubereitungen von der zur Fütterung verwendeten Art"^^xsd:string ,
+        "Ölkuchen und andere feste Rückstände aus der Gewinnung pflanzlicher oder mikrobieller Fette oder Öle, auch gemahlen oder in Form von Pellets, ausgenommen Waren der Positionen 2304 und 2305"^^xsd:string ,
+        "Ölkuchen und andere feste Rückstände aus der Gewinnung von Erdnussöl, auch gemahlen oder in Form von Pellets"^^xsd:string ,
+        "Ölkuchen und andere feste Rückstände aus der Gewinnung von Sojaöl, auch gemahlen oder in Form von Pellets"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/c1226eb6-e411-5462-be65-44274fc7bf3d>
@@ -20161,6 +21591,30 @@ bfo:RO_0002234
     eucn:validityStart "2016-04-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/c75a308d-441d-502d-8858-04ad894a3077>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080011"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/378b03ab-49d5-5ed7-b1cd-2bd38e503d50> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23080011"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/c75aa0c3-cbe3-5869-a409-9701cbb37d1a>
     a eucn:TARICMeasure ;
     eucn:codeString "2309907000"^^xsd:string ;
@@ -20398,6 +21852,36 @@ bfo:RO_0002234
     eucn:validityStart "2016-10-10"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/c97d1ada-c024-5f5e-a570-1f2333332d0b>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091039"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091039"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/c9868cb0-726f-5bab-89af-bb6709c00915>
     a eucn:TARICMeasure ;
     eucn:codeString "2309903900"^^xsd:string ;
@@ -20476,6 +21960,18 @@ bfo:RO_0002234
     eucn:measureTypeId "570"^^xsd:string ;
     eucn:regulationId "Decision 0142/96"^^xsd:string ;
     eucn:validityStart "2026-04-29"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/ca67de88-da5a-5008-b30f-47d0e9a1a179>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/8fcbb724-ff8f-5a3b-b519-fb21b78037d6> ,
+        <https://w3id.org/eucn/ind/e86b2ad6-bdb8-5ca2-a499-ef3722bdac72> ;
+    eucn:questionText
+        "andere"^^xsd:string ,
+        "mit einem Gehalt an Stärke von 28 GHT oder weniger, vorausgesetzt, dass entweder 10 GHT oder weniger der Ware durch ein Sieb mit einer Maschenweite von 0,2 mm hindurchgehen oder bei einem Siebdurchgang von mehr als 10 GHT der auf die Trockenmasse bezogene Aschegehalt des Siebdurchgangs 1,5 GHT oder mehr beträgt"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/ca6fca14-74c9-5d6c-82aa-9f77d7140926>
@@ -20585,6 +22081,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0239/04"^^xsd:string ;
     eucn:validityStart "2016-11-06"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/cbdc76c2-69a5-5f39-984e-dd862a65dbeb>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23069019"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23069019"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/cc1ac648-2412-5c61-9e0d-c2215434b0f7>
@@ -21124,6 +22644,60 @@ bfo:RO_0002234
     eucn:validityStart "2009-04-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/d20c2333-d731-55f7-8479-1386f0d0d9a0>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23066000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23066000"^^xsd:string ;
+.
+
+<https://w3id.org/eucn/ind/d2173a6c-4476-5142-91fd-cebd22b2b243>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099031"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099031"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/d22b52f7-18e2-5dc0-900e-257a36a39500>
     a eucn:TARICMeasure ;
     eucn:codeString "2308009000"^^xsd:string ;
@@ -21142,6 +22716,33 @@ bfo:RO_0002234
     eucn:measureTypeId "570"^^xsd:string ;
     eucn:regulationId "Decision 0142/96"^^xsd:string ;
     eucn:validityStart "2025-01-15"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/d278537c-9287-553c-a031-ce95797be650>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/0ba35d8d-9458-5a3d-a44c-13a2266fc9d5> ,
+        <https://w3id.org/eucn/ind/28d1845d-482e-5729-a1c0-84e30301c3b4> ,
+        <https://w3id.org/eucn/ind/67c84762-13d4-5de4-b0fa-e1a482f5e827> ,
+        <https://w3id.org/eucn/ind/6ee06523-d946-56b5-b0f3-eeca890ae5a6> ,
+        <https://w3id.org/eucn/ind/729c8116-1833-527a-9671-8cd9646bc38e> ,
+        <https://w3id.org/eucn/ind/8996b0a3-0574-5e2a-b200-ccc5701ad1ab> ,
+        <https://w3id.org/eucn/ind/9c2e6a9e-6c84-53ad-a34d-827173d99aea> ,
+        <https://w3id.org/eucn/ind/a64086cc-20c8-5818-9844-c59e93c4583c> ,
+        <https://w3id.org/eucn/ind/a8e1f044-999b-58be-a196-4703910ffa37> ,
+        <https://w3id.org/eucn/ind/c97d1ada-c024-5f5e-a570-1f2333332d0b> ,
+        <https://w3id.org/eucn/ind/ec2d434e-dd05-5cd8-ba48-45edfaf6081e> ,
+        <https://w3id.org/eucn/ind/f8a5effb-70e9-5bf9-ba67-a4baaf8e151a> ;
+    eucn:questionText
+        "andere"^^xsd:string ,
+        "keine Milcherzeugnisse enthaltend oder mit einem Gehalt an Milcherzeugnissen von weniger als 10 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 10 oder mehr, jedoch weniger als 50 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 50 GHT oder mehr"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 50 oder mehr, jedoch weniger als 75 GHT"^^xsd:string ,
+        "mit einem Gehalt an Milcherzeugnissen von 75 GHT oder mehr"^^xsd:string ,
+        "weder Stärke, Glucose, Glucosesirup, Maltodextrin noch Maltodextrinsirup, jedoch Milcherzeugnisse enthaltend"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/d289a977-f734-574f-94a5-fa5d2e39a2e8>
@@ -21185,6 +22786,30 @@ bfo:RO_0002234
     eucn:measureTypeId "755"^^xsd:string ;
     eucn:regulationId "Regulation 1157/24"^^xsd:string ;
     eucn:validityStart "2026-05-21"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/d2da2c01-ffe3-5196-a7dc-ab767bef15d8>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23060000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23064900"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23064900"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/d2e16aaa-17b2-5501-9edd-77c68a298e94>
@@ -21441,6 +23066,30 @@ bfo:RO_0002234
     eucn:validityStart "2017-09-21"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/d5c2f524-9d5e-5f3d-ad14-554fd604b7cd>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23030000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23031019"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23031019"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/d5e580dd-b38e-50e6-b689-48a4cd418d07>
     a eucn:TARICMeasure ;
     eucn:codeString "2303101100"^^xsd:string ;
@@ -21566,6 +23215,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0037/17"^^xsd:string ;
     eucn:validityStart "2017-09-21"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/d7111101-01b2-50fb-8ad6-761a0eeb29a4>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23010000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23012000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/0933da53-5996-5b6d-a0c9-603a32f3c32c> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23012000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/d73966d8-4d16-52e0-8734-a49e66956e05>
@@ -22246,6 +23919,35 @@ bfo:RO_0002234
     eucn:validityStart "2025-07-20"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/dfe0f170-5f5c-5241-b304-ba0665a3d299>
+    a eucn:ClassificationNode ;
+    dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do> ;
+    rdfs:comment "Advisory tool only. Classification paths sourced from EZT-Online do not constitute legally binding EU instruments." ;
+    eucn:classifiesAs
+        <https://w3id.org/eucn/ind/1f3963c0-9409-51d6-8525-df7bd26d77f8> ,
+        <https://w3id.org/eucn/ind/2db9b838-36b1-5cdb-a28b-1e0f573f82f2> ,
+        <https://w3id.org/eucn/ind/3ed0b3f9-c753-5335-b788-8b4edb509cec> ,
+        <https://w3id.org/eucn/ind/4a740d8c-2908-5371-9ef7-f923ead4e40c> ,
+        <https://w3id.org/eucn/ind/6fa0510b-acfe-5c46-a139-317495f67d03> ,
+        <https://w3id.org/eucn/ind/70089b47-964a-568b-a442-722771b9353c> ,
+        <https://w3id.org/eucn/ind/84a6dcd4-172b-51d0-a00f-d90daab5fbb7> ,
+        <https://w3id.org/eucn/ind/86220a38-05bc-595f-b2fc-7d25ee48bf10> ,
+        <https://w3id.org/eucn/ind/cbdc76c2-69a5-5f39-984e-dd862a65dbeb> ,
+        <https://w3id.org/eucn/ind/d20c2333-d731-55f7-8479-1386f0d0d9a0> ,
+        <https://w3id.org/eucn/ind/d2da2c01-ffe3-5196-a7dc-ab767bef15d8> ;
+    eucn:questionText
+        "andere"^^xsd:string ,
+        "aus Baumwollsamen"^^xsd:string ,
+        "aus Kokosnüssen (Kopra)"^^xsd:string ,
+        "aus Leinsamen"^^xsd:string ,
+        "aus Maiskeimen"^^xsd:string ,
+        "aus Palmnüssen oder Palmkernen"^^xsd:string ,
+        "aus Sonnenblumenkernen"^^xsd:string ,
+        "aus erucasäurearmen Raps- oder Rübsensamen"^^xsd:string ,
+        "mit einem Gehalt an Olivenöl von 3 GHT oder weniger"^^xsd:string ,
+        "mit einem Gehalt an Olivenöl von mehr als 3 GHT"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/dfef79c6-50d1-51b9-9a40-5dc02d685692>
     a eucn:TARICMeasure ;
     eucn:codeString "2309909659"^^xsd:string ;
@@ -22361,6 +24063,36 @@ bfo:RO_0002234
     eucn:measureTypeId "695"^^xsd:string ;
     eucn:regulationId "Regulation 1227/25"^^xsd:string ;
     eucn:validityStart "2025-07-20"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/e11ac1a0-6495-5ab3-a44a-cda831ff17b7>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024002"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/19fc17d7-98f4-576f-8595-cd0dc6e5ee45> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23024002"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/e12b96f1-1d08-5a99-8601-6d5fc6941fde>
@@ -23063,6 +24795,36 @@ bfo:RO_0002234
     eucn:validityStart "2008-12-29"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/e86b2ad6-bdb8-5ca2-a499-ef3722bdac72>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23023000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23023090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ba0aa3a7-9355-5000-a10e-dfb2e5276a9b> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23023090"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/e878ccce-f773-5165-82bb-c9f7559a5352>
     a eucn:TARICMeasure ;
     eucn:codeString "2309101900"^^xsd:string ;
@@ -23276,6 +25038,36 @@ bfo:RO_0002234
     eucn:validityStart "2015-10-18"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/ec2d434e-dd05-5cd8-ba48-45edfaf6081e>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091051"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091051"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/ec482708-f9ca-5b37-8f06-fe40f7e5219f>
     a eucn:TARICMeasure ;
     eucn:codeString "2300000000"^^xsd:string ;
@@ -23325,6 +25117,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 1647/24"^^xsd:string ;
     eucn:validityStart "2024-07-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/ecb159f4-773f-50db-8da1-f5dc066a0e98>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23080040"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/378b03ab-49d5-5ed7-b1cd-2bd38e503d50> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23080040"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/ecc2e0ed-1a55-5a2d-bf14-784a62046bff>
@@ -23735,6 +25551,30 @@ bfo:RO_0002234
     eucn:measureTypeId "142"^^xsd:string ;
     eucn:regulationId "Decision 0415/00"^^xsd:string ;
     eucn:validityStart "2016-07-01"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/f0bb211b-dee6-5bcb-adda-ff485ef5fe1a>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23030000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23033000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23033000"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/f0c34309-be16-541a-8c2d-a69281b6c6e2>
@@ -24192,6 +26032,36 @@ bfo:RO_0002234
     eucn:validityStart "2026-05-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/f66ebb87-8030-5028-8fab-f068b13001bd>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23020000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23024008"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/19fc17d7-98f4-576f-8595-cd0dc6e5ee45> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23024008"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/f6ebecbc-043c-54b2-8faa-93d3cc719466>
     a eucn:TARICMeasure ;
     eucn:codeString "2309103300"^^xsd:string ;
@@ -24298,6 +26168,36 @@ bfo:RO_0002234
     eucn:validityStart "2020-05-17"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/f8a5effb-70e9-5bf9-ba67-a4baaf8e151a>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23091019"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23091019"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/f8d6324b-d7b3-51ee-8ee5-49f80f42799a>
     a eucn:TARICMeasure ;
     eucn:codeString "2302000000"^^xsd:string ;
@@ -24360,6 +26260,30 @@ bfo:RO_0002234
     eucn:measureTypeId "695"^^xsd:string ;
     eucn:regulationId "Regulation 1227/25"^^xsd:string ;
     eucn:validityStart "2025-07-20"^^xsd:date ;
+.
+
+<https://w3id.org/eucn/ind/f9b02299-cda9-52ed-b7f7-ddce7c0a0e8b>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23030000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23031090"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23031090"^^xsd:string ;
 .
 
 <https://w3id.org/eucn/ind/f9bc01e0-284f-5108-bb58-fe7449dcfcff>
@@ -24691,6 +26615,36 @@ bfo:RO_0002234
     eucn:validityStart "2000-07-01"^^xsd:date ;
 .
 
+<https://w3id.org/eucn/ind/fd31264d-7aaa-5afd-8044-a1d8102de8fd>
+    a eucn:CNCode ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23090000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099000"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84> ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:hasValue "23099049"^^xsd:string ;
+                    owl:onProperty <https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009> ;
+                ]
+            ) ;
+        ] ;
+    eucn:belongsToChapter <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63> ;
+    eucn:codeString "23099049"^^xsd:string ;
+.
+
 <https://w3id.org/eucn/ind/fd4976cf-75c5-5134-aa62-a2787aa791bf>
     a eucn:TARICMeasure ;
     eucn:codeString "2308009000"^^xsd:string ;
@@ -24987,14 +26941,39 @@ eucn:StillWine
         "non-sparkling wine of fresh grapes in containers, classified under CN subheadings 2204 21 (≤ 2 L) and 2204 29 (> 2 L) (Chapter 22)"@en ;
 .
 
-eucn:ClassificationNode
-    a owl:Class ;
-    rdfs:label
-        "Einreihungsknoten"@de ,
-        "Classification Node"@en ;
-    skos:definition
-        "Schritt in einem sequenziellen Wareneinreihungsverfahren, der eine einzelne unterscheidende Frage stellt, um die zutreffende Nomenklaturposition einzugrenzen; bezogen auf den Beratungsassistenten EZT-Online und ohne rechtsbindende Wirkung als EU-Instrument"@de ,
-        "step in a sequential commodity classification procedure that poses a single discriminating question to narrow the applicable nomenclature position; sourced from the EZT-Online advisory wizard and carrying advisory status only, not constituting a legally binding EU instrument"@en ;
+<https://w3id.org/eucn/ind/0933da53-5996-5b6d-a0c9-603a32f3c32c>
+    a owl:AnnotationProperty ;
+    rdfs:label "Mehl und Pellets von Fleisch, von Schlachtnebenerzeugnissen, von Fischen oder von Krebstieren, von Weichtieren oder anderen wirbellosen Wassertieren, ungenießbar; Grieben/Grammeln"@de ;
+.
+
+<https://w3id.org/eucn/ind/a84db38a-2a5e-5702-9a92-76e41512c29d>
+    a owl:AnnotationProperty ;
+    rdfs:label "von Mais"@de ;
+.
+
+<https://w3id.org/eucn/ind/ba0aa3a7-9355-5000-a10e-dfb2e5276a9b>
+    a owl:AnnotationProperty ;
+    rdfs:label "von Weizen"@de ;
+.
+
+<https://w3id.org/eucn/ind/8cc5da3e-b22e-5a90-b5c0-e3fca480d5bd>
+    a owl:AnnotationProperty ;
+    rdfs:label "Weintrub/Weingeläger; Weinstein, roh"@de ;
+.
+
+<https://w3id.org/eucn/ind/19fc17d7-98f4-576f-8595-cd0dc6e5ee45>
+    a owl:AnnotationProperty ;
+    rdfs:label "von anderem Getreide"@de ;
+.
+
+<https://w3id.org/eucn/ind/378b03ab-49d5-5ed7-b1cd-2bd38e503d50>
+    a owl:AnnotationProperty ;
+    rdfs:label "Pflanzliche Stoffe und pflanzliche Abfälle, pflanzliche Rückstände und pflanzliche Nebenerzeugnisse der zur Fütterung verwendeten Art, auch in Form von Pellets, anderweit weder genannt noch inbegriffe"@de ;
+.
+
+<https://w3id.org/eucn/ind/ce779744-b793-533e-8079-6497b0c80694>
+    a owl:AnnotationProperty ;
+    rdfs:label "Rückstände aus der Stärkegewinnung und ähnliche Rückstände, ausgelaugte Rübenschnitzel, Bagasse und andere Abfälle aus der Zuckergewinnung, Treber, Schlempen und Abfälle aus Brauereien oder Brennereie"@de ;
 .
 
 eucn:AceticFermentation
@@ -25353,6 +27332,11 @@ eucn:Beverage
         "liquid intended for human consumption, classified under CN Chapter 22; a subclass of BFO Object (BFO_0000030)"@en ;
 .
 
+<https://w3id.org/eucn/ind/b57d47fb-e721-52a5-bcc6-bf56a11350a4>
+    a owl:AnnotationProperty ;
+    rdfs:label "Kleie und andere Rückstände, auch in Form von Pellets, vom Sichten, Mahlen oder von anderen Bearbeitungen von Getreide oder Hülsenfrüchten"@de ;
+.
+
 eucn:producedBy
     a
         owl:FunctionalProperty ,
@@ -25393,6 +27377,11 @@ eucn:Wine
         "wine of fresh grapes, including grape must with fermentation arrested by the addition of alcohol, classified under CN heading 2204 (Chapter 22)"@en ;
 .
 
+<https://w3id.org/eucn/ind/a4554114-a042-51a0-9734-e8e3c805544a>
+    a owl:AnnotationProperty ;
+    rdfs:label "Ölkuchen und andere feste Rückstände aus der Gewinnung pflanzlicher oder mikrobieller Fette oder Öle, auch gemahlen oder in Form von Pellets, ausgenommen Waren der Positionen 2304 und 2305"@de ;
+.
+
 eucn:cnHeadingCode
     a owl:DatatypeProperty ;
     rdfs:label
@@ -25402,6 +27391,36 @@ eucn:cnHeadingCode
     skos:definition
         "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; z. B. '2203' für Bier, '220410' für Schaumwein"@de ,
         "four-digit (or six-digit for subheadings) CN heading code inferred by the OWL reasoner from the product class membership; e.g. '2203' for Beer, '220410' for Sparkling Wine"@en ;
+.
+
+<https://w3id.org/eucn/ind/2ea0c1fd-bb0d-5912-8f96-d69a8306939a>
+    a owl:AnnotationProperty ;
+    rdfs:label "Hunde- und Katzenfutter, in Aufmachungen für den Einzelverkauf"@de ;
+.
+
+<https://w3id.org/eucn/ind/40b1b7d5-547f-5145-8756-5871b0eb6009>
+    a owl:AnnotationProperty ;
+    rdfs:label "andere"@de ;
+.
+
+eucn:ClassificationNode
+    a owl:Class ;
+    rdfs:label
+        "Einreihungsknoten"@de ,
+        "Classification Node"@en ;
+    skos:definition
+        "Schritt in einem sequenziellen Wareneinreihungsverfahren, der eine einzelne unterscheidende Frage stellt, um die zutreffende Nomenklaturposition einzugrenzen; bezogen auf den Beratungsassistenten EZT-Online und ohne rechtsbindende Wirkung als EU-Instrument"@de ,
+        "step in a sequential commodity classification procedure that poses a single discriminating question to narrow the applicable nomenclature position; sourced from the EZT-Online advisory wizard and carrying advisory status only, not constituting a legally binding EU instrument"@en ;
+.
+
+<https://w3id.org/eucn/ind/4d5225e7-cd7c-567a-8d1d-24f19c62ad84>
+    a owl:AnnotationProperty ;
+    rdfs:label "Zubereitungen von der zur Fütterung verwendeten Art"@de ;
+.
+
+<https://w3id.org/eucn/ind/6450204b-36e8-5d29-9325-329053545395>
+    a owl:AnnotationProperty ;
+    rdfs:label "RÜCKSTÄNDE UND ABFÄLLE DER LEBENSMITTELINDUSTRIE; ZUBEREITETES FUTTER"@de ;
 .
 
 <https://w3id.org/eucn/ind/bd3be6aa-f2f5-5693-916a-0290c48fed63>

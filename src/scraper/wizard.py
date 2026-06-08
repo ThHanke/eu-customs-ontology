@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import hashlib
+import json
 import re
 from pathlib import Path
 from typing import Callable
@@ -8,19 +8,67 @@ from typing import Callable
 from src.schema.wizard import AnswerOption, ClassificationNode, WizardTree
 from src.scraper.checkpoint import (
     append_node_jsonl,
-    load_checkpoint,
     load_nodes_jsonl,
-    save_checkpoint,
 )
 
-ENTRY_URL = "https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do"
-CN_CODE_RE = re.compile(r"\b(\d{8,10})\b")
+BASE_URL = "https://auskunft.ezt-online.de/ezto"
+SEARCH_URL = f"{BASE_URL}/EztSuche.do"
 CHECKPOINT_INTERVAL = 50
 
 
-def state_key(url: str, form_data: dict[str, str]) -> str:
-    param_str = "&".join(f"{k}={v}" for k, v in sorted(form_data.items()))
-    return hashlib.sha256(f"{url}|{param_str}".encode()).hexdigest()
+def _parent_code(code: str) -> str | None:
+    """Return the parent 8-digit code by zeroing the rightmost non-zero digit pair.
+
+    Hierarchy: CCNN0000 → CC000000 (heading → chapter)
+               CCNNSS00 → CCNN0000 (subheading → heading)
+               CCNNSSXX → CCNNSS00 (CN code → subheading)
+    """
+    if len(code) != 8:
+        return None
+    for suffix_len in (2, 4, 6):
+        candidate = code[: 8 - suffix_len] + "0" * suffix_len
+        if candidate != code:
+            return candidate
+    return None
+
+
+def _build_hierarchy(codes_8: list[str]) -> dict[str, list[str]]:
+    """Return {parent_code: [child_codes]} mapping."""
+    code_set = set(codes_8)
+    children: dict[str, list[str]] = {c: [] for c in codes_8}
+    for code in sorted(codes_8):
+        p = _parent_code(code)
+        while p is not None:
+            if p in code_set:
+                children[p].append(code)
+                break
+            p = _parent_code(p)
+    return children
+
+
+def _lookup_description(page, code: str) -> tuple[str, bool]:
+    """POST code to EztSuche.do; return (description, is_endlinie)."""
+    page.fill("input[name='warennummer']", code)
+    page.click("input[name='doSearch']")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(300)
+    body = page.inner_text("body")
+    desc = ""
+    if "Warenbeschreibung" in body:
+        idx = body.find("Warenbeschreibung")
+        # Description may be on same line after colon or on next non-empty line
+        after = body[idx + len("Warenbeschreibung") :]
+        first_line = after.split("\n")[0].strip().lstrip(":").strip()
+        if first_line:
+            desc = first_line
+        else:
+            for line in after.split("\n")[1:]:
+                stripped = line.strip()
+                if stripped and stripped != ":":
+                    desc = stripped
+                    break
+    is_endlinie = "Endlinie" in body
+    return desc or f"CN {code}", is_endlinie
 
 
 def scrape_chapter(
@@ -31,181 +79,111 @@ def scrape_chapter(
     storage_state_path: Path | None = None,
     on_node: Callable[[dict], None] | None = None,
 ) -> WizardTree:
-    """DFS traversal of the EZT wizard for the given chapter.
+    """Build WizardTree from TARIC codes + EZT Ausfuhr description lookup.
 
-    Writes completed nodes to wizard_ch{chapter:02d}.jsonl and checkpoint state
-    to checkpoint_ch{chapter:02d}.json every CHECKPOINT_INTERVAL nodes.
-
-    Returns a WizardTree built from all completed nodes.
+    Reads taric_ch{chapter:02d}.json from intermediate_dir for code list.
+    Writes completed nodes to wizard_ch{chapter:02d}.jsonl.
+    Returns a WizardTree with proper descriptions.
     """
-    from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-    import datetime
+    from playwright.sync_api import sync_playwright
 
     jsonl_path = intermediate_dir / f"wizard_ch{chapter:02d}.jsonl"
-    ckpt_path = intermediate_dir / f"checkpoint_ch{chapter:02d}.json"
-    err_dir = intermediate_dir
+    taric_path = intermediate_dir / f"taric_ch{chapter:02d}.json"
 
-    chapter_prefix = f"{chapter:02d}"
+    # Load TARIC codes
+    taric_data = json.loads(taric_path.read_text()) if taric_path.exists() else {}
+    measures = taric_data.get("measures", [])
+    codes_10 = sorted(set(m["commodity_code"] for m in measures))
+    # Deduplicate to 8-digit codes; keep codes that start with this chapter
+    prefix = f"{chapter:02d}"
+    codes_8 = sorted(
+        set(c[:8] for c in codes_10 if c.startswith(prefix))
+    )
+
+    # Add chapter root if missing
+    root_8 = f"{chapter:02d}000000"
+    if root_8 not in codes_8:
+        codes_8 = [root_8] + codes_8
+
+    children_map = _build_hierarchy(codes_8)
+    # Identify leaf codes: codes with no children in our set
+    leaf_codes = {c for c in codes_8 if not children_map.get(c)}
+
+    # Load already-scraped nodes; ignore orphan stubs from prior runs
+    code_set = set(codes_8)
+    existing: dict[str, ClassificationNode] = {}
+    for nd in load_nodes_jsonl(jsonl_path):
+        node = ClassificationNode.model_validate(nd)
+        if node.node_id in code_set:
+            existing[node.node_id] = node
+    scraped_codes = {n.node_id for n in existing.values()}
+
+    # If file has no valid nodes (e.g. old-format stub), truncate so we start clean
+    if jsonl_path.exists() and not existing:
+        jsonl_path.write_text("")
+
+    nodes: dict[str, ClassificationNode] = dict(existing)
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
         ctx_kwargs: dict = {}
-        ss_path = storage_state_path or (intermediate_dir / "session_state.json")
+        ss_path = storage_state_path or (intermediate_dir / "session_state_ausfuhr.json")
         if ss_path.exists():
             ctx_kwargs["storage_state"] = str(ss_path)
         context = browser.new_context(**ctx_kwargs)
         page = context.new_page()
 
-        def _navigate_entry():
-            page.goto(ENTRY_URL)
-            page.wait_for_load_state("networkidle")
-            context.storage_state(path=str(ss_path))
+        # Establish Ausfuhr session
+        page.goto(f"{BASE_URL}/Init.do")
+        page.wait_for_load_state("networkidle")
+        page.click("input[value='zur Ausfuhr']")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(300)
 
-        def _select_chapter():
-            # Try to find a chapter dropdown or link for the given chapter
-            # EZT uses a form with chapter selection; look for chapter 22 option
-            try:
-                # Select by value if a <select> exists
-                page.select_option("select[name*='kapitel'], select[name*='chapter']",
-                                   value=str(chapter), timeout=5000)
-            except Exception:
-                # Fall back: click a link matching the chapter number
-                page.click(f"a:has-text('{chapter_prefix}')", timeout=5000)
-            page.wait_for_load_state("networkidle")
+        # Save session state for resumption
+        context.storage_state(path=str(ss_path))
 
-        def _extract_node(url: str, path_from_root: list[str]) -> ClassificationNode | None:
-            content = page.content()
-            # Extract question text from the main question element
-            q_el = page.query_selector(".frage, .question, #question, [class*='frage']")
-            question_text = q_el.inner_text().strip() if q_el else ""
-
-            # Extract answer options — look for radio buttons or submit buttons with answer labels
-            options: list[AnswerOption] = []
-            answer_els = page.query_selector_all("input[type='radio'], button[type='submit']")
-            for el in answer_els:
-                label = ""
-                el_id = el.get_attribute("id")
-                if el_id:
-                    lbl = page.query_selector(f"label[for='{el_id}']")
-                    if lbl:
-                        label = lbl.inner_text().strip()
-                if not label:
-                    label = el.get_attribute("value") or el.inner_text().strip()
-                if label:
-                    options.append(AnswerOption(answer_text=label, next_node_id=None))
-
-            # Detect terminal node: CN code in page
-            cn_match = CN_CODE_RE.search(content)
-            cn_code = cn_match.group(1) if (cn_match and not options) else None
-            is_terminal = cn_code is not None or len(options) == 0
-
-            # Build node_id from path
-            node_id = hashlib.sha256("|".join(path_from_root).encode()).hexdigest()[:16]
-
-            return ClassificationNode(
-                node_id=node_id,
-                question_text=question_text or "(no question)",
-                answer_options=options if not is_terminal else [],
-                is_terminal=is_terminal,
-                cn_code=cn_code if is_terminal else None,
-                path_from_root=list(path_from_root),
-            )
-
-        # Load checkpoint if exists
-        ckpt = load_checkpoint(ckpt_path)
-        visited: set[str] = set(ckpt["visited"]) if ckpt else set()
-        frontier: list[tuple[str, dict, list[str]]] = []
-        if ckpt:
-            for item in ckpt["frontier"]:
-                frontier.append((item["url"], item["form_data"], item["path"]))
-
-        if not frontier:
-            _navigate_entry()
-            _select_chapter()
-            initial_url = page.url
-            initial_forms = {}  # entry form data after chapter selection
-            frontier = [(initial_url, initial_forms, [])]
-
-        nodes: dict[str, ClassificationNode] = {}
-        # Load already-completed nodes from JSONL
-        for nd in load_nodes_jsonl(jsonl_path):
-            node = ClassificationNode.model_validate(nd)
-            nodes[node.node_id] = node
-
-        root_node_id: str | None = None
-        node_count = 0
-
-        while frontier:
-            url, form_data, path = frontier.pop()
-            sk = state_key(url, form_data)
-            if sk in visited:
+        for code in codes_8:
+            if code in scraped_codes:
                 continue
-            visited.add(sk)
 
-            try:
-                if form_data:
-                    # POST the form
-                    page.goto(url)
-                    page.wait_for_load_state("networkidle")
+            desc, is_endlinie = _lookup_description(page, code)
 
-                node = _extract_node(page.url, path)
-                nodes[node.node_id] = node
-                if on_node:
-                    on_node(node.model_dump())
-                append_node_jsonl(jsonl_path, node.model_dump())
-                node_count += 1
+            # Determine children answer options
+            child_codes = children_map.get(code, [])
+            answer_options = [
+                AnswerOption(answer_text=c, next_node_id=c)
+                for c in child_codes
+            ]
 
-                if root_node_id is None and not path:
-                    root_node_id = node.node_id
+            is_terminal = code in leaf_codes or is_endlinie
+            cn_code = code if is_terminal else None
 
-                if not node.is_terminal:
-                    # Click each answer option to discover next states
-                    answer_els = page.query_selector_all("input[type='radio'], button[type='submit']")
-                    for i, el in enumerate(answer_els):
-                        answer_text = ""
-                        el_id = el.get_attribute("id")
-                        if el_id:
-                            lbl = page.query_selector(f"label[for='{el_id}']")
-                            if lbl:
-                                answer_text = lbl.inner_text().strip()
-                        if not answer_text:
-                            answer_text = el.get_attribute("value") or el.inner_text().strip()
+            # path_from_root: list of ancestor codes
+            path: list[str] = []
+            p = _parent_code(code)
+            while p is not None:
+                if p in {c for c in codes_8}:
+                    path.insert(0, p)
+                p = _parent_code(p)
 
-                        next_path = path + [answer_text]
-                        # Push the state: we'll navigate to it by replaying from entry
-                        next_state = state_key(page.url, {str(i): answer_text})
-                        if next_state not in visited:
-                            frontier.append((page.url, {"_answer_idx": str(i), "_text": answer_text}, next_path))
-
-            except PlaywrightTimeout as exc:
-                ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                page.screenshot(path=str(err_dir / f"error_{ts}.png"))
-                save_checkpoint(ckpt_path, visited, [
-                    {"url": u, "form_data": fd, "path": p} for u, fd, p in frontier
-                ])
-                raise RuntimeError(
-                    f"Timeout after {node_count} nodes. Checkpoint saved to {ckpt_path}."
-                ) from exc
-
-            # Detect session expiry: response URL reverted to entry despite being mid-traversal
-            if path and ENTRY_URL in page.url:
-                save_checkpoint(ckpt_path, visited, [
-                    {"url": u, "form_data": fd, "path": p} for u, fd, p in frontier
-                ])
-                raise RuntimeError(
-                    f"Session expired after {node_count} nodes. "
-                    f"Resume from checkpoint {ckpt_path}."
-                )
-
-            if node_count % CHECKPOINT_INTERVAL == 0:
-                save_checkpoint(ckpt_path, visited, [
-                    {"url": u, "form_data": fd, "path": p} for u, fd, p in frontier
-                ])
+            node = ClassificationNode(
+                node_id=code,
+                question_text=desc,
+                answer_options=answer_options,
+                is_terminal=is_terminal,
+                cn_code=cn_code,
+                path_from_root=path,
+            )
+            nodes[code] = node
+            append_node_jsonl(jsonl_path, node.model_dump())
+            if on_node:
+                on_node(node.model_dump())
 
         browser.close()
 
     return WizardTree(
         chapter=chapter,
         nodes=nodes,
-        root_node_id=root_node_id or (next(iter(nodes)) if nodes else ""),
+        root_node_id=root_8,
     )
