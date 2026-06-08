@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import tempfile
 from pathlib import Path
@@ -149,7 +148,7 @@ def harmonize(
                 scratch_path = Path(f.name)
             g.serialize(destination=str(scratch_path), format="turtle")
             check_consistency(scratch_path)
-        except KoncludeConsistencyError as exc:
+        except (KoncludeConsistencyError, Exception) as exc:
             logger.warning(
                 "harmonize: Konclude consistency check failed for chapter %d (no corrections): %s",
                 chapter, exc,
@@ -167,7 +166,7 @@ def harmonize(
             scratch_path = Path(f.name)
         g.serialize(destination=str(scratch_path), format="turtle")
         check_consistency(scratch_path)
-    except KoncludeConsistencyError as exc:
+    except (KoncludeConsistencyError, Exception) as exc:
         logger.warning(
             "harmonize: Konclude consistency check failed for chapter %d corrections — skipping: %s",
             chapter, exc,

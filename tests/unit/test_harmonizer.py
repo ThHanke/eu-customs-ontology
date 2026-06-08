@@ -358,3 +358,42 @@ def test_scratch_file_deleted_on_konclude_failure(tmp_path):
     # All temp files should have been cleaned up
     for p in created_temps:
         assert not p.exists(), f"Temp file not cleaned up: {p}"
+
+
+# ---------------------------------------------------------------------------
+# Konclude binary absent: FileNotFoundError → [] without raising
+# ---------------------------------------------------------------------------
+
+
+def test_konclude_not_found_returns_empty(tmp_path):
+    """check_consistency raising FileNotFoundError → warning logged, empty list returned."""
+    import logging
+
+    base_tbox = _make_base_tbox(tmp_path)
+
+    correction_payload = [
+        {
+            "primary_iri": _IRI_A,
+            "duplicate_iri": _IRI_B,
+            "equivalence_type": "class",
+            "rationale": "Same concept.",
+        }
+    ]
+
+    with patch("src.agent.harmonizer.anthropic.Anthropic") as MockClient:
+        mock_client = MockClient.return_value
+        mock_client.messages.create.return_value = _make_tool_response(correction_payload)
+
+        with patch(
+            "src.agent.harmonizer.check_consistency",
+            side_effect=FileNotFoundError("konclude: command not found"),
+        ):
+            # Must not raise — FileNotFoundError must be swallowed
+            result = harmonize(
+                chapter=22,
+                new_iris=_NEW_IRIS_TWO,
+                base_tbox_path=base_tbox,
+                model="claude-opus-4-8",
+            )
+
+    assert result == []
