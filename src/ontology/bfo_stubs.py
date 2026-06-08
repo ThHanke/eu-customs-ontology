@@ -9,7 +9,7 @@ BFO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl"
 RO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/ro.owl")
 
 # BFO 2020 parent classes
-BFO_INDEPENDENT_CONTINUANT = BFO["BFO_0000040"]  # parent of material entity (BFO_0000030)
+BFO_INDEPENDENT_CONTINUANT = BFO["BFO_0000004"]  # parent of material entity (BFO_0000030)
 BFO_OCCURRENT = BFO["BFO_0000003"]               # parent of process (BFO_0000015)
 
 
@@ -31,20 +31,18 @@ def add_bfo_stubs(graph: Graph) -> None:
         "kontinuierender Teil einer anderen materiellen Entität ist",
         lang="de",
     )))
-    # BFO_0000030 parent: independent continuant (BFO_0000040)
+    # BFO_0000030 parent: independent continuant (BFO_0000004)
     g.add((BFO_OBJECT, RDFS.subClassOf, BFO_INDEPENDENT_CONTINUANT))
     g.add((BFO_INDEPENDENT_CONTINUANT, RDF.type, OWL.Class))
     g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.label, Literal("independent continuant", lang="en")))
     g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.label, Literal("unabhängige Kontinuante", lang="de")))
     g.add((BFO_INDEPENDENT_CONTINUANT, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
     g.add((BFO_INDEPENDENT_CONTINUANT, SKOS.definition, Literal(
-        "continuant that is a bearer of quality and realizable entity where the bearer "
-        "is independent of whether or not there is any realization",
+        "continuant that is not specifically dependent on or generically dependent on any other entity",
         lang="en",
     )))
     g.add((BFO_INDEPENDENT_CONTINUANT, SKOS.definition, Literal(
-        "Kontinuante, die Träger einer Qualität oder realisierbaren Entität ist, "
-        "unabhängig davon, ob eine Realisierung vorliegt",
+        "Kontinuante, die weder spezifisch noch generisch von einer anderen Entität abhängig ist",
         lang="de",
     )))
     # BFO:Process

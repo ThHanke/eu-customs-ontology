@@ -51,10 +51,10 @@ class TestBuildStaticContext:
         from src.ontology.namespaces import BFO
         bfo_object = BFO["BFO_0000030"]
         bfo_process = BFO["BFO_0000015"]
-        bfo_ind_cont = BFO["BFO_0000040"]
+        bfo_ind_cont = BFO["BFO_0000004"]
         bfo_occurrent = BFO["BFO_0000003"]
         assert (bfo_object, RDFS.subClassOf, bfo_ind_cont) in g, \
-            "BFO_0000030 must have rdfs:subClassOf BFO_0000040 (independent continuant)"
+            "BFO_0000030 must have rdfs:subClassOf BFO_0000004 (independent continuant)"
         assert (bfo_process, RDFS.subClassOf, bfo_occurrent) in g, \
             "BFO_0000015 must have rdfs:subClassOf BFO_0000003 (occurrent)"
 

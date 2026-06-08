@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import re
+from datetime import date
 
 from rdflib import Graph
 
@@ -14,13 +16,24 @@ logger = logging.getLogger(__name__)
 _TRIPLE_CAP = 500
 
 
-def build_static_context(chapter: int) -> str:
+def build_static_context(chapter: int, extract_date: date | None = None) -> str:
     """Serialize BFO stubs + core TBox + chapter TBox into compact Turtle.
+
+    Parameters
+    ----------
+    chapter:
+        Chapter number to build the TBox for.
+    extract_date:
+        Date to pass to build_tbox for versionIRI/versionInfo embedding.
+        When *None* build_tbox uses today's date.  Pass a fixed epoch date
+        (e.g. ``date(2000, 1, 1)``) to obtain a stable, date-independent
+        serialisation suitable for hashing.
 
     Logs a warning if the serialized graph exceeds _TRIPLE_CAP triples.
     """
     g = Graph()
-    build_tbox(g, chapter=chapter)
+    kwargs = {} if extract_date is None else {"extract_date": extract_date}
+    build_tbox(g, chapter=chapter, **kwargs)
     triple_count = len(g)
     if triple_count > _TRIPLE_CAP:
         logger.warning(
@@ -79,8 +92,11 @@ def build_node_context(
 
 
 def compute_tbox_hash(chapter: int) -> str:
-    """Return SHA-256 hex digest over the serialized TBox for *chapter*."""
-    ttl = build_static_context(chapter)
+    """Return SHA-256 hex digest over the serialized TBox for *chapter*.
+
+    Uses a fixed epoch date so the hash is stable across days.
+    """
+    ttl = build_static_context(chapter, extract_date=date(2000, 1, 1))
     return hashlib.sha256(ttl.encode()).hexdigest()
 
 
@@ -104,12 +120,15 @@ def _compute_hierarchy_path(
 
 
 def _collect_existing_axioms(cn_code: str, running_tbox_ttl: str) -> list[str]:
-    """Extract lines from the running TBox that mention the cn_code fragment."""
+    """Extract lines from the running TBox that mention the cn_code fragment.
+
+    For numeric cn_codes a digit-boundary regex is used so that e.g. "22"
+    does not match "2204", "2022", or "Regulation22".
+    """
     if not running_tbox_ttl:
         return []
-    lines = []
+    if cn_code.isdigit():
+        pattern = re.compile(r'(?<!\d)' + re.escape(cn_code) + r'(?!\d)', re.IGNORECASE)
+        return [line for line in running_tbox_ttl.splitlines() if pattern.search(line)]
     fragment = cn_code.lower()
-    for line in running_tbox_ttl.splitlines():
-        if fragment in line.lower():
-            lines.append(line)
-    return lines
+    return [line for line in running_tbox_ttl.splitlines() if fragment in line.lower()]
