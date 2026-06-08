@@ -114,3 +114,107 @@ def fetch_note_pdf(note_id: str) -> bytes:
     if resp.status_code != 200:
         raise ValueError(f"CLASS API error {resp.status_code} for note {note_id}")
     return base64.b64decode(resp.json()["base64"])
+
+
+def _decode_note_response(resp: httpx.Response) -> str:
+    """Decode the API response body to plain text.
+
+    The API may return:
+    - JSON with a ``"base64"`` key: base64-encoded PDF bytes → extract text via pdfminer
+    - JSON with a ``"text"`` or ``"content"`` key: use that value directly
+    - Anything else: return raw response text
+    """
+    try:
+        payload = resp.json()
+    except Exception:
+        return resp.text
+
+    if isinstance(payload, dict):
+        if "base64" in payload:
+            pdf_bytes = base64.b64decode(payload["base64"])
+            try:
+                import io
+
+                from pdfminer.high_level import extract_text
+
+                return extract_text(io.BytesIO(pdf_bytes))
+            except ImportError:
+                return pdf_bytes.decode("utf-8", errors="replace")
+        if "text" in payload:
+            return str(payload["text"])
+        if "content" in payload:
+            return str(payload["content"])
+
+    return resp.text
+
+
+def fetch_full_note_text(
+    note_id: str,
+    out_dir: Path,
+    *,
+    force: bool = False,
+) -> str:
+    """Fetch the complete legal text for a note, with filesystem caching.
+
+    Checks ``out_dir/{note_id}.txt`` first; returns cached content unless
+    *force* is ``True``. Otherwise calls
+    ``/classification/getNotesById?referenceId={note_id}``, decodes the
+    response to plain text, writes the result to the cache file, and returns
+    it.  Rate-limit: 0.5 s sleep before each HTTP call.
+
+    Args:
+        note_id: The CLASS API note reference id.
+        out_dir: Directory where ``{note_id}.txt`` is cached.
+        force: Re-fetch even when a cached file exists.
+
+    Returns:
+        Plain-text content of the note (may be empty string).
+
+    Raises:
+        ValueError: When the API returns a 4xx or 5xx status code.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    cache_path = out_dir / f"{note_id}.txt"
+
+    if cache_path.exists() and not force:
+        return cache_path.read_text(encoding="utf-8")
+
+    time.sleep(0.5)
+    with httpx.Client(timeout=30) as client:
+        resp = client.get(
+            f"{BASE_URL}/classification/getNotesById",
+            params={"referenceId": note_id},
+        )
+
+    if resp.status_code >= 400:
+        raise ValueError(
+            f"CLASS API error {resp.status_code} for note {note_id}"
+        )
+
+    text = _decode_note_response(resp)
+    cache_path.write_text(text, encoding="utf-8")
+    return text
+
+
+def fetch_all_full_notes(
+    chapter: int,
+    out_dir: Path,
+    note_ids: list[str],
+    *,
+    force: bool = False,
+) -> dict[str, str]:
+    """Batch-fetch full note texts for a list of note IDs.
+
+    Args:
+        chapter: Chapter number (informational; used only for logging context).
+        out_dir: Directory passed to :func:`fetch_full_note_text`.
+        note_ids: List of note reference IDs to fetch.
+        force: Re-fetch even when cached files exist.
+
+    Returns:
+        Mapping of ``note_id → plain-text content``.
+    """
+    results: dict[str, str] = {}
+    for note_id in note_ids:
+        results[note_id] = fetch_full_note_text(note_id, out_dir, force=force)
+    return results

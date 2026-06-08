@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.fetcher.class_api import fetch_chapter_notes
+from src.fetcher.class_api import fetch_all_full_notes, fetch_chapter_notes, fetch_full_note_text
 from src.schema.legal_text import LegalSection
 
 _NOTE_EN = {
@@ -152,3 +152,77 @@ def test_missing_note_id_raises_key_error(mock_client_cls, mock_sleep, tmp_path)
 
     with pytest.raises(KeyError):
         fetch_chapter_notes(22, tmp_path, languages=["en"])
+
+
+# ---------------------------------------------------------------------------
+# fetch_full_note_text tests
+# ---------------------------------------------------------------------------
+
+
+def _make_get_response(payload: dict | None = None, status_code: int = 200, text: str = "") -> MagicMock:
+    resp = MagicMock()
+    resp.status_code = status_code
+    resp.text = text
+    if payload is not None:
+        resp.json.return_value = payload
+    else:
+        resp.json.side_effect = Exception("no JSON")
+    return resp
+
+
+@patch("src.fetcher.class_api.time.sleep")
+def test_full_note_cached_no_http_call(mock_sleep, tmp_path):
+    """Cached file is returned directly without making an HTTP call."""
+    cache_file = tmp_path / "NOTE001.txt"
+    cache_file.write_text("cached legal text", encoding="utf-8")
+
+    with patch("src.fetcher.class_api.httpx.Client") as mock_client_cls:
+        result = fetch_full_note_text("NOTE001", tmp_path)
+
+    assert result == "cached legal text"
+    mock_client_cls.assert_not_called()
+    mock_sleep.assert_not_called()
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_full_note_uncached_fetched_and_written(mock_client_cls, mock_sleep, tmp_path):
+    """Uncached note is fetched, decoded, written to disk, and returned."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+    mock_client.get.return_value = _make_get_response({"text": "full legal text for NOTE002"})
+
+    result = fetch_full_note_text("NOTE002", tmp_path)
+
+    assert result == "full legal text for NOTE002"
+    cache_file = tmp_path / "NOTE002.txt"
+    assert cache_file.exists()
+    assert cache_file.read_text(encoding="utf-8") == "full legal text for NOTE002"
+    mock_sleep.assert_called_once_with(0.5)
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_full_note_http_4xx_raises_value_error(mock_client_cls, mock_sleep, tmp_path):
+    """HTTP 4xx raises ValueError containing the note_id."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+    mock_client.get.return_value = _make_get_response(status_code=404)
+
+    with pytest.raises(ValueError, match="NOTE003"):
+        fetch_full_note_text("NOTE003", tmp_path)
+
+
+@patch("src.fetcher.class_api.time.sleep")
+@patch("src.fetcher.class_api.httpx.Client")
+def test_full_note_empty_response_returns_empty_string(mock_client_cls, mock_sleep, tmp_path):
+    """Empty response body returns empty string and does not raise."""
+    mock_client = MagicMock()
+    mock_client_cls.return_value.__enter__.return_value = mock_client
+    mock_client.get.return_value = _make_get_response(payload=None, text="")
+
+    result = fetch_full_note_text("NOTE004", tmp_path)
+
+    assert result == ""
+    cache_file = tmp_path / "NOTE004.txt"
+    assert cache_file.exists()
