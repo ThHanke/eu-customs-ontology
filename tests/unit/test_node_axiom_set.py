@@ -191,6 +191,27 @@ def test_invalid_status_raises():
 
 
 # ---------------------------------------------------------------------------
+# bfo_parent_iri namespace validation
+# ---------------------------------------------------------------------------
+
+
+def test_bfo_parent_iri_invalid_namespace_raises():
+    bad_class = {**_VALID_CLASS, "bfo_parent_iri": "http://example.com/SomeClass"}
+    with pytest.raises(ValidationError):
+        NewClass(**bad_class)
+
+
+def test_bfo_parent_iri_valid_bfo_namespace():
+    nc = NewClass(**_VALID_CLASS)
+    assert nc.bfo_parent_iri == BFO_MATERIAL
+
+
+def test_bfo_parent_iri_valid_eucn_namespace():
+    nc = NewClass(**{**_VALID_CLASS, "bfo_parent_iri": f"{EUCN_NS}SomeParent"})
+    assert nc.bfo_parent_iri.startswith(EUCN_NS)
+
+
+# ---------------------------------------------------------------------------
 # facet can be None
 # ---------------------------------------------------------------------------
 
@@ -199,6 +220,23 @@ def test_restriction_facet_none_is_valid():
     restriction = {**_VALID_RESTRICTION, "restriction_type": "someValuesFrom", "facet": None}
     n = NodeAxiomSet(**_make_valid_axiom_set(restrictions=[restriction]))
     assert n.restrictions[0].facet is None
+
+
+# ---------------------------------------------------------------------------
+# decimalRange requires non-None facet
+# ---------------------------------------------------------------------------
+
+
+def test_decimal_range_with_null_facet_raises():
+    bad_restriction = {**_VALID_RESTRICTION, "restriction_type": "decimalRange", "facet": None}
+    with pytest.raises(ValidationError):
+        NodeRestriction(**bad_restriction)
+
+
+def test_decimal_range_with_facet_is_valid():
+    r = NodeRestriction(**_VALID_RESTRICTION)
+    assert r.restriction_type == "decimalRange"
+    assert r.facet is not None
 
 
 # ---------------------------------------------------------------------------

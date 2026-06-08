@@ -14,6 +14,14 @@ class NewClass(BaseModel):
     bfo_parent_iri: str
     class_type: Literal["material_entity", "process", "quality", "other"]
 
+    @field_validator("bfo_parent_iri")
+    @classmethod
+    def _validate_bfo_or_eucn(cls, v: str) -> str:
+        valid = ("http://purl.obolibrary.org/obo/", "https://w3id.org/eucn/")
+        if not any(v.startswith(p) for p in valid):
+            raise ValueError(f"bfo_parent_iri must be a BFO or EUCN IRI, got: {v!r}")
+        return v
+
 
 class NewProperty(BaseModel):
     iri_local_name: str
@@ -30,6 +38,12 @@ class NodeRestriction(BaseModel):
     property_iri: str
     value: str
     facet: str | None
+
+    @model_validator(mode="after")
+    def _validate_facet(self) -> "NodeRestriction":
+        if self.restriction_type == "decimalRange" and self.facet is None:
+            raise ValueError("facet must not be None when restriction_type is 'decimalRange'")
+        return self
 
 
 class NodeAxiomSet(BaseModel):
