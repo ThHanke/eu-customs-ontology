@@ -149,26 +149,10 @@ def build_abox(
     )
     if node_registry_dir.exists():
         from src.agent.node_registry import NodeRegistry
-        from src.agent.axiom_builder import build_equivalence_axioms_from_candidates
+        from src.agent.axiom_builder import build_graph_from_node_axiom_set
         node_registry = NodeRegistry(node_registry_dir)
-        approved_sets = [s for s in node_registry.iter_all() if s.status == "approved"]
-        if approved_sets:
-            import tempfile
-            fd, _tmp = tempfile.mkstemp(suffix=".jsonl")
-            import os as _os
-            _os.close(fd)
-            flat_path = Path(_tmp)
-            try:
-                node_registry.flatten_to_candidates(flat_path)
-                from src.agent.candidate_registry import CandidateRegistry
-                candidate_reg = CandidateRegistry(flat_path)
-                candidate_reg.load()
-                # Candidates from flatten_to_candidates are "proposed"; approved
-                # status was already validated at NodeAxiomSet level (approved_sets).
-                active = candidate_reg.get_active()
-                if active:
-                    build_equivalence_axioms_from_candidates(g, active)
-            finally:
-                flat_path.unlink(missing_ok=True)
+        for axiom_set in node_registry.iter_all():
+            if axiom_set.status == "approved":
+                build_graph_from_node_axiom_set(g, axiom_set)
 
     return g, coverage

@@ -6,9 +6,9 @@ import tempfile
 from pathlib import Path
 
 import anthropic
-from rdflib import BNode, Graph, Literal, URIRef
-from rdflib.namespace import OWL, RDF, RDFS, XSD
+from rdflib import Graph
 
+from src.agent.axiom_builder import build_graph_from_node_axiom_set
 from src.reasoning.konclude import KoncludeConsistencyError, check_consistency
 from src.schema.node_axiom_set import (
     PROPOSE_AXIOMS_TOOL_SCHEMA,
@@ -29,101 +29,6 @@ def _load_system_prompt(static_context: str) -> str:
     return template.replace("{static_context}", static_context)
 
 
-def _build_axiom_graph(axiom_set: NodeAxiomSet) -> Graph:
-    """Convert a NodeAxiomSet into an rdflib Graph of OWL triples."""
-    g = Graph()
-    eucn_ns = "https://w3id.org/eucn/"
-    def _iri(s: str) -> URIRef:
-        # If already a full IRI, return as-is; otherwise treat as local name under EUCN
-        if s.startswith("http://") or s.startswith("https://"):
-            return URIRef(s)
-        return URIRef(f"{eucn_ns}{s}")
-
-    # Declare new classes
-    for nc in axiom_set.new_classes:
-        cls_iri = _iri(nc.iri_local_name)
-        parent_iri = URIRef(nc.bfo_parent_iri)
-        g.add((cls_iri, RDF.type, OWL.Class))
-        g.add((cls_iri, RDFS.subClassOf, parent_iri))
-        g.add((cls_iri, RDFS.label, Literal(nc.label_en, lang="en")))
-        g.add((cls_iri, RDFS.label, Literal(nc.label_de, lang="de")))
-        g.add((cls_iri, URIRef("http://purl.obolibrary.org/obo/IAO_0000115"),
-               Literal(nc.definition_en, lang="en")))
-
-    # Declare new properties
-    for np_ in axiom_set.new_properties:
-        prop_iri = _iri(np_.iri_local_name)
-        if np_.property_type == "object":
-            g.add((prop_iri, RDF.type, OWL.ObjectProperty))
-            if np_.is_functional:
-                g.add((prop_iri, RDF.type, OWL.FunctionalProperty))
-        else:
-            g.add((prop_iri, RDF.type, OWL.DatatypeProperty))
-            if np_.is_functional:
-                g.add((prop_iri, RDF.type, OWL.FunctionalProperty))
-        g.add((prop_iri, RDFS.label, Literal(np_.label_en, lang="en")))
-        if np_.domain_iri:
-            g.add((prop_iri, RDFS.domain, _iri(np_.domain_iri)))
-        if np_.range_iri:
-            g.add((prop_iri, RDFS.range, _iri(np_.range_iri)))
-
-    # Declare restrictions
-    for i, restr in enumerate(axiom_set.restrictions):
-        cls_iri = _iri(restr.owl_class_iri)
-        prop_iri = _iri(restr.property_iri)
-        key = f"{axiom_set.cn_code}:{i}"
-
-        if restr.restriction_type == "someValuesFrom":
-            r = BNode(f"r_sv_{key}")
-            g.add((r, RDF.type, OWL.Restriction))
-            g.add((r, OWL.onProperty, prop_iri))
-            g.add((r, OWL.someValuesFrom, _iri(restr.value)))
-            g.add((cls_iri, RDFS.subClassOf, r))
-
-        elif restr.restriction_type == "hasValue":
-            r = BNode(f"r_hv_{key}")
-            g.add((r, RDF.type, OWL.Restriction))
-            g.add((r, OWL.onProperty, prop_iri))
-            val_str = restr.value
-            if ":" in val_str:
-                # IRI-shaped value (e.g. named singleton individual like eucn:GrapeFermentation_individual)
-                filler = URIRef(val_str)
-            elif val_str.lower() in ("true", "false"):
-                filler = Literal(val_str.lower() == "true", datatype=XSD.boolean)
-            else:
-                filler = Literal(val_str, datatype=XSD.string)
-            g.add((r, OWL.hasValue, filler))
-            g.add((cls_iri, RDFS.subClassOf, r))
-
-        elif restr.restriction_type == "decimalRange":
-            facet_iri = URIRef(restr.facet) if restr.facet else XSD.maxInclusive
-            facet_b = BNode(f"facet_{key}")
-            g.add((facet_b, facet_iri, Literal(str(float(restr.value)), datatype=XSD.decimal)))
-            dtype = BNode(f"dtype_{key}")
-            g.add((dtype, RDF.type, RDFS.Datatype))
-            g.add((dtype, OWL.onDatatype, XSD.decimal))
-            fl = BNode(f"fl_{key}")
-            g.add((fl, RDF.first, facet_b))
-            g.add((fl, RDF.rest, RDF.nil))
-            g.add((dtype, OWL.withRestrictions, fl))
-            r = BNode(f"r_dr_{key}")
-            g.add((r, RDF.type, OWL.Restriction))
-            g.add((r, OWL.onProperty, prop_iri))
-            g.add((r, OWL.someValuesFrom, dtype))
-            g.add((cls_iri, RDFS.subClassOf, r))
-
-        elif restr.restriction_type == "complement":
-            inner = BNode(f"r_sv_inner_{key}")
-            g.add((inner, RDF.type, OWL.Restriction))
-            g.add((inner, OWL.onProperty, prop_iri))
-            g.add((inner, OWL.someValuesFrom, _iri(restr.value)))
-            compl = BNode(f"r_compl_{key}")
-            g.add((compl, RDF.type, OWL.Class))
-            g.add((compl, OWL.complementOf, inner))
-            g.add((cls_iri, RDFS.subClassOf, compl))
-
-    return g
-
 
 def _build_scratch_ttl(
     base_tbox_path: Path,
@@ -138,9 +43,7 @@ def _build_scratch_ttl(
         g.parse(str(running_tbox_path), format="turtle")
     if existing_axioms_ttl and existing_axioms_ttl.strip():
         g.parse(data=existing_axioms_ttl, format="turtle")
-    axiom_g = _build_axiom_graph(axiom_set)
-    for triple in axiom_g:
-        g.add(triple)
+    build_graph_from_node_axiom_set(g, axiom_set)
     with tempfile.NamedTemporaryFile(suffix=".ttl", delete=False, mode="w") as f:
         scratch_path = Path(f.name)
     try:
