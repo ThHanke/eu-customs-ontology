@@ -3,7 +3,7 @@ from __future__ import annotations
 from rdflib import Graph, Literal
 from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
-from src.ontology.namespaces import EUCN
+from src.ontology.namespaces import BFO_PROCESS, EUCN, RO_HAS_OUTPUT
 
 
 def _dp(g: Graph, iri, label_en: str, label_de: str, def_en: str, def_de: str, range_) -> None:
@@ -13,6 +13,16 @@ def _dp(g: Graph, iri, label_en: str, label_de: str, def_en: str, def_de: str, r
     g.add((iri, SKOS.definition, Literal(def_en, lang="en")))
     g.add((iri, SKOS.definition, Literal(def_de, lang="de")))
     g.add((iri, RDFS.range, range_))
+
+
+def _op(g: Graph, iri, label_en: str, label_de: str, def_en: str, def_de: str, range_=None) -> None:
+    g.add((iri, RDF.type, OWL.ObjectProperty))
+    g.add((iri, RDFS.label, Literal(label_en, lang="en")))
+    g.add((iri, RDFS.label, Literal(label_de, lang="de")))
+    g.add((iri, SKOS.definition, Literal(def_en, lang="en")))
+    g.add((iri, SKOS.definition, Literal(def_de, lang="de")))
+    if range_ is not None:
+        g.add((iri, RDFS.range, range_))
 
 
 def add_discriminating_props(graph: Graph) -> None:
@@ -61,19 +71,16 @@ def add_discriminating_props(graph: Graph) -> None:
         XSD.decimal,
     )
 
-    _dp(
-        g, EUCN.fermentationBase,
-        "fermentation base", "Fermentationsgrundlage",
-        "raw material from which a fermented beverage is produced, expressed as a controlled "
-        "string value: 'malt' (beer), 'grape' (wine), 'fruit' (cider/perry), 'grain' (spirits); "
-        "used to discriminate between CN headings 2203 (malt), 2204/2205 (grape), 2206 (other), "
-        "and 2208 (grain/fruit distillates)",
-        "Ausgangsrohstoff, aus dem ein fermentiertes Getränk hergestellt wird, ausgedrückt als "
-        "kontrollierter Zeichenkettenwert: 'malt' (Bier), 'grape' (Wein), 'fruit' (Apfel-/Birnenwein), "
-        "'grain' (Spirituosen); zur Unterscheidung zwischen den KN-Positionen 2203 (Malz), "
-        "2204/2205 (Traube), 2206 (sonstige) und 2208 (Getreide-/Fruchtdestillate)",
-        XSD.string,
+    _op(
+        g, EUCN.producedBy,
+        "produced by", "hergestellt durch",
+        "production process by which a beverage is made; links a beverage individual to its "
+        "named process singleton, used to discriminate between CN headings in Chapter 22",
+        "Herstellungsprozess, durch den ein Getränk erzeugt wird; verknüpft ein Getränkeindividuum "
+        "mit seinem benannten Prozesssingleton, zur Unterscheidung zwischen KN-Positionen in Kapitel 22",
+        BFO_PROCESS,
     )
-    # Functional: each beverage has exactly one fermentation base.
-    # Required for OWL 2 DL realization: lets the reasoner infer ferm≠X from ferm=Y.
-    g.add((EUCN.fermentationBase, RDF.type, OWL.FunctionalProperty))
+    # Functional: each beverage is produced by exactly one process.
+    # inverseOf RO:has_output (RO_0002234) — the process outputs the beverage.
+    g.add((EUCN.producedBy, RDF.type, OWL.FunctionalProperty))
+    g.add((EUCN.producedBy, OWL.inverseOf, RO_HAS_OUTPUT))
