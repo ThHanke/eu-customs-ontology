@@ -4,6 +4,24 @@ OWL ontology for assigning EU customs codes and tariff regulations to products. 
 
 OWL classes and individuals are published under the persistent IRI base **`https://w3id.org/eucn`**.
 
+## Ontology Architecture
+
+The OWL 2 DL ontology uses a **production-process restriction pattern** for individual classification. Each CN heading is defined by an `owl:equivalentClass` axiom combining `eucn:producedBy` (an `owl:FunctionalProperty` `owl:ObjectProperty`) `hasValue` restrictions on named process singleton individuals (e.g. `eucn:malt-fermentation`) with numeric range restrictions on `eucn:alcoholByVolumePercent`. Process singletons are typed as `bfo:Process` subclasses with pairwise `owl:disjointWith` between classes and `owl:differentFrom` between individuals to enable world-closure under OWA. Phase 2 classes (Spirit, EthylAlcohol) use graph-derived `NOT(producedBy = X)` complement restrictions for the remaining headings.
+
+```turtle
+# Example: Beer ≡ (malt fermentation ∩ ABV > 0.5%)
+eucn:Beer owl:equivalentClass [
+    owl:intersectionOf (
+        [ owl:onProperty eucn:producedBy ; owl:hasValue eucn:malt-fermentation ]
+        [ owl:onProperty eucn:alcoholByVolumePercent ;
+          owl:someValuesFrom [ owl:onDatatype xsd:decimal ;
+            owl:withRestrictions ([ xsd:minExclusive 0.5 ]) ] ]
+    )
+] .
+```
+
+See [docs/ontology-patterns.md](docs/ontology-patterns.md) for the full pattern specification, world-closure mechanics, and a step-by-step guide for adding new chapters.
+
 ## Data Sources
 
 | Source | What it provides | URL |
