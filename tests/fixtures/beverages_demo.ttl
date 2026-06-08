@@ -11,43 +11,43 @@
 
 # CN 2204 10 — Sparkling wine (eucn:SparklingWine)
 demo:champagne-brut a owl:NamedIndividual ;
-    eucn:fermentationBase  "grape"^^xsd:string ;
+    eucn:producedBy        eucn:grape-fermentation ;
     eucn:isCarbonated      "true"^^xsd:boolean .
 
 # CN 2204 21/29 — Still wine (eucn:StillWine)
 demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:fermentationBase  "grape"^^xsd:string ;
+    eucn:producedBy        eucn:grape-fermentation ;
     eucn:isCarbonated      "false"^^xsd:boolean .
 
 # CN 2206 — Other fermented beverage, apple cider (eucn:FermentedBeverage)
 demo:apple-cider a owl:NamedIndividual ;
-    eucn:fermentationBase  "fruit"^^xsd:string .
+    eucn:producedBy        eucn:fruit-fermentation .
 
 # CN 2205 — Flavoured wine, vermouth (eucn:FlavouredWine)
 demo:dry-vermouth a owl:NamedIndividual ;
-    eucn:fermentationBase  "grape-flavoured"^^xsd:string .
+    eucn:producedBy        eucn:grape-flavouring .
 
 # CN 2209 — Vinegar (eucn:Vinegar)
 demo:malt-vinegar a owl:NamedIndividual ;
-    eucn:fermentationBase  "acetic"^^xsd:string .
+    eucn:producedBy        eucn:acetic-fermentation .
 
 # CN 2202 — Non-alcoholic beverage, lemonade (eucn:NonAlcoholicBeverage)
 demo:sparkling-lemonade a owl:NamedIndividual ;
-    eucn:fermentationBase  "sweetened-water"^^xsd:string .
+    eucn:producedBy        eucn:sweetened-water-process .
 
 # CN 2203 — Beer (eucn:Beer)
 demo:czech-lager a owl:NamedIndividual ;
-    eucn:fermentationBase       "malt"^^xsd:string ;
+    eucn:producedBy             eucn:malt-fermentation ;
     eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
 
 # CN 2208 — Spirit (eucn:Spirit)
 demo:whisky-12y a owl:NamedIndividual ;
-    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
 
 # CN 2207 — Ethyl alcohol (eucn:EthylAlcohol)
 demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
 
 # CN 2201 — Water (eucn:Water)

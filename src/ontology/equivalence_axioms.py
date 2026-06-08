@@ -125,7 +125,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     carb = EUCN.isCarbonated
     denature = EUCN.isDenatured
     vol = EUCN.maxContainerVolumeL
-    ferm = EUCN.fermentationBase
+    produced_by = EUCN.producedBy
 
     # ── Phase 1: unconditional axioms ─────────────────────────────────────────
 
@@ -145,7 +145,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.NonAlcoholicBeverage,
         [
             _has_value_restr(
-                g, ferm, Literal("sweetened-water", datatype=XSD.string), "nonalco:ferm"
+                g, produced_by, EUCN["sweetened-water-process"], "nonalco:ferm"
             ),
         ],
         "nonalco",
@@ -156,7 +156,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.Beer,
         [
             _has_value_restr(
-                g, ferm, Literal("malt", datatype=XSD.string), "beer:ferm"
+                g, produced_by, EUCN["malt-fermentation"], "beer:ferm"
             ),
             _decimal_range_restr(
                 g, abv, XSD.minExclusive, 0.5, "beer:abv"
@@ -170,7 +170,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.Wine,
         [
             _has_value_restr(
-                g, ferm, Literal("grape", datatype=XSD.string), "wine:ferm"
+                g, produced_by, EUCN["grape-fermentation"], "wine:ferm"
             ),
         ],
         "wine",
@@ -181,7 +181,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.SparklingWine,
         [
             _has_value_restr(
-                g, ferm, Literal("grape", datatype=XSD.string), "sparkling:ferm"
+                g, produced_by, EUCN["grape-fermentation"], "sparkling:ferm"
             ),
             _has_value_restr(
                 g, carb, Literal(True, datatype=XSD.boolean), "sparkling:carb"
@@ -195,7 +195,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.StillWine,
         [
             _has_value_restr(
-                g, ferm, Literal("grape", datatype=XSD.string), "still:ferm"
+                g, produced_by, EUCN["grape-fermentation"], "still:ferm"
             ),
             _has_value_restr(
                 g, carb, Literal(False, datatype=XSD.boolean), "still:carb"
@@ -209,7 +209,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.FlavouredWine,
         [
             _has_value_restr(
-                g, ferm, Literal("grape-flavoured", datatype=XSD.string), "flavoured:ferm"
+                g, produced_by, EUCN["grape-flavouring"], "flavoured:ferm"
             ),
         ],
         "flavoured",
@@ -220,7 +220,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.FermentedBeverage,
         [
             _has_value_restr(
-                g, ferm, Literal("fruit", datatype=XSD.string), "fermented:ferm"
+                g, produced_by, EUCN["fruit-fermentation"], "fermented:ferm"
             ),
         ],
         "fermented",
@@ -231,7 +231,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         g, EUCN.Vinegar,
         [
             _has_value_restr(
-                g, ferm, Literal("acetic", datatype=XSD.string), "vinegar:ferm"
+                g, produced_by, EUCN["acetic-fermentation"], "vinegar:ferm"
             ),
         ],
         "vinegar",
