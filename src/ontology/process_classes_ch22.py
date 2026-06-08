@@ -1,7 +1,9 @@
-"""Named BFO Process subclasses and singleton individuals for CN Chapter 22 beverages.
+"""Named BFO Process subclasses for CN Chapter 22 beverages.
 
-Each singleton is pairwise owl:differentFrom all other singletons — required for
-OWL 2 DL world-closure: FunctionalProperty + differentFrom enables complement exclusion inference.
+Process classes are pairwise owl:disjointWith — the load-bearing world-closure
+mechanism: eucn:producedBy is owl:FunctionalProperty, so if the unique producedBy
+value is typed as (e.g.) MaltFermentation, Konclude can infer
+NOT(producedBy someValuesFrom GrapeFermentation) via class disjointness.
 """
 from __future__ import annotations
 
@@ -24,22 +26,6 @@ def _proc(g: Graph, iri: URIRef, label_en: str, label_de: str,
     g.add((iri, SKOS.definition, Literal(def_de, lang="de")))
 
 
-def _proc_singleton(g: Graph, class_iri: URIRef, ind_iri: URIRef,
-                    label_en: str, label_de: str) -> None:
-    """Declare a named individual of the given process class."""
-    g.add((ind_iri, RDF.type, OWL.NamedIndividual))
-    g.add((ind_iri, RDF.type, class_iri))
-    g.add((ind_iri, RDFS.label, Literal(label_en, lang="en")))
-    g.add((ind_iri, RDFS.label, Literal(label_de, lang="de")))
-
-
-def _different_pairs(g: Graph, individuals: list[URIRef]) -> None:
-    """Assert pairwise owl:differentFrom for all pairs (symmetric)."""
-    for a, b in itertools.combinations(individuals, 2):
-        g.add((a, OWL.differentFrom, b))
-        g.add((b, OWL.differentFrom, a))
-
-
 def _disjoint_pairs(g: Graph, classes: list[URIRef]) -> None:
     """Assert pairwise owl:disjointWith for all pairs (symmetric)."""
     for a, b in itertools.combinations(classes, 2):
@@ -48,7 +34,7 @@ def _disjoint_pairs(g: Graph, classes: list[URIRef]) -> None:
 
 
 def add_process_classes_ch22(graph: Graph) -> None:
-    """Declare Ch22 process class vocabulary and singletons. Idempotent."""
+    """Declare Ch22 process class vocabulary. Idempotent."""
     g = graph
 
     # ── Process classes ───────────────────────────────────────────────────────
@@ -130,50 +116,7 @@ def add_process_classes_ch22(graph: Graph) -> None:
         "einzigartigen Süßwasserprozesstyp in der KN-Kapitel-22-Einreihung",
     )
 
-    # ── Singletons ────────────────────────────────────────────────────────────
-    _proc_singleton(
-        g, EUCN.MaltFermentation, EUCN["malt-fermentation"],
-        "malt fermentation process", "Malzfermentationsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.GrapeFermentation, EUCN["grape-fermentation"],
-        "grape fermentation process", "Traubenfermentationsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.GrapeFlavouringProcess, EUCN["grape-flavouring"],
-        "grape flavouring process", "Traubenaromatisierungsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.FruitFermentation, EUCN["fruit-fermentation"],
-        "fruit fermentation process", "Fruchtfermentationsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.GrainDistillation, EUCN["grain-distillation"],
-        "grain distillation process", "Getreidedestillationsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.AceticFermentation, EUCN["acetic-fermentation"],
-        "acetic fermentation process", "Essigsäuregärungsprozess",
-    )
-    _proc_singleton(
-        g, EUCN.SweetenedWaterProcess, EUCN["sweetened-water-process"],
-        "sweetened water process", "Süßwasserprozess",
-    )
-
-    # ── Pairwise owl:differentFrom (individuals) ──────────────────────────────
-    _different_pairs(g, [
-        EUCN["malt-fermentation"],
-        EUCN["grape-fermentation"],
-        EUCN["grape-flavouring"],
-        EUCN["fruit-fermentation"],
-        EUCN["grain-distillation"],
-        EUCN["acetic-fermentation"],
-        EUCN["sweetened-water-process"],
-    ])
-
-    # ── Pairwise owl:disjointWith (classes) ───────────────────────────────────
-    # Required for Konclude realization: it infers individual distinctness from
-    # class disjointness + class membership, not from owl:differentFrom alone.
+    # ── Pairwise owl:disjointWith (world-closure for producedBy FunctionalProperty) ──
     _disjoint_pairs(g, [
         EUCN.MaltFermentation,
         EUCN.GrapeFermentation,

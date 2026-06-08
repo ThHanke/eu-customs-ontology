@@ -3,15 +3,25 @@
 All heading-level siblings are pairwise disjoint (owl:disjointWith).
 Root eucn:Beverage is a subClassOf BFO:Object (BFO_0000030).
 No owl:AllDisjointClasses — pairwise only (Konclude WASM constraint).
+
+Each product class carries a rdfs:subClassOf owl:hasValue restriction on
+eucn:cnHeadingCode so that the OWL reasoner propagates the CN code to
+classified individuals automatically.
 """
 from __future__ import annotations
 
+import hashlib
 import itertools
 
-from rdflib import Graph, Literal, URIRef
-from rdflib.namespace import OWL, RDF, RDFS, SKOS
+from rdflib import BNode, Graph, Literal, URIRef
+from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
 from src.ontology.namespaces import BFO_OBJECT, EUCN
+
+
+def _bnode(key: str) -> BNode:
+    h = hashlib.sha256(key.encode()).hexdigest()[:16]
+    return BNode(h)
 
 
 def _cls(g: Graph, iri: URIRef, label_en: str, label_de: str,
@@ -25,6 +35,15 @@ def _cls(g: Graph, iri: URIRef, label_en: str, label_de: str,
 
 def _sub(g: Graph, child: URIRef, parent: URIRef) -> None:
     g.add((child, RDFS.subClassOf, parent))
+
+
+def _cn_heading(g: Graph, cls_iri: URIRef, code: str) -> None:
+    """Add rdfs:subClassOf [hasValue code] so the reasoner propagates the CN code."""
+    r = _bnode(f"cn:heading:{code}")
+    g.add((r, RDF.type, OWL.Restriction))
+    g.add((r, OWL.onProperty, EUCN.cnHeadingCode))
+    g.add((r, OWL.hasValue, Literal(code, datatype=XSD.string)))
+    g.add((cls_iri, RDFS.subClassOf, r))
 
 
 def _disjoint_pairs(g: Graph, classes: list[URIRef]) -> None:
@@ -59,6 +78,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "Eis und Schnee, eingereiht in KN-Position 2201 (Kapitel 22)",
     )
     _sub(g, EUCN.Water, EUCN.Beverage)
+    _cn_heading(g, EUCN.Water, "2201")
 
     _cls(
         g, EUCN.NonAlcoholicBeverage,
@@ -71,6 +91,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "Getränke, eingereiht in KN-Position 2202 (Kapitel 22)",
     )
     _sub(g, EUCN.NonAlcoholicBeverage, EUCN.Beverage)
+    _cn_heading(g, EUCN.NonAlcoholicBeverage, "2202")
 
     _cls(
         g, EUCN.Beer,
@@ -83,6 +104,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "(Kapitel 22)",
     )
     _sub(g, EUCN.Beer, EUCN.Beverage)
+    _cn_heading(g, EUCN.Beer, "2203")
 
     _cls(
         g, EUCN.Wine,
@@ -93,6 +115,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "eingereiht in KN-Position 2204 (Kapitel 22)",
     )
     _sub(g, EUCN.Wine, EUCN.Beverage)
+    _cn_heading(g, EUCN.Wine, "2204")
 
     _cls(
         g, EUCN.FlavouredWine,
@@ -103,6 +126,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "Stoffen versetzt, eingereiht in KN-Position 2205 (Kapitel 22)",
     )
     _sub(g, EUCN.FlavouredWine, EUCN.Beverage)
+    _cn_heading(g, EUCN.FlavouredWine, "2205")
 
     _cls(
         g, EUCN.FermentedBeverage,
@@ -115,6 +139,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "eingereiht in KN-Position 2206 (Kapitel 22)",
     )
     _sub(g, EUCN.FermentedBeverage, EUCN.Beverage)
+    _cn_heading(g, EUCN.FermentedBeverage, "2206")
 
     _cls(
         g, EUCN.EthylAlcohol,
@@ -127,6 +152,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "KN-Position 2207 (Kapitel 22)",
     )
     _sub(g, EUCN.EthylAlcohol, EUCN.Beverage)
+    _cn_heading(g, EUCN.EthylAlcohol, "2207")
 
     _cls(
         g, EUCN.Spirit,
@@ -139,6 +165,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "(Kapitel 22)",
     )
     _sub(g, EUCN.Spirit, EUCN.Beverage)
+    _cn_heading(g, EUCN.Spirit, "2208")
 
     _cls(
         g, EUCN.Vinegar,
@@ -149,6 +176,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "(Kapitel 22)",
     )
     _sub(g, EUCN.Vinegar, EUCN.Beverage)
+    _cn_heading(g, EUCN.Vinegar, "2209")
 
     # ── Pairwise disjointness at heading level ─────────────────────────────────
     heading_classes = [
@@ -175,6 +203,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "Flaschengärung schäumend ist, eingereiht in KN-Unterposition 2204 10 (Kapitel 22)",
     )
     _sub(g, EUCN.SparklingWine, EUCN.Wine)
+    _cn_heading(g, EUCN.SparklingWine, "220410")
 
     _cls(
         g, EUCN.StillWine,
@@ -185,6 +214,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "KN-Unterpositionen 2204 21 (≤ 2 L) und 2204 29 (> 2 L) (Kapitel 22)",
     )
     _sub(g, EUCN.StillWine, EUCN.Wine)
+    _cn_heading(g, EUCN.StillWine, "220421")
 
     _cls(
         g, EUCN.GrapeMust,
@@ -195,6 +225,7 @@ def add_product_classes_ch22(graph: Graph) -> None:
         "KN-Unterposition 2204 30 (Kapitel 22)",
     )
     _sub(g, EUCN.GrapeMust, EUCN.Wine)
+    _cn_heading(g, EUCN.GrapeMust, "220430")
 
     # Pairwise disjointness within Wine sub-classes
     _disjoint_pairs(g, [EUCN.SparklingWine, EUCN.StillWine, EUCN.GrapeMust])

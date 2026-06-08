@@ -36,15 +36,14 @@ def _build_list(g: Graph, items: list[BNode], key: str) -> BNode:
 
 
 def _neg_hasvalue_from_disjoint_equiv(g: Graph, cls_iri, key: str) -> list[BNode]:
-    """Return NOT(P=v) complement BNodes derived from disjoint siblings' hasValue axioms.
+    """Return NOT(producedBy someValuesFrom C) BNodes derived from disjoint siblings.
 
-    Generic: for each owl:disjointWith sibling, walks the sibling's equivalentClass
-    intersectionOf list, finds owl:Restriction hasValue members, and emits
-    owl:complementOf [Restriction onProperty P hasValue v] for each.
-    No domain values or class IRIs are hardcoded — all come from the graph.
+    Walks each disjoint sibling's equivalentClass intersectionOf list, finds
+    owl:Restriction someValuesFrom members whose value is a named class (URIRef,
+    not a datatype BNode), and emits owl:complementOf [Restriction someValuesFrom C]
+    for each.
 
-    Requires that product_classes and earlier equivalence axioms are already in g.
-    Deterministic: siblings and values are sorted by IRI/literal string.
+    Deterministic: siblings and values are sorted by IRI string.
     """
     exclusions: list[BNode] = []
     for j, sibling in enumerate(sorted(g.objects(cls_iri, OWL.disjointWith), key=str)):
@@ -58,14 +57,17 @@ def _neg_hasvalue_from_disjoint_equiv(g: Graph, cls_iri, key: str) -> list[BNode
                 if first:
                     member = first[0]
                     if ((member, RDF.type, OWL.Restriction) in g
-                            and (member, OWL.hasValue, None) in g):
+                            and (member, OWL.someValuesFrom, None) in g):
                         for prop in sorted(g.objects(member, OWL.onProperty), key=str):
-                            for val in sorted(g.objects(member, OWL.hasValue), key=str):
+                            for val in sorted(g.objects(member, OWL.someValuesFrom), key=str):
+                                # Skip datatype restrictions (BNode = anonymous datatype)
+                                if isinstance(val, BNode):
+                                    continue
                                 neg_key = f"{key}:neg:{j}:{str(prop)}:{str(val)}"
-                                inner = _bnode(f"r:hv:{neg_key}")
+                                inner = _bnode(f"r:sv_cls:{neg_key}")
                                 g.add((inner, RDF.type, OWL.Restriction))
                                 g.add((inner, OWL.onProperty, prop))
-                                g.add((inner, OWL.hasValue, val))
+                                g.add((inner, OWL.someValuesFrom, val))
                                 outer = _bnode(f"r:compl:{neg_key}")
                                 g.add((outer, RDF.type, OWL.Class))
                                 g.add((outer, OWL.complementOf, inner))
@@ -74,6 +76,15 @@ def _neg_hasvalue_from_disjoint_equiv(g: Graph, cls_iri, key: str) -> list[BNode
                 rest = list(g.objects(node, RDF.rest))
                 node = rest[0] if rest else RDF.nil
     return exclusions
+
+
+def _some_values_class_restr(g: Graph, prop, class_iri, key: str) -> BNode:
+    """owl:someValuesFrom <NamedClass> — links process type to product class."""
+    r = _bnode(f"r:sv_cls:{key}")
+    g.add((r, RDF.type, OWL.Restriction))
+    g.add((r, OWL.onProperty, prop))
+    g.add((r, OWL.someValuesFrom, class_iri))
+    return r
 
 
 def _has_value_restr(g: Graph, prop, value, key: str) -> BNode:
@@ -115,16 +126,19 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     """Add curated owl:equivalentClass axioms for Ch22 product classes. Idempotent.
 
     Two-phase structure:
-      Phase 1 — unconditional axioms (hasValue / someValuesFrom only).
-      Phase 2 — axioms that derive NOT(P=v) complements from sibling equivalentClass
-                axioms already set in Phase 1; must run after Phase 1 completes.
+      Phase 1 — unconditional axioms (someValuesFrom NamedClass / someValuesFrom DataRange).
+      Phase 2 — axioms that derive NOT(producedBy someValuesFrom C) complements from
+                sibling equivalentClass axioms already set in Phase 1; runs after Phase 1.
+
+    World-closure: eucn:producedBy is owl:FunctionalProperty + process classes are
+    pairwise owl:disjointWith. Together these let Konclude infer ¬(∃producedBy.C) for
+    each sibling process class when the individual's unique producedBy value is typed
+    as a disjoint class.
     """
     g = graph
 
     abv = EUCN.alcoholByVolumePercent
     carb = EUCN.isCarbonated
-    denature = EUCN.isDenatured
-    vol = EUCN.maxContainerVolumeL
     produced_by = EUCN.producedBy
 
     # ── Phase 1: unconditional axioms ─────────────────────────────────────────
@@ -133,19 +147,17 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     _equiv(
         g, EUCN.Water,
         [
-            _decimal_range_restr(
-                g, abv, XSD.maxInclusive, 0.0, "water:abv"
-            ),
+            _decimal_range_restr(g, abv, XSD.maxInclusive, 0.0, "water:abv"),
         ],
         "water",
     )
 
-    # eucn:NonAlcoholicBeverage (CN 2202) — sweetened/flavoured water
+    # eucn:NonAlcoholicBeverage (CN 2202) — sweetened/flavoured water process
     _equiv(
         g, EUCN.NonAlcoholicBeverage,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["sweetened-water-process"], "nonalco:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.SweetenedWaterProcess, "nonalco:proc"
             ),
         ],
         "nonalco",
@@ -155,12 +167,10 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     _equiv(
         g, EUCN.Beer,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["malt-fermentation"], "beer:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.MaltFermentation, "beer:proc"
             ),
-            _decimal_range_restr(
-                g, abv, XSD.minExclusive, 0.5, "beer:abv"
-            ),
+            _decimal_range_restr(g, abv, XSD.minExclusive, 0.5, "beer:abv"),
         ],
         "beer",
     )
@@ -169,19 +179,19 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     _equiv(
         g, EUCN.Wine,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["grape-fermentation"], "wine:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.GrapeFermentation, "wine:proc"
             ),
         ],
         "wine",
     )
 
-    # eucn:SparklingWine (CN 2204 10) — grape + carbonated
+    # eucn:SparklingWine (CN 2204 10) — grape fermentation + carbonated
     _equiv(
         g, EUCN.SparklingWine,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["grape-fermentation"], "sparkling:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.GrapeFermentation, "sparkling:proc"
             ),
             _has_value_restr(
                 g, carb, Literal(True, datatype=XSD.boolean), "sparkling:carb"
@@ -190,26 +200,26 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "sparkling",
     )
 
-    # eucn:StillWine (CN 2204 21/29) — grape + not carbonated
+    # eucn:StillWine (CN 2204 21/29) — grape fermentation + not carbonated
     _equiv(
         g, EUCN.StillWine,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["grape-fermentation"], "still:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.GrapeFermentation, "stillwine:proc"
             ),
             _has_value_restr(
-                g, carb, Literal(False, datatype=XSD.boolean), "still:carb"
+                g, carb, Literal(False, datatype=XSD.boolean), "stillwine:carb"
             ),
         ],
         "stillwine",
     )
 
-    # eucn:FlavouredWine (CN 2205) — grape-flavoured (distinct from plain grape)
+    # eucn:FlavouredWine (CN 2205) — grape flavouring process
     _equiv(
         g, EUCN.FlavouredWine,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["grape-flavouring"], "flavoured:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.GrapeFlavouringProcess, "flavoured:proc"
             ),
         ],
         "flavoured",
@@ -219,8 +229,8 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     _equiv(
         g, EUCN.FermentedBeverage,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["fruit-fermentation"], "fermented:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.FruitFermentation, "fermented:proc"
             ),
         ],
         "fermented",
@@ -230,8 +240,8 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
     _equiv(
         g, EUCN.Vinegar,
         [
-            _has_value_restr(
-                g, produced_by, EUCN["acetic-fermentation"], "vinegar:ferm"
+            _some_values_class_restr(
+                g, produced_by, EUCN.AceticFermentation, "vinegar:proc"
             ),
         ],
         "vinegar",
@@ -239,7 +249,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
 
     # ── Phase 2: axioms derived from sibling equivalentClass conditions ────────
 
-    # eucn:EthylAlcohol (CN 2207) — ABV >= 80% + NOT(P=v) for each sibling hasValue
+    # eucn:EthylAlcohol (CN 2207) — ABV >= 80% + NOT(producedBy someValuesFrom C) for each sibling
     _equiv(
         g, EUCN.EthylAlcohol,
         [
@@ -249,7 +259,7 @@ def add_ch22_equivalence_axioms(graph: Graph) -> None:
         "ethyl",
     )
 
-    # eucn:Spirit (CN 2208) — 0.5% < ABV < 80% + NOT(P=v) for each sibling hasValue
+    # eucn:Spirit (CN 2208) — 0.5% < ABV < 80% + NOT(producedBy someValuesFrom C) for each sibling
     _equiv(
         g, EUCN.Spirit,
         [

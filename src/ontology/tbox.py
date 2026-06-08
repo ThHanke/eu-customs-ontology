@@ -290,4 +290,13 @@ def build_tbox(graph: Graph, extract_date: Date | None = None) -> Graph:
                "TARIC-Maßnahme erlassen oder zuletzt geändert hat",
                range_=XSD.string)
 
+    _data_prop(g, EUCN.cnHeadingCode, "CN heading code", "KN-Positionsnummer",
+               "four-digit (or six-digit for subheadings) CN heading code inferred by the "
+               "OWL reasoner from the product class membership; e.g. '2203' for Beer, "
+               "'220410' for Sparkling Wine",
+               "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, "
+               "die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; "
+               "z. B. '2203' für Bier, '220410' für Schaumwein",
+               range_=XSD.string)
+
     return g

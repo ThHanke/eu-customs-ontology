@@ -51038,7 +51038,13 @@ eucn:GrapeMust
     rdfs:label
         "Traubenmost"@de ,
         "Grape Must"@en ;
-    rdfs:subClassOf eucn:Wine ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "220430"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Wine ;
     owl:disjointWith
         eucn:SparklingWine ,
         eucn:StillWine ;
@@ -51052,7 +51058,13 @@ eucn:SparklingWine
     rdfs:label
         "Schaumwein"@de ,
         "Sparkling Wine"@en ;
-    rdfs:subClassOf eucn:Wine ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "220410"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Wine ;
     owl:disjointWith
         eucn:GrapeMust ,
         eucn:StillWine ;
@@ -51063,8 +51075,8 @@ eucn:SparklingWine
                 
                 [
                     a owl:Restriction ;
-                    owl:hasValue eucn:grape-fermentation ;
                     owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:GrapeFermentation ;
                 ]
                 
                 [
@@ -51084,7 +51096,13 @@ eucn:StillWine
     rdfs:label
         "Stillwein"@de ,
         "Still Wine"@en ;
-    rdfs:subClassOf eucn:Wine ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "220421"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Wine ;
     owl:disjointWith
         eucn:GrapeMust ,
         eucn:SparklingWine ;
@@ -51095,8 +51113,8 @@ eucn:StillWine
                 
                 [
                     a owl:Restriction ;
-                    owl:hasValue eucn:grape-fermentation ;
                     owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:GrapeFermentation ;
                 ]
                 
                 [
@@ -51143,20 +51161,519 @@ eucn:alcoholByVolumePercent
         "alcohol content of a beverage expressed as a percentage of volume, used to discriminate between CN headings 2201–2208 in Chapter 22"@en ;
 .
 
-eucn:grain-distillation
-    a
-        owl:NamedIndividual ,
-        eucn:GrainDistillation ;
+eucn:GrainDistillation
+    a owl:Class ;
     rdfs:label
-        "Getreidedestillationsprozess"@de ,
-        "grain distillation process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:fruit-fermentation ,
-        eucn:grape-fermentation ,
-        eucn:grape-flavouring ,
-        eucn:malt-fermentation ,
-        eucn:sweetened-water-process ;
+        "Getreidebrennerei"@de ,
+        "grain distillation"@en ;
+    rdfs:subClassOf bfo:BFO_0000015 ;
+    owl:disjointWith
+        eucn:AceticFermentation ,
+        eucn:FruitFermentation ,
+        eucn:GrapeFermentation ,
+        eucn:GrapeFlavouringProcess ,
+        eucn:MaltFermentation ,
+        eucn:SweetenedWaterProcess ;
+    skos:definition
+        "Prozess der Destillation von vergorenem Getreidebrei zur Herstellung von Spirituosen oder hochprozentigem Ethylalkohol; jedes Individuum repräsentiert den einzigartigen Getreidedestillationsprozesstyp in der KN-Kapitel-22-Einreihung"@de ,
+        "process of distilling fermented grain mash to produce spirits or high-strength ethyl alcohol; each individual represents the unique grain-distillation process type in the CN Chapter 22 classification"@en ;
+.
+
+bfo:BFO_0000015
+    a owl:Class ;
+    rdfs:label
+        "Prozess"@de ,
+        "process"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    skos:definition
+        "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
+        "entity that exists in time by occurring or happening, and that has temporal parts"@en ;
+.
+
+eucn:Beer
+    a owl:Class ;
+    rdfs:label
+        "Bier"@de ,
+        "Beer"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2203"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:MaltFermentation ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:alcoholByVolumePercent ;
+                    owl:someValuesFrom
+                        [
+                            a rdfs:Datatype ;
+                            owl:onDatatype xsd:decimal ;
+                            owl:withRestrictions (
+                                
+                                [
+                                    xsd:minExclusive 0.5 ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Bier aus Malz, fermentiertes Getränk mit einem Alkoholgehalt, der durch Vergärung von Gerstenmalz oder anderen Getreidearten entsteht, eingereiht in KN-Position 2203 (Kapitel 22)"@de ,
+        "beer made from malt, a fermented beverage with alcoholic strength derived from the fermentation of malted barley or other cereals, classified under CN heading 2203 (Chapter 22)"@en ;
+.
+
+eucn:EthylAlcohol
+    a owl:Class ;
+    rdfs:label
+        "Ethylalkohol"@de ,
+        "Ethyl Alcohol"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2207"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:alcoholByVolumePercent ;
+                    owl:someValuesFrom
+                        [
+                            a rdfs:Datatype ;
+                            owl:onDatatype xsd:decimal ;
+                            owl:withRestrictions (
+                                
+                                [
+                                    xsd:minInclusive 80.0 ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:MaltFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:FruitFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:GrapeFlavouringProcess ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:SweetenedWaterProcess ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:AceticFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:GrapeFermentation ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Unvergällter Ethylalkohol mit einem Alkoholgehalt von 80 % vol oder mehr; Ethylalkohol und andere Spirituosen, vergällt, jedes Alkoholgehalts, eingereiht in KN-Position 2207 (Kapitel 22)"@de ,
+        "undenatured ethyl alcohol of an alcoholic strength by volume of 80 % vol or higher; ethyl alcohol and other spirits, denatured, of any strength, classified under CN heading 2207 (Chapter 22)"@en ;
+.
+
+eucn:FermentedBeverage
+    a owl:Class ;
+    rdfs:label
+        "Anderes Gärerzeugnis"@de ,
+        "Fermented Beverage"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2206"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:FruitFermentation ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Andere Gärerzeugnisse (z. B. Apfelwein, Birnenwein, Met, Sake) sowie Mischungen von Gärerzeugnissen und nichtalkoholischen Getränken, anderweit weder genannt noch inbegriffen, eingereiht in KN-Position 2206 (Kapitel 22)"@de ,
+        "other fermented beverages (for example, cider, perry, mead, saké) and mixtures of fermented beverages and non-alcoholic beverages not elsewhere specified or included, classified under CN heading 2206 (Chapter 22)"@en ;
+.
+
+eucn:FlavouredWine
+    a owl:Class ;
+    rdfs:label
+        "Wermutwein und andere aromatisierte Weine"@de ,
+        "Flavoured Wine"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2205"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:GrapeFlavouringProcess ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Wermutwein und andere Weine aus frischen Weintrauben, mit Pflanzen oder aromatischen Stoffen versetzt, eingereiht in KN-Position 2205 (Kapitel 22)"@de ,
+        "vermouth and other wines of fresh grapes, flavoured with plants or aromatic substances, classified under CN heading 2205 (Chapter 22)"@en ;
+.
+
+eucn:NonAlcoholicBeverage
+    a owl:Class ;
+    rdfs:label
+        "Nichtalkoholisches Getränk"@de ,
+        "Non-Alcoholic Beverage"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2202"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:SweetenedWaterProcess ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Wasser (einschließlich Mineralwasser und kohlensäurehaltiges Wasser) mit Zusatz von Zucker oder anderen Süßungsmitteln oder Aromastoffen sowie andere nichtalkoholische Getränke, eingereiht in KN-Position 2202 (Kapitel 22)"@de ,
+        "waters (including mineral waters and aerated waters) containing added sugar or other sweetening matter or flavoured, and other non-alcoholic beverages, classified under CN heading 2202 (Chapter 22)"@en ;
+.
+
+eucn:Spirit
+    a owl:Class ;
+    rdfs:label
+        "Spirituose"@de ,
+        "Spirit"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2208"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Vinegar ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:alcoholByVolumePercent ;
+                    owl:someValuesFrom
+                        [
+                            a rdfs:Datatype ;
+                            owl:onDatatype xsd:decimal ;
+                            owl:withRestrictions (
+                                
+                                [
+                                    xsd:minExclusive 0.5 ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:alcoholByVolumePercent ;
+                    owl:someValuesFrom
+                        [
+                            a rdfs:Datatype ;
+                            owl:onDatatype xsd:decimal ;
+                            owl:withRestrictions (
+                                
+                                [
+                                    xsd:maxExclusive 80.0 ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:MaltFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:FruitFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:GrapeFlavouringProcess ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:SweetenedWaterProcess ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:AceticFermentation ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:onProperty eucn:producedBy ;
+                            owl:someValuesFrom eucn:GrapeFermentation ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Unvergällter Ethylalkohol mit einem Alkoholgehalt von weniger als 80 % vol; Spirituosen, Likör und andere alkoholische Getränke, eingereiht in KN-Position 2208 (Kapitel 22)"@de ,
+        "undenatured ethyl alcohol of an alcoholic strength by volume of less than 80 % vol; spirits, liqueurs and other spirituous beverages, classified under CN heading 2208 (Chapter 22)"@en ;
+.
+
+eucn:Vinegar
+    a owl:Class ;
+    rdfs:label
+        "Essig"@de ,
+        "Vinegar"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2209"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Water ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:AceticFermentation ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Essig und Essigsäureersatz, aus Essigsäure gewonnen, eingereiht in KN-Position 2209 (Kapitel 22)"@de ,
+        "vinegar and substitutes for vinegar obtained from acetic acid, classified under CN heading 2209 (Chapter 22)"@en ;
+.
+
+eucn:Water
+    a owl:Class ;
+    rdfs:label
+        "Wasser"@de ,
+        "Water"@en ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2201"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
+    owl:disjointWith
+        eucn:Beer ,
+        eucn:EthylAlcohol ,
+        eucn:FermentedBeverage ,
+        eucn:FlavouredWine ,
+        eucn:NonAlcoholicBeverage ,
+        eucn:Spirit ,
+        eucn:Vinegar ,
+        eucn:Wine ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty eucn:alcoholByVolumePercent ;
+                    owl:someValuesFrom
+                        [
+                            a rdfs:Datatype ;
+                            owl:onDatatype xsd:decimal ;
+                            owl:withRestrictions (
+                                
+                                [
+                                    xsd:maxInclusive 0.0 ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Wasser (einschließlich natürliches oder künstliches Mineralwasser und kohlensäurehaltiges Wasser), Eis und Schnee, eingereiht in KN-Position 2201 (Kapitel 22)"@de ,
+        "water (including natural or artificial mineral waters and aerated waters), ice, and snow, classified under CN heading 2201 (Chapter 22)"@en ;
 .
 
 eucn:AceticFermentation
@@ -51177,6 +51694,17 @@ eucn:AceticFermentation
         "process of acetic acid fermentation of ethyl alcohol to produce vinegar; each individual represents the unique acetic-fermentation process type in the CN Chapter 22 classification"@en ;
 .
 
+eucn:Beverage
+    a owl:Class ;
+    rdfs:label
+        "Getränk"@de ,
+        "Beverage"@en ;
+    rdfs:subClassOf bfo:BFO_0000030 ;
+    skos:definition
+        "für den menschlichen Genuss bestimmte Flüssigkeit, eingereiht in Kapitel 22 der KN; Unterklasse von BFO-Objekt (BFO_0000030)"@de ,
+        "liquid intended for human consumption, classified under CN Chapter 22; a subclass of BFO Object (BFO_0000030)"@en ;
+.
+
 eucn:FruitFermentation
     a owl:Class ;
     rdfs:label
@@ -51193,42 +51721,6 @@ eucn:FruitFermentation
     skos:definition
         "Prozess der Vergärung von Früchten (außer Weintrauben) zur Herstellung von Apfelwein, Birnenwein oder anderen Gärerzeugnissen; jedes Individuum repräsentiert den einzigartigen Fruchtfermentationsprozesstyp in der KN-Kapitel-22-Einreihung"@de ,
         "process of fermenting fruit (other than grapes) to produce cider, perry, or other fermented beverages; each individual represents the unique fruit-fermentation process type in the CN Chapter 22 classification"@en ;
-.
-
-eucn:GrainDistillation
-    a owl:Class ;
-    rdfs:label
-        "Getreidebrennerei"@de ,
-        "grain distillation"@en ;
-    rdfs:subClassOf bfo:BFO_0000015 ;
-    owl:disjointWith
-        eucn:AceticFermentation ,
-        eucn:FruitFermentation ,
-        eucn:GrapeFermentation ,
-        eucn:GrapeFlavouringProcess ,
-        eucn:MaltFermentation ,
-        eucn:SweetenedWaterProcess ;
-    skos:definition
-        "Prozess der Destillation von vergorenem Getreidebrei zur Herstellung von Spirituosen oder hochprozentigem Ethylalkohol; jedes Individuum repräsentiert den einzigartigen Getreidedestillationsprozesstyp in der KN-Kapitel-22-Einreihung"@de ,
-        "process of distilling fermented grain mash to produce spirits or high-strength ethyl alcohol; each individual represents the unique grain-distillation process type in the CN Chapter 22 classification"@en ;
-.
-
-eucn:GrapeFermentation
-    a owl:Class ;
-    rdfs:label
-        "Traubenfermentation"@de ,
-        "grape fermentation"@en ;
-    rdfs:subClassOf bfo:BFO_0000015 ;
-    owl:disjointWith
-        eucn:AceticFermentation ,
-        eucn:FruitFermentation ,
-        eucn:GrainDistillation ,
-        eucn:GrapeFlavouringProcess ,
-        eucn:MaltFermentation ,
-        eucn:SweetenedWaterProcess ;
-    skos:definition
-        "Prozess der Vergärung von frischen Weintrauben oder Traubenmost zur Herstellung von Wein; jedes Individuum repräsentiert den einzigartigen Traubenfermentationsprozesstyp in der KN-Kapitel-22-Einreihung"@de ,
-        "process of fermenting fresh grapes or grape must to produce wine; each individual represents the unique grape-fermentation process type in the CN Chapter 22 classification"@en ;
 .
 
 eucn:GrapeFlavouringProcess
@@ -51285,544 +51777,22 @@ eucn:SweetenedWaterProcess
         "process of producing sweetened or flavoured non-alcoholic beverages by adding sugar or flavouring to water; each individual represents the unique sweetened-water-process type in the CN Chapter 22 classification"@en ;
 .
 
-bfo:BFO_0000015
+eucn:GrapeFermentation
     a owl:Class ;
     rdfs:label
-        "Prozess"@de ,
-        "process"@en ;
-    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
-    skos:definition
-        "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
-        "entity that exists in time by occurring or happening, and that has temporal parts"@en ;
-.
-
-eucn:Beer
-    a owl:Class ;
-    rdfs:label
-        "Bier"@de ,
-        "Beer"@en ;
-    rdfs:subClassOf eucn:Beverage ;
+        "Traubenfermentation"@de ,
+        "grape fermentation"@en ;
+    rdfs:subClassOf bfo:BFO_0000015 ;
     owl:disjointWith
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:hasValue eucn:malt-fermentation ;
-                    owl:onProperty eucn:producedBy ;
-                ]
-                
-                [
-                    a owl:Restriction ;
-                    owl:onProperty eucn:alcoholByVolumePercent ;
-                    owl:someValuesFrom
-                        [
-                            a rdfs:Datatype ;
-                            owl:onDatatype xsd:decimal ;
-                            owl:withRestrictions (
-                                
-                                [
-                                    xsd:minExclusive 0.5 ;
-                                ]
-                            ) ;
-                        ] ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Bier aus Malz, fermentiertes Getränk mit einem Alkoholgehalt, der durch Vergärung von Gerstenmalz oder anderen Getreidearten entsteht, eingereiht in KN-Position 2203 (Kapitel 22)"@de ,
-        "beer made from malt, a fermented beverage with alcoholic strength derived from the fermentation of malted barley or other cereals, classified under CN heading 2203 (Chapter 22)"@en ;
-.
-
-eucn:EthylAlcohol
-    a owl:Class ;
-    rdfs:label
-        "Ethylalkohol"@de ,
-        "Ethyl Alcohol"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:onProperty eucn:alcoholByVolumePercent ;
-                    owl:someValuesFrom
-                        [
-                            a rdfs:Datatype ;
-                            owl:onDatatype xsd:decimal ;
-                            owl:withRestrictions (
-                                
-                                [
-                                    xsd:minInclusive 80.0 ;
-                                ]
-                            ) ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:malt-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:fruit-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:grape-flavouring ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:sweetened-water-process ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:acetic-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:grape-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Unvergällter Ethylalkohol mit einem Alkoholgehalt von 80 % vol oder mehr; Ethylalkohol und andere Spirituosen, vergällt, jedes Alkoholgehalts, eingereiht in KN-Position 2207 (Kapitel 22)"@de ,
-        "undenatured ethyl alcohol of an alcoholic strength by volume of 80 % vol or higher; ethyl alcohol and other spirits, denatured, of any strength, classified under CN heading 2207 (Chapter 22)"@en ;
-.
-
-eucn:FermentedBeverage
-    a owl:Class ;
-    rdfs:label
-        "Anderes Gärerzeugnis"@de ,
-        "Fermented Beverage"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:hasValue eucn:fruit-fermentation ;
-                    owl:onProperty eucn:producedBy ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Andere Gärerzeugnisse (z. B. Apfelwein, Birnenwein, Met, Sake) sowie Mischungen von Gärerzeugnissen und nichtalkoholischen Getränken, anderweit weder genannt noch inbegriffen, eingereiht in KN-Position 2206 (Kapitel 22)"@de ,
-        "other fermented beverages (for example, cider, perry, mead, saké) and mixtures of fermented beverages and non-alcoholic beverages not elsewhere specified or included, classified under CN heading 2206 (Chapter 22)"@en ;
-.
-
-eucn:FlavouredWine
-    a owl:Class ;
-    rdfs:label
-        "Wermutwein und andere aromatisierte Weine"@de ,
-        "Flavoured Wine"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:hasValue eucn:grape-flavouring ;
-                    owl:onProperty eucn:producedBy ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Wermutwein und andere Weine aus frischen Weintrauben, mit Pflanzen oder aromatischen Stoffen versetzt, eingereiht in KN-Position 2205 (Kapitel 22)"@de ,
-        "vermouth and other wines of fresh grapes, flavoured with plants or aromatic substances, classified under CN heading 2205 (Chapter 22)"@en ;
-.
-
-eucn:NonAlcoholicBeverage
-    a owl:Class ;
-    rdfs:label
-        "Nichtalkoholisches Getränk"@de ,
-        "Non-Alcoholic Beverage"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:hasValue eucn:sweetened-water-process ;
-                    owl:onProperty eucn:producedBy ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Wasser (einschließlich Mineralwasser und kohlensäurehaltiges Wasser) mit Zusatz von Zucker oder anderen Süßungsmitteln oder Aromastoffen sowie andere nichtalkoholische Getränke, eingereiht in KN-Position 2202 (Kapitel 22)"@de ,
-        "waters (including mineral waters and aerated waters) containing added sugar or other sweetening matter or flavoured, and other non-alcoholic beverages, classified under CN heading 2202 (Chapter 22)"@en ;
-.
-
-eucn:Spirit
-    a owl:Class ;
-    rdfs:label
-        "Spirituose"@de ,
-        "Spirit"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Vinegar ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:onProperty eucn:alcoholByVolumePercent ;
-                    owl:someValuesFrom
-                        [
-                            a rdfs:Datatype ;
-                            owl:onDatatype xsd:decimal ;
-                            owl:withRestrictions (
-                                
-                                [
-                                    xsd:minExclusive 0.5 ;
-                                ]
-                            ) ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Restriction ;
-                    owl:onProperty eucn:alcoholByVolumePercent ;
-                    owl:someValuesFrom
-                        [
-                            a rdfs:Datatype ;
-                            owl:onDatatype xsd:decimal ;
-                            owl:withRestrictions (
-                                
-                                [
-                                    xsd:maxExclusive 80.0 ;
-                                ]
-                            ) ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:malt-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:fruit-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:grape-flavouring ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:sweetened-water-process ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:acetic-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-                
-                [
-                    a owl:Class ;
-                    owl:complementOf
-                        [
-                            a owl:Restriction ;
-                            owl:hasValue eucn:grape-fermentation ;
-                            owl:onProperty eucn:producedBy ;
-                        ] ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Unvergällter Ethylalkohol mit einem Alkoholgehalt von weniger als 80 % vol; Spirituosen, Likör und andere alkoholische Getränke, eingereiht in KN-Position 2208 (Kapitel 22)"@de ,
-        "undenatured ethyl alcohol of an alcoholic strength by volume of less than 80 % vol; spirits, liqueurs and other spirituous beverages, classified under CN heading 2208 (Chapter 22)"@en ;
-.
-
-eucn:Vinegar
-    a owl:Class ;
-    rdfs:label
-        "Essig"@de ,
-        "Vinegar"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Water ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:hasValue eucn:acetic-fermentation ;
-                    owl:onProperty eucn:producedBy ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Essig und Essigsäureersatz, aus Essigsäure gewonnen, eingereiht in KN-Position 2209 (Kapitel 22)"@de ,
-        "vinegar and substitutes for vinegar obtained from acetic acid, classified under CN heading 2209 (Chapter 22)"@en ;
-.
-
-eucn:Water
-    a owl:Class ;
-    rdfs:label
-        "Wasser"@de ,
-        "Water"@en ;
-    rdfs:subClassOf eucn:Beverage ;
-    owl:disjointWith
-        eucn:Beer ,
-        eucn:EthylAlcohol ,
-        eucn:FermentedBeverage ,
-        eucn:FlavouredWine ,
-        eucn:NonAlcoholicBeverage ,
-        eucn:Spirit ,
-        eucn:Vinegar ,
-        eucn:Wine ;
-    owl:equivalentClass
-        [
-            a owl:Class ;
-            owl:intersectionOf (
-                
-                [
-                    a owl:Restriction ;
-                    owl:onProperty eucn:alcoholByVolumePercent ;
-                    owl:someValuesFrom
-                        [
-                            a rdfs:Datatype ;
-                            owl:onDatatype xsd:decimal ;
-                            owl:withRestrictions (
-                                
-                                [
-                                    xsd:maxInclusive 0.0 ;
-                                ]
-                            ) ;
-                        ] ;
-                ]
-            ) ;
-        ] ;
-    skos:definition
-        "Wasser (einschließlich natürliches oder künstliches Mineralwasser und kohlensäurehaltiges Wasser), Eis und Schnee, eingereiht in KN-Position 2201 (Kapitel 22)"@de ,
-        "water (including natural or artificial mineral waters and aerated waters), ice, and snow, classified under CN heading 2201 (Chapter 22)"@en ;
-.
-
-eucn:Beverage
-    a owl:Class ;
-    rdfs:label
-        "Getränk"@de ,
-        "Beverage"@en ;
-    rdfs:subClassOf bfo:BFO_0000030 ;
-    skos:definition
-        "für den menschlichen Genuss bestimmte Flüssigkeit, eingereiht in Kapitel 22 der KN; Unterklasse von BFO-Objekt (BFO_0000030)"@de ,
-        "liquid intended for human consumption, classified under CN Chapter 22; a subclass of BFO Object (BFO_0000030)"@en ;
-.
-
-eucn:acetic-fermentation
-    a
-        owl:NamedIndividual ,
-        eucn:AceticFermentation ;
-    rdfs:label
-        "Essigsäuregärungsprozess"@de ,
-        "acetic fermentation process"@en ;
-    owl:differentFrom
-        eucn:fruit-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-fermentation ,
-        eucn:grape-flavouring ,
-        eucn:malt-fermentation ,
-        eucn:sweetened-water-process ;
-.
-
-eucn:fruit-fermentation
-    a
-        owl:NamedIndividual ,
-        eucn:FruitFermentation ;
-    rdfs:label
-        "Fruchtfermentationsprozess"@de ,
-        "fruit fermentation process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-fermentation ,
-        eucn:grape-flavouring ,
-        eucn:malt-fermentation ,
-        eucn:sweetened-water-process ;
-.
-
-eucn:grape-flavouring
-    a
-        owl:NamedIndividual ,
-        eucn:GrapeFlavouringProcess ;
-    rdfs:label
-        "Traubenaromatisierungsprozess"@de ,
-        "grape flavouring process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:fruit-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-fermentation ,
-        eucn:malt-fermentation ,
-        eucn:sweetened-water-process ;
-.
-
-eucn:malt-fermentation
-    a
-        owl:NamedIndividual ,
-        eucn:MaltFermentation ;
-    rdfs:label
-        "Malzfermentationsprozess"@de ,
-        "malt fermentation process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:fruit-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-fermentation ,
-        eucn:grape-flavouring ,
-        eucn:sweetened-water-process ;
-.
-
-eucn:sweetened-water-process
-    a
-        owl:NamedIndividual ,
+        eucn:AceticFermentation ,
+        eucn:FruitFermentation ,
+        eucn:GrainDistillation ,
+        eucn:GrapeFlavouringProcess ,
+        eucn:MaltFermentation ,
         eucn:SweetenedWaterProcess ;
-    rdfs:label
-        "Süßwasserprozess"@de ,
-        "sweetened water process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:fruit-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-fermentation ,
-        eucn:grape-flavouring ,
-        eucn:malt-fermentation ;
+    skos:definition
+        "Prozess der Vergärung von frischen Weintrauben oder Traubenmost zur Herstellung von Wein; jedes Individuum repräsentiert den einzigartigen Traubenfermentationsprozesstyp in der KN-Kapitel-22-Einreihung"@de ,
+        "process of fermenting fresh grapes or grape must to produce wine; each individual represents the unique grape-fermentation process type in the CN Chapter 22 classification"@en ;
 .
 
 eucn:Wine
@@ -51830,7 +51800,13 @@ eucn:Wine
     rdfs:label
         "Wein"@de ,
         "Wine"@en ;
-    rdfs:subClassOf eucn:Beverage ;
+    rdfs:subClassOf 
+        [
+            a owl:Restriction ;
+            owl:hasValue "2204"^^xsd:string ;
+            owl:onProperty eucn:cnHeadingCode ;
+        ] ,
+        eucn:Beverage ;
     owl:disjointWith
         eucn:Beer ,
         eucn:EthylAlcohol ,
@@ -51847,8 +51823,8 @@ eucn:Wine
                 
                 [
                     a owl:Restriction ;
-                    owl:hasValue eucn:grape-fermentation ;
                     owl:onProperty eucn:producedBy ;
+                    owl:someValuesFrom eucn:GrapeFermentation ;
                 ]
             ) ;
         ] ;
@@ -51857,20 +51833,15 @@ eucn:Wine
         "wine of fresh grapes, including grape must with fermentation arrested by the addition of alcohol, classified under CN heading 2204 (Chapter 22)"@en ;
 .
 
-eucn:grape-fermentation
-    a
-        owl:NamedIndividual ,
-        eucn:GrapeFermentation ;
+eucn:cnHeadingCode
+    a owl:DatatypeProperty ;
     rdfs:label
-        "Traubenfermentationsprozess"@de ,
-        "grape fermentation process"@en ;
-    owl:differentFrom
-        eucn:acetic-fermentation ,
-        eucn:fruit-fermentation ,
-        eucn:grain-distillation ,
-        eucn:grape-flavouring ,
-        eucn:malt-fermentation ,
-        eucn:sweetened-water-process ;
+        "KN-Positionsnummer"@de ,
+        "CN heading code"@en ;
+    rdfs:range xsd:string ;
+    skos:definition
+        "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; z. B. '2203' für Bier, '220410' für Schaumwein"@de ,
+        "four-digit (or six-digit for subheadings) CN heading code inferred by the OWL reasoner from the product class membership; e.g. '2203' for Beer, '220410' for Sparkling Wine"@en ;
 .
 
 eucn:producedBy

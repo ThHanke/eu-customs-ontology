@@ -1,6 +1,7 @@
 PREFIX owl:  <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
 PREFIX eucn: <https://w3id.org/eucn/>
 PREFIX demo: <https://w3id.org/eucn/demo/>
 
@@ -8,49 +9,66 @@ PREFIX demo: <https://w3id.org/eucn/demo/>
     a owl:Ontology ;
     owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-ch22-latest.ttl> .
 
-# ── ABox demo individuals ──────────────────────────────────────────────────────
-# Load this file in Ontosphere to see live OWL 2 DL reasoning:
-# https://thhanke.github.io/ontosphere/?rdfUrl=https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/demo/ch22-beverages-demo.ttl
+# ── ABox: process instances ────────────────────────────────────────────────
+# Each process is typed as a eucn:*Process class and linked to its beverage
+# output via obo:RO_0002234 (has_output).
+# eucn:producedBy (inverseOf obo:RO_0002234) is then inferred by the reasoner,
+# which classifies each beverage into the correct CN product class.
+
+demo:malt-brew-1 a owl:NamedIndividual, eucn:MaltFermentation ;
+    obo:RO_0002234 demo:czech-lager .
+
+demo:grape-ferment-1 a owl:NamedIndividual, eucn:GrapeFermentation ;
+    obo:RO_0002234 demo:champagne-brut, demo:bordeaux-rouge .
+
+demo:fruit-ferment-1 a owl:NamedIndividual, eucn:FruitFermentation ;
+    obo:RO_0002234 demo:apple-cider .
+
+demo:grape-flavour-1 a owl:NamedIndividual, eucn:GrapeFlavouringProcess ;
+    obo:RO_0002234 demo:dry-vermouth .
+
+demo:acetic-ferment-1 a owl:NamedIndividual, eucn:AceticFermentation ;
+    obo:RO_0002234 demo:malt-vinegar .
+
+demo:sweet-water-1 a owl:NamedIndividual, eucn:SweetenedWaterProcess ;
+    obo:RO_0002234 demo:sparkling-lemonade .
+
+demo:grain-distil-1 a owl:NamedIndividual, eucn:GrainDistillation ;
+    obo:RO_0002234 demo:whisky-12y, demo:grain-spirit-96 .
+
+# ── ABox: beverage individuals ─────────────────────────────────────────────
+# eucn:producedBy is inferred — only assert the discriminating data properties.
 
 # CN 2204 10 — Sparkling wine (eucn:SparklingWine)
 demo:champagne-brut a owl:NamedIndividual ;
-    eucn:producedBy      eucn:grape-fermentation ;
-    eucn:isCarbonated    "true"^^xsd:boolean .
+    eucn:isCarbonated "true"^^xsd:boolean .
 
 # CN 2204 21/29 — Still wine (eucn:StillWine)
 demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:producedBy      eucn:grape-fermentation ;
-    eucn:isCarbonated    "false"^^xsd:boolean .
+    eucn:isCarbonated "false"^^xsd:boolean .
 
-# CN 2206 — Fermented beverage, cider (eucn:FermentedBeverage)
-demo:apple-cider a owl:NamedIndividual ;
-    eucn:producedBy      eucn:fruit-fermentation .
+# CN 2206 — Apple cider (eucn:FermentedBeverage)
+demo:apple-cider a owl:NamedIndividual .
 
-# CN 2205 — Flavoured wine, vermouth (eucn:FlavouredWine)
-demo:dry-vermouth a owl:NamedIndividual ;
-    eucn:producedBy      eucn:grape-flavouring .
+# CN 2205 — Vermouth (eucn:FlavouredWine)
+demo:dry-vermouth a owl:NamedIndividual .
 
 # CN 2209 — Vinegar (eucn:Vinegar)
-demo:malt-vinegar a owl:NamedIndividual ;
-    eucn:producedBy      eucn:acetic-fermentation .
+demo:malt-vinegar a owl:NamedIndividual .
 
 # CN 2202 — Non-alcoholic beverage (eucn:NonAlcoholicBeverage)
-demo:sparkling-lemonade a owl:NamedIndividual ;
-    eucn:producedBy      eucn:sweetened-water-process .
+demo:sparkling-lemonade a owl:NamedIndividual .
 
 # CN 2203 — Beer (eucn:Beer)
 demo:czech-lager a owl:NamedIndividual ;
-    eucn:producedBy             eucn:malt-fermentation ;
     eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
 
 # CN 2208 — Spirit / whisky (eucn:Spirit)
 demo:whisky-12y a owl:NamedIndividual ;
-    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
 
 # CN 2207 — Ethyl alcohol >= 80 % vol (eucn:EthylAlcohol)
 demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
 
 # CN 2201 — Water (eucn:Water)

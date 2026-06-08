@@ -188,71 +188,61 @@ Each CN heading is linked to a named **process singleton** (e.g. `eucn:malt-ferm
 
 ### Describe a product
 
+The ABox contains two kinds of individuals: **process instances** (typed as `eucn:*Process` BFO subclasses) linked to their beverage outputs via `obo:RO_0002234` (`has_output`), and **beverage individuals** with their discriminating data properties. `eucn:producedBy` (the inverse of `has_output`) is inferred automatically.
+
 ```turtle
 @prefix demo: <https://w3id.org/eucn/demo/> .
 @prefix eucn: <https://w3id.org/eucn/> .
+@prefix obo:  <http://purl.obolibrary.org/obo/> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 
-demo:champagne-brut a owl:NamedIndividual ;
-    eucn:producedBy      eucn:grape-fermentation ;
-    eucn:isCarbonated    "true"^^xsd:boolean .
+# Process instances — typed as eucn:*Process (bfo:Process subclasses)
+demo:malt-brew-1     a eucn:MaltFermentation ;  obo:RO_0002234 demo:czech-lager .
+demo:grape-ferment-1 a eucn:GrapeFermentation ; obo:RO_0002234 demo:champagne-brut, demo:bordeaux-rouge .
+demo:grain-distil-1  a eucn:GrainDistillation ;  obo:RO_0002234 demo:whisky-12y, demo:grain-spirit-96 .
 
-demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:producedBy      eucn:grape-fermentation ;
-    eucn:isCarbonated    "false"^^xsd:boolean .
-
-demo:apple-cider a owl:NamedIndividual ;
-    eucn:producedBy      eucn:fruit-fermentation .
-
-demo:czech-lager a owl:NamedIndividual ;
-    eucn:producedBy             eucn:malt-fermentation ;
-    eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
-
-demo:whisky-12y a owl:NamedIndividual ;
-    eucn:producedBy             eucn:grain-distillation ;
-    eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
-
-demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:producedBy             eucn:grain-distillation ;
-    eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
-
-demo:still-water a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "0.0"^^xsd:decimal .
+# Beverage individuals — eucn:producedBy is inferred from the inverse
+demo:champagne-brut  a owl:NamedIndividual ; eucn:isCarbonated "true"^^xsd:boolean .
+demo:bordeaux-rouge  a owl:NamedIndividual ; eucn:isCarbonated "false"^^xsd:boolean .
+demo:czech-lager     a owl:NamedIndividual ; eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
+demo:whisky-12y      a owl:NamedIndividual ; eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
+demo:grain-spirit-96 a owl:NamedIndividual ; eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
+demo:still-water     a owl:NamedIndividual ; eucn:alcoholByVolumePercent "0.0"^^xsd:decimal .
 ```
 
 ### What the reasoner infers
 
-| Individual | Inferred types (via `owl:equivalentClass`) |
-|------------|-------------------------------------------|
-| `demo:champagne-brut` | `eucn:SparklingWine` · `eucn:Wine` · `eucn:Beverage` |
-| `demo:bordeaux-rouge` | `eucn:StillWine` · `eucn:Wine` · `eucn:Beverage` |
-| `demo:apple-cider` | `eucn:FermentedBeverage` · `eucn:Beverage` |
-| `demo:dry-vermouth` | `eucn:FlavouredWine` · `eucn:Beverage` |
-| `demo:malt-vinegar` | `eucn:Vinegar` · `eucn:Beverage` |
-| `demo:sparkling-lemonade` | `eucn:NonAlcoholicBeverage` · `eucn:Beverage` |
-| `demo:czech-lager` | `eucn:Beer` · `eucn:Beverage` |
-| `demo:whisky-12y` | `eucn:Spirit` · `eucn:Beverage` |
-| `demo:grain-spirit-96` | `eucn:EthylAlcohol` · `eucn:Beverage` |
-| `demo:still-water` | `eucn:Water` · `eucn:Beverage` |
+| Individual | Inferred types | Inferred `cnHeadingCode` |
+|------------|----------------|--------------------------|
+| `demo:champagne-brut` | `eucn:SparklingWine` · `eucn:Wine` · `eucn:Beverage` | `220410` |
+| `demo:bordeaux-rouge` | `eucn:StillWine` · `eucn:Wine` · `eucn:Beverage` | `220421` |
+| `demo:apple-cider` | `eucn:FermentedBeverage` · `eucn:Beverage` | `2206` |
+| `demo:dry-vermouth` | `eucn:FlavouredWine` · `eucn:Beverage` | `2205` |
+| `demo:malt-vinegar` | `eucn:Vinegar` · `eucn:Beverage` | `2209` |
+| `demo:sparkling-lemonade` | `eucn:NonAlcoholicBeverage` · `eucn:Beverage` | `2202` |
+| `demo:czech-lager` | `eucn:Beer` · `eucn:Beverage` | `2203` |
+| `demo:whisky-12y` | `eucn:Spirit` · `eucn:Beverage` | `2208` |
+| `demo:grain-spirit-96` | `eucn:EthylAlcohol` · `eucn:Beverage` | `2207` |
+| `demo:still-water` | `eucn:Water` · `eucn:Beverage` | `2201` |
+
+`eucn:cnHeadingCode` is inferred because each product class carries `rdfs:subClassOf [owl:onProperty eucn:cnHeadingCode; owl:hasValue "XXXX"]` — the reasoner propagates the value to every classified individual.
 
 ### How it works
 
-`eucn:SparklingWine` is defined by an `owl:equivalentClass` axiom:
+`eucn:SparklingWine` is defined by an `owl:equivalentClass` axiom using `someValuesFrom` on the process class:
 
 ```turtle
 eucn:SparklingWine owl:equivalentClass [
     a owl:Class ;
     owl:intersectionOf (
-        [ owl:onProperty eucn:producedBy  ; owl:hasValue eucn:grape-fermentation ]
+        [ owl:onProperty eucn:producedBy ; owl:someValuesFrom eucn:GrapeFermentation ]
         [ owl:onProperty eucn:isCarbonated ; owl:hasValue "true"^^xsd:boolean ]
     )
 ] .
 ```
 
-Any individual satisfying both restrictions is automatically classified as `SparklingWine`, and — by `rdfs:subClassOf` transitivity — as `Wine` and `Beverage` too. Disjointness axioms (`owl:disjointWith`) between beverage classes guarantee a sparkling wine cannot simultaneously be a beer or a spirit.
-
-Spirit and EthylAlcohol discrimination uses `owl:complementOf` restrictions: the reasoner proves `demo:whisky-12y` is a Spirit (not EthylAlcohol) because `eucn:producedBy` is `owl:FunctionalProperty`, `eucn:grain-distillation ∈ eucn:GrainDistillation`, and `eucn:GrainDistillation owl:disjointWith eucn:MaltFermentation` (etc.) — so Konclude can derive the individual is distinct from all other process singletons and apply the complement exclusions.
+Any individual produced by a `eucn:GrapeFermentation` process and marked carbonated is automatically classified as `SparklingWine`. `eucn:producedBy` is `owl:FunctionalProperty` (each beverage has exactly one producer) and the 7 process classes are pairwise `owl:disjointWith` — together these close the open world so Konclude can infer `NOT(∃producedBy.MaltFermentation)` for a grape-fermented individual, enabling discrimination of Spirit and EthylAlcohol by elimination.
 
 ---
 
