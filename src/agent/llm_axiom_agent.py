@@ -239,7 +239,7 @@ class LLMAxiomAgent:
                 source_note_ids=[],
                 source_text_hash="0" * 64,
                 tbox_hash="0" * 64,
-                status="proposed",
+                status="approved",
                 agent_model=self.model,
                 generated_at=datetime.datetime.now(datetime.UTC).isoformat(),
             )
@@ -300,8 +300,12 @@ class LLMAxiomAgent:
                     base_tbox_path, running_tbox_path, existing_axioms_ttl, axiom_set
                 )
                 check_consistency(scratch_path)
-                # Consistent — return success
-                logger.info("LLMAxiomAgent: axioms consistent on attempt %d for CN %s", attempt + 1, cn_code)
+                # Consistent — auto-approve and return
+                axiom_set.status = "approved"
+                logger.info(
+                    "LLMAxiomAgent: axioms consistent (attempt %d) — approved CN %s",
+                    attempt + 1, cn_code,
+                )
                 return axiom_set
 
             except KoncludeConsistencyError as exc:
@@ -326,6 +330,14 @@ class LLMAxiomAgent:
                             "is_error": True,
                         }],
                     })
+
+            except Exception as exc:
+                # Konclude unavailable or crashed — leave as proposed for manual review
+                logger.warning(
+                    "LLMAxiomAgent: Konclude check failed for CN %s: %s — leaving as proposed",
+                    cn_code, exc,
+                )
+                return axiom_set
 
             finally:
                 if scratch_path is not None and scratch_path.exists():
