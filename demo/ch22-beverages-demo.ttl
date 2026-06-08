@@ -7,7 +7,7 @@ PREFIX demo: <https://w3id.org/eucn/demo/>
 
 <https://w3id.org/eucn/demo>
     a owl:Ontology ;
-    owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-ch22-latest.ttl> .
+    owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-ch22-beverages-latest.ttl> .
 
 # ── ABox: process instances ────────────────────────────────────────────────
 # Each process is typed as a eucn:*Process class and linked to its beverage

@@ -138,18 +138,24 @@ jobs:
           CH="${{ needs.check.outputs.chapter }}"
 
           if [ "$VERSION" = "latest" ]; then
-            TTL=$(ls -t data/ontology/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
-            if [ -z "$TTL" ]; then
-              echo "::error::No committed TTL found in data/ontology/ for chapter $CH"
+            # dev build: use committed stable alias
+            TTL="data/ontology/eucn-ch${CH}-latest.ttl"
+            if [ ! -f "$TTL" ]; then
+              echo "::error::No committed TTL found at $TTL"
               exit 1
             fi
           else
+            # release build: download all matching TTLs, prefer stable alias
             mkdir -p /tmp/release-ttl
             gh release download "$VERSION" \
               --pattern "eucn-ch${CH}-*.ttl" \
               --dir /tmp/release-ttl/
-            TTL=$(ls -t /tmp/release-ttl/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
-            if [ -z "$TTL" ]; then
+            TTL="/tmp/release-ttl/eucn-ch${CH}-latest.ttl"
+            if [ ! -f "$TTL" ]; then
+              # fallback: any slug-named file (older release without stable alias)
+              TTL=$(ls -t /tmp/release-ttl/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
+            fi
+            if [ -z "$TTL" ] || [ ! -f "$TTL" ]; then
               echo "::error::No TTL found in release $VERSION for chapter $CH"
               exit 1
             fi

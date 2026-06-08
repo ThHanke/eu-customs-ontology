@@ -90,13 +90,13 @@ jobs:
           KONCLUDE_CLI_PATH: ${{ github.workspace }}/tools/konclude/cli.js
 
       # Compare SHA256 of the generated TTL to the last released SHA256.
-      # We use ls -t so we always pick the newest file when multiple dates exist.
+      # We use a stable alias (eucn-chNN-latest.ttl) produced by the pipeline.
       - name: Detect output change
         id: changed
         run: |
           CH="${{ matrix.chapter }}"
-          TTL=$(ls -t data/ontology/eucn-ch${CH}-*.ttl 2>/dev/null | head -1)
-          if [ -z "$TTL" ]; then
+          TTL="data/ontology/eucn-ch${CH}-latest.ttl"
+          if [ ! -f "$TTL" ]; then
             echo "ERROR: pipeline produced no TTL for chapter $CH" >&2
             exit 1
           fi
@@ -105,8 +105,10 @@ jobs:
           FORCE="${{ inputs.force_rebuild }}"
           if [ "$CURRENT" != "$CACHED" ] || [ "$FORCE" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            # Stage the new hash for the release job to commit
             echo "$CURRENT" > /tmp/ch${CH}-ttl.sha256
+            # Core is identical across parallel chapter jobs — each uploads same hash
+            CORE_CURRENT=$(sha256sum data/ontology/eucn-core-latest.ttl | awk '{print $1}')
+            echo "$CORE_CURRENT" > /tmp/core-ttl.sha256
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Output unchanged — skipping release for chapter $CH"
@@ -120,6 +122,7 @@ jobs:
           path: |
             data/ontology/eucn-ch${{ matrix.chapter }}-*.ttl
             data/ontology/eucn-ch${{ matrix.chapter }}-*.trig
+            data/ontology/eucn-core-*.ttl
           if-no-files-found: error
           retention-days: 1
 
@@ -128,7 +131,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sha256-ch${{ matrix.chapter }}
-          path: /tmp/ch${{ matrix.chapter }}-ttl.sha256
+          path: |
+            /tmp/ch${{ matrix.chapter }}-ttl.sha256
+            /tmp/core-ttl.sha256
           if-no-files-found: error
           retention-days: 1
 
@@ -209,19 +214,21 @@ jobs:
             git push
           fi
 
-      # Trigger docs.yml to publish Widoco HTML for the new release.
-      # Dispatches for chapter 22 (pilot); re-trigger manually for other chapters.
+      # Trigger docs.yml to publish Widoco HTML for each released chapter.
       - name: Trigger documentation build
         if: steps.has-files.outputs.yes == 'true'
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: trigger-docs
-          client-payload: >-
-            {
-              "version": "ontology-${{ steps.date.outputs.value }}-r${{ github.run_number }}",
-              "chapter": "${{ inputs.chapters || '22' }}"
-            }
+        run: |
+          TAG="ontology-${{ steps.date.outputs.value }}-r${{ github.run_number }}"
+          for LATEST in release-files/eucn-ch*-latest.ttl; do
+            [ -f "$LATEST" ] || continue
+            CH=$(basename "$LATEST" | grep -oP 'eucn-ch\K\d+')
+            gh api repos/${{ github.repository }}/dispatches \
+              --method POST \
+              --field event_type=trigger-docs \
+              --field "client_payload={\"version\":\"${TAG}\",\"chapter\":\"${CH}\"}"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ─────────────────────────────────────────────────────────
   # 4. Always write a job summary (incl. dry-run notice)

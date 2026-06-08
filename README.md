@@ -64,9 +64,9 @@ The pipeline runs five stages in sequence:
 |-------|--------|
 | Fetch TARIC | `data/intermediate/taric_ch{N}.json` |
 | Scrape EZT-Online wizard | `data/intermediate/wizard_ch{N}.jsonl` |
-| Build OWL ontology | `data/ontology/eucn-ch{N}-{date}.ttl` + `.trig` |
+| Build core TBox | `data/ontology/eucn-core-{date}.ttl` + `eucn-core-latest.ttl` |
+| Build chapter ontology | `data/ontology/eucn-ch{N}-{slug}-{date}.ttl` + `eucn-ch{N}-{slug}-latest.ttl` + `.trig` |
 | Konclude consistency check | OWL DL consistency (exit 1 if inconsistent) |
-| SPARQL acceptance test | MFN rate validation (chapter 22 only) |
 
 The Konclude OWL reasoner is bundled in `tools/konclude/` (WASM, requires Node.js). Override the path with the `KONCLUDE_CLI_PATH` environment variable.
 
@@ -117,7 +117,7 @@ summary  (always)
   Notes "Dry run" when dry_run=true.
 ```
 
-**Change detection:** SHA256 of the generated TTL is compared to the committed value in `.github/cache/ch{N}-ttl.sha256`. A release is created only when the hash differs (or `force_rebuild=true`). The cache file is updated after each release so subsequent runs skip unchanged chapters.
+**Change detection:** SHA256 of `eucn-ch{N}-latest.ttl` is compared to `.github/cache/ch{N}-ttl.sha256`. SHA256 of `eucn-core-latest.ttl` is stored in `.github/cache/core-ttl.sha256`. Release is created only when a hash differs (or `force_rebuild=true`). Cache files are updated after each release.
 
 ---
 
@@ -250,13 +250,16 @@ Any individual produced by a `eucn:GrapeFermentation` process and marked carbona
 
 ```
 .github/
-  cache/              SHA256 of last-released TTL per chapter (committed)
+  cache/              SHA256 of last-released TTL per chapter + core (committed)
+                        ch{N}-ttl.sha256, core-ttl.sha256
   workflows/
     build-release.yml   Weekly rebuild, change detection, GitHub Release
     docs.yml            Widoco HTML docs → gh-pages branch
 data/
   intermediate/       Fetcher + scraper cache (gitignored)
   ontology/           Built TTL + TRIG files
+                        eucn-core-{date}.ttl, eucn-core-latest.ttl (stable alias)
+                        eucn-ch{N}-{slug}-{date}.ttl, eucn-ch{N}-{slug}-latest.ttl
 src/
   fetcher/            TARIC XML / XLSX fetcher (httpx + lxml)
   scraper/            Playwright EZT-Online wizard scraper
