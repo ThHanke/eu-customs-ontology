@@ -8,13 +8,6 @@
 @prefix vann: <http://purl.org/vocab/vann/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-eucn:provenance {
-    <https://w3id.org/eucn/run/b281dca8-99ec-44e6-9a09-f57d5bf2a097> a prov:Activity ;
-        dcterms:description "Pipeline run for Chapter 22"^^xsd:string ;
-        dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do>,
-            <https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b> .
-}
-
 {
     <https://w3id.org/eucn> a owl:Ontology ;
         rdfs:label "Ontologie der EU-Kombinierten Nomenklatur (KN/TARIC)"@de,
@@ -31,6 +24,19 @@ eucn:provenance {
         vann:preferredNamespaceUri "https://w3id.org/eucn/" ;
         owl:versionIRI <https://w3id.org/eucn/2026/06/08> ;
         owl:versionInfo "TARIC extract 2026-06-08" .
+
+    eucn:Heading a owl:Class ;
+        rdfs:label "Position"@de,
+            "Heading"@en ;
+        skos:definition "vierstellige Unterteilung der Nomenklatur des Harmonisierten Systems, die eine bestimmte Warengruppe innerhalb eines Kapitels durch weitere Differenzierung nach Material, Verarbeitungsstufe oder Verwendungszweck identifiziert"@de,
+            "four-digit subdivision of the Harmonized System nomenclature that identifies a specific group of goods within a chapter by further differentiating on material, process, or use"@en .
+
+    eucn:TARICCode a owl:Class ;
+        rdfs:label "TARIC-Code"@de,
+            "TARIC Code"@en ;
+        rdfs:subClassOf eucn:CNCode ;
+        skos:definition "Zehnstellige Erweiterung eines KN-Codes im Integrierten Zolltarif der Europäischen Gemeinschaften, die die anwendbaren Regelungsmaßnahmen auf der detailliertesten Warenebene festlegt"@de,
+            "ten-digit extension of a CN code within the Integrated Tariff of the European Communities that specifies the applicable regulatory measures at the most granular commodity level"@en .
 
     eucn:answerText a owl:DatatypeProperty ;
         rdfs:label "Antworttext"@de,
@@ -6445,18 +6451,12 @@ eucn:provenance {
         skos:definition "Datum, ab dem eine TARIC-Maßnahme in Kraft tritt"@de,
             "date from which a TARIC measure is in force"@en .
 
-    eucn:Heading a owl:Class ;
-        rdfs:label "Position"@de,
-            "Heading"@en ;
-        skos:definition "vierstellige Unterteilung der Nomenklatur des Harmonisierten Systems, die eine bestimmte Warengruppe innerhalb eines Kapitels durch weitere Differenzierung nach Material, Verarbeitungsstufe oder Verwendungszweck identifiziert"@de,
-            "four-digit subdivision of the Harmonized System nomenclature that identifies a specific group of goods within a chapter by further differentiating on material, process, or use"@en .
-
-    eucn:TARICCode a owl:Class ;
-        rdfs:label "TARIC-Code"@de,
-            "TARIC Code"@en ;
-        rdfs:subClassOf eucn:CNCode ;
-        skos:definition "Zehnstellige Erweiterung eines KN-Codes im Integrierten Zolltarif der Europäischen Gemeinschaften, die die anwendbaren Regelungsmaßnahmen auf der detailliertesten Warenebene festlegt"@de,
-            "ten-digit extension of a CN code within the Integrated Tariff of the European Communities that specifies the applicable regulatory measures at the most granular commodity level"@en .
+    <http://purl.obolibrary.org/obo/BFO_0000030> a owl:Class ;
+        rdfs:label "Objekt"@de,
+            "object"@en ;
+        rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+        skos:definition "dreidimensionale materielle Entität, die räumlich zusammenhängend ist und kein kontinuierender Teil einer anderen materiellen Entität ist"@de,
+            "three-dimensional material entity that is spatially self-connected and is not a continuant part of any other material entity"@en .
 
     <http://purl.obolibrary.org/obo/RO_0002234> a owl:ObjectProperty ;
         rdfs:label "hat Ausgabe"@de,
@@ -42945,23 +42945,6 @@ eucn:provenance {
         eucn:regulationId "Regulation 0110/08"^^xsd:string ;
         eucn:validityStart "2021-03-01"^^xsd:date .
 
-    <http://purl.obolibrary.org/obo/BFO_0000030> a owl:Class ;
-        rdfs:label "Objekt"@de,
-            "object"@en ;
-        rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
-        skos:definition "dreidimensionale materielle Entität, die räumlich zusammenhängend ist und kein kontinuierender Teil einer anderen materiellen Entität ist"@de,
-            "three-dimensional material entity that is spatially self-connected and is not a continuant part of any other material entity"@en .
-
-    <https://w3id.org/eucn/ind/276fccec-e848-59a4-a126-df2cfd5cf05e> a owl:AnnotationProperty ;
-        rdfs:label "Ethylalkohol mit einem Alkoholgehalt von 80 % vol oder mehr, unvergällt; Ethylalkohol und Branntwein mit beliebigem Alkoholgehalt, vergällt"@de .
-
-    eucn:isCarbonated a owl:DatatypeProperty ;
-        rdfs:label "ist kohlensäurehaltig"@de,
-            "is carbonated"@en ;
-        rdfs:range xsd:boolean ;
-        skos:definition "boolesches Merkmal, das angibt, ob ein Getränk mit Kohlensäure versetzt (schäumend) statt still ist, zur Unterscheidung zwischen den KN-Unterpositionen 2204 10 und 2204 21/29"@de,
-            "boolean flag indicating whether a beverage is carbonated (sparkling) rather than still, used to discriminate between CN subheadings 2204 10 (sparkling) and 2204 21/29 (still)"@en .
-
     eucn:Chapter a owl:Class ;
         rdfs:label "Kapitel"@de,
             "Chapter"@en ;
@@ -43000,6 +42983,16 @@ eucn:provenance {
         skos:definition "Nicht schäumender Wein aus frischen Weintrauben in Behältnissen, eingereiht in KN-Unterpositionen 2204 21 (≤ 2 L) und 2204 29 (> 2 L) (Kapitel 22)"@de,
             "non-sparkling wine of fresh grapes in containers, classified under CN subheadings 2204 21 (≤ 2 L) and 2204 29 (> 2 L) (Chapter 22)"@en .
 
+    <https://w3id.org/eucn/ind/276fccec-e848-59a4-a126-df2cfd5cf05e> a owl:AnnotationProperty ;
+        rdfs:label "Ethylalkohol mit einem Alkoholgehalt von 80 % vol oder mehr, unvergällt; Ethylalkohol und Branntwein mit beliebigem Alkoholgehalt, vergällt"@de .
+
+    eucn:isCarbonated a owl:DatatypeProperty ;
+        rdfs:label "ist kohlensäurehaltig"@de,
+            "is carbonated"@en ;
+        rdfs:range xsd:boolean ;
+        skos:definition "boolesches Merkmal, das angibt, ob ein Getränk mit Kohlensäure versetzt (schäumend) statt still ist, zur Unterscheidung zwischen den KN-Unterpositionen 2204 10 und 2204 21/29"@de,
+            "boolean flag indicating whether a beverage is carbonated (sparkling) rather than still, used to discriminate between CN subheadings 2204 10 (sparkling) and 2204 21/29 (still)"@en .
+
     <https://w3id.org/eucn/ind/0f820df0-69a3-5330-ad2d-64ddbee1b137> a owl:AnnotationProperty ;
         rdfs:label "Wodka"@de .
 
@@ -43019,9 +43012,6 @@ eucn:provenance {
     <https://w3id.org/eucn/ind/9c381f2f-0dd6-5e40-ab87-8a733e5c0331> a owl:AnnotationProperty ;
         rdfs:label "anderer Traubenmost"@de .
 
-    <https://w3id.org/eucn/ind/198e01d4-e63b-5044-9650-9ac48bd1afef> a owl:AnnotationProperty ;
-        rdfs:label "Rum und anderer Branntwein, gewonnen durch Destillieren vergorener Zuckerrohrerzeugnisse"@de .
-
     eucn:GrainDistillation a owl:Class ;
         rdfs:label "Getreidebrennerei"@de,
             "grain distillation"@en ;
@@ -43035,14 +43025,18 @@ eucn:provenance {
         skos:definition "Prozess der Destillation von vergorenem Getreidebrei zur Herstellung von Spirituosen oder hochprozentigem Ethylalkohol; jedes Individuum repräsentiert den einzigartigen Getreidedestillationsprozesstyp in der KN-Kapitel-22-Einreihung"@de,
             "process of distilling fermented grain mash to produce spirits or high-strength ethyl alcohol; each individual represents the unique grain-distillation process type in the CN Chapter 22 classification"@en .
 
+    <https://w3id.org/eucn/ind/198e01d4-e63b-5044-9650-9ac48bd1afef> a owl:AnnotationProperty ;
+        rdfs:label "Rum und anderer Branntwein, gewonnen durch Destillieren vergorener Zuckerrohrerzeugnisse"@de .
+
     <https://w3id.org/eucn/ind/77be1a85-c05a-563e-bdc2-46d7c26a9438> a owl:AnnotationProperty ;
         rdfs:label "Andere gegorene Getränke (z. B. Apfelwein, Birnenwein, Met und Sake); Mischungen gegorener Getränke und Mischungen gegorener Getränke und nicht alkoholischer Getränke, anderweit weder genannt noch inb"@de .
 
-    <https://w3id.org/eucn/ind/492be9d8-9e88-5c14-acf1-d9bdd2474543> a owl:AnnotationProperty ;
-        rdfs:label "Schaumwein"@de .
-
-    <https://w3id.org/eucn/ind/c404415c-e443-5272-b6f1-128674263061> a owl:AnnotationProperty ;
-        rdfs:label "Wasser, einschließlich Mineralwasser und kohlensäurehaltiges Wasser, mit Zusatz von Zucker, anderen Süßmitteln oder Aromastoffen und andere nicht alkoholhaltige Getränke, ausgenommen Frucht-, Nuss- un"@de .
+    <http://purl.obolibrary.org/obo/BFO_0000015> a owl:Class ;
+        rdfs:label "Prozess"@de,
+            "process"@en ;
+        rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+        skos:definition "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de,
+            "entity that exists in time by occurring or happening, and that has temporal parts"@en .
 
     eucn:Beer a owl:Class ;
         rdfs:label "Bier"@de,
@@ -43180,6 +43174,12 @@ eucn:provenance {
         skos:definition "Wasser (einschließlich natürliches oder künstliches Mineralwasser und kohlensäurehaltiges Wasser), Eis und Schnee, eingereiht in KN-Position 2201 (Kapitel 22)"@de,
             "water (including natural or artificial mineral waters and aerated waters), ice, and snow, classified under CN heading 2201 (Chapter 22)"@en .
 
+    <https://w3id.org/eucn/ind/492be9d8-9e88-5c14-acf1-d9bdd2474543> a owl:AnnotationProperty ;
+        rdfs:label "Schaumwein"@de .
+
+    <https://w3id.org/eucn/ind/c404415c-e443-5272-b6f1-128674263061> a owl:AnnotationProperty ;
+        rdfs:label "Wasser, einschließlich Mineralwasser und kohlensäurehaltiges Wasser, mit Zusatz von Zucker, anderen Süßmitteln oder Aromastoffen und andere nicht alkoholhaltige Getränke, ausgenommen Frucht-, Nuss- un"@de .
+
     eucn:AceticFermentation a owl:Class ;
         rdfs:label "Essigsäuregärung"@de,
             "acetic fermentation"@en ;
@@ -43192,6 +43192,13 @@ eucn:provenance {
             eucn:SweetenedWaterProcess ;
         skos:definition "Prozess der Essigsäuregärung von Ethylalkohol zur Herstellung von Essig; jedes Individuum repräsentiert den einzigartigen Essigsäuregärungsprozesstyp in der KN-Kapitel-22-Einreihung"@de,
             "process of acetic acid fermentation of ethyl alcohol to produce vinegar; each individual represents the unique acetic-fermentation process type in the CN Chapter 22 classification"@en .
+
+    eucn:Beverage a owl:Class ;
+        rdfs:label "Getränk"@de,
+            "Beverage"@en ;
+        rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> ;
+        skos:definition "für den menschlichen Genuss bestimmte Flüssigkeit, eingereiht in Kapitel 22 der KN; Unterklasse von BFO-Objekt (BFO_0000030)"@de,
+            "liquid intended for human consumption, classified under CN Chapter 22; a subclass of BFO Object (BFO_0000030)"@en .
 
     eucn:FruitFermentation a owl:Class ;
         rdfs:label "Fruchtfermentation"@de,
@@ -43258,23 +43265,6 @@ eucn:provenance {
         skos:definition "Prozess der Vergärung von frischen Weintrauben oder Traubenmost zur Herstellung von Wein; jedes Individuum repräsentiert den einzigartigen Traubenfermentationsprozesstyp in der KN-Kapitel-22-Einreihung"@de,
             "process of fermenting fresh grapes or grape must to produce wine; each individual represents the unique grape-fermentation process type in the CN Chapter 22 classification"@en .
 
-    <http://purl.obolibrary.org/obo/BFO_0000015> a owl:Class ;
-        rdfs:label "Prozess"@de,
-            "process"@en ;
-        rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
-        skos:definition "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de,
-            "entity that exists in time by occurring or happening, and that has temporal parts"@en .
-
-    eucn:cnHeadingCode a owl:DatatypeProperty ;
-        rdfs:label "KN-Positionsnummer"@de,
-            "CN heading code"@en ;
-        rdfs:range xsd:string ;
-        skos:definition "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; z. B. '2203' für Bier, '220410' für Schaumwein"@de,
-            "four-digit (or six-digit for subheadings) CN heading code inferred by the OWL reasoner from the product class membership; e.g. '2203' for Beer, '220410' for Sparkling Wine"@en .
-
-    <https://w3id.org/eucn/ind/fff062c4-bd18-5fc6-80b4-e74b6005ab14> a owl:AnnotationProperty ;
-        rdfs:label "Branntwein aus Wein oder Traubentrester"@de .
-
     eucn:Wine a owl:Class ;
         rdfs:label "Wein"@de,
             "Wine"@en ;
@@ -43292,12 +43282,15 @@ eucn:provenance {
         skos:definition "Wein aus frischen Weintrauben, einschließlich mit Alkohol stummgemachten Weins, eingereiht in KN-Position 2204 (Kapitel 22)"@de,
             "wine of fresh grapes, including grape must with fermentation arrested by the addition of alcohol, classified under CN heading 2204 (Chapter 22)"@en .
 
-    eucn:Beverage a owl:Class ;
-        rdfs:label "Getränk"@de,
-            "Beverage"@en ;
-        rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> ;
-        skos:definition "für den menschlichen Genuss bestimmte Flüssigkeit, eingereiht in Kapitel 22 der KN; Unterklasse von BFO-Objekt (BFO_0000030)"@de,
-            "liquid intended for human consumption, classified under CN Chapter 22; a subclass of BFO Object (BFO_0000030)"@en .
+    eucn:cnHeadingCode a owl:DatatypeProperty ;
+        rdfs:label "KN-Positionsnummer"@de,
+            "CN heading code"@en ;
+        rdfs:range xsd:string ;
+        skos:definition "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; z. B. '2203' für Bier, '220410' für Schaumwein"@de,
+            "four-digit (or six-digit for subheadings) CN heading code inferred by the OWL reasoner from the product class membership; e.g. '2203' for Beer, '220410' for Sparkling Wine"@en .
+
+    <https://w3id.org/eucn/ind/fff062c4-bd18-5fc6-80b4-e74b6005ab14> a owl:AnnotationProperty ;
+        rdfs:label "Branntwein aus Wein oder Traubentrester"@de .
 
     eucn:producedBy a owl:FunctionalProperty,
             owl:ObjectProperty ;
@@ -48437,61 +48430,10 @@ eucn:provenance {
         rdf:rest () .
 }
 
-<https://w3id.org/eucn/inferred/2026-06-08> {
-    eucn:Heading rdfs:subClassOf owl:Thing .
-
-    eucn:TARICCode rdfs:subClassOf eucn:CNCode .
-
-    <http://purl.obolibrary.org/obo/BFO_0000030> rdfs:subClassOf owl:Thing .
-
-    eucn:Chapter rdfs:subClassOf owl:Thing .
-
-    eucn:GrapeMust rdfs:subClassOf eucn:Wine .
-
-    eucn:SparklingWine rdfs:subClassOf eucn:Wine .
-
-    eucn:StillWine rdfs:subClassOf eucn:Wine .
-
-    eucn:GrainDistillation rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:Beer rdfs:subClassOf eucn:Beverage .
-
-    eucn:EthylAlcohol rdfs:subClassOf eucn:Beverage .
-
-    eucn:FermentedBeverage rdfs:subClassOf eucn:Beverage .
-
-    eucn:FlavouredWine rdfs:subClassOf eucn:Beverage .
-
-    eucn:NonAlcoholicBeverage rdfs:subClassOf eucn:Beverage .
-
-    eucn:Spirit rdfs:subClassOf eucn:Beverage .
-
-    eucn:Vinegar rdfs:subClassOf eucn:Beverage .
-
-    eucn:Water rdfs:subClassOf eucn:Beverage .
-
-    eucn:AceticFermentation rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:FruitFermentation rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:GrapeFlavouringProcess rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:MaltFermentation rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:SweetenedWaterProcess rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:GrapeFermentation rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-    eucn:Wine rdfs:subClassOf eucn:Beverage .
-
-    <http://purl.obolibrary.org/obo/BFO_0000015> rdfs:subClassOf owl:Thing .
-
-    eucn:Beverage rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-    eucn:ClassificationNode rdfs:subClassOf owl:Thing .
-
-    eucn:CNCode rdfs:subClassOf owl:Thing .
-
-    eucn:TARICMeasure rdfs:subClassOf owl:Thing .
+eucn:provenance {
+    <https://w3id.org/eucn/run/dbf1255d-da50-4909-9af9-0b71ac3cc1b3> a prov:Activity ;
+        dcterms:description "Pipeline run for Chapter 22"^^xsd:string ;
+        dcterms:source <https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do>,
+            <https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b> .
 }
 

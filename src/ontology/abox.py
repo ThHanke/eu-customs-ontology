@@ -125,21 +125,19 @@ def build_abox(
     for triple in wizard_triples:
         g.add(triple)
 
-    # Curated equivalence axioms — registry takes precedence over hand-authored
+    # Curated equivalence axioms: hand-authored always applied; approved registry candidates additive
     chapter_module = get_chapter(wizard_tree.chapter)
-    registry_path = Path(__file__).parent.parent.parent / "data" / "axiom_candidates" / f"ch{wizard_tree.chapter:02d}.jsonl"
+    if chapter_module.add_equivalence_axioms is not None:
+        chapter_module.add_equivalence_axioms(g)
 
+    registry_path = Path(__file__).parent.parent.parent / "data" / "axiom_candidates" / f"ch{wizard_tree.chapter:02d}.jsonl"
     if registry_path.exists():
         from src.agent.candidate_registry import CandidateRegistry
         from src.agent.axiom_builder import build_equivalence_axioms_from_candidates
         registry = CandidateRegistry(registry_path)
         registry.load()
-        active = registry.get_active()
-        if active:
-            build_equivalence_axioms_from_candidates(g, active)
-        elif chapter_module.add_equivalence_axioms is not None:
-            chapter_module.add_equivalence_axioms(g)
-    elif chapter_module.add_equivalence_axioms is not None:
-        chapter_module.add_equivalence_axioms(g)
+        approved = [c for c in registry.get_active() if c.status == "approved"]
+        if approved:
+            build_equivalence_axioms_from_candidates(g, approved)
 
     return g, coverage

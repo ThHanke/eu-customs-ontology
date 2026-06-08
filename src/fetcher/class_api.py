@@ -65,13 +65,7 @@ def fetch_chapter_notes(
                 "language": lang,
                 "simDate": sim_date,
                 "informationTypes": ["CN"],
-                "cnCodes": [
-                    {
-                        "valueType": "RANGE",
-                        "valueFrom": f"{chapter:02d}00000000",
-                        "valueTo": f"{chapter:02d}99999999",
-                    }
-                ],
+                "cnCodes": [{"valueType": "NUMBER", "value": f"{chapter:02d}"}],
             }
 
             resp = _post_with_retry(client, url, body)
