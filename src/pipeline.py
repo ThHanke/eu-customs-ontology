@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 """Chapter-parameterized EU customs ontology pipeline.
 
 Usage:
     python -m src.pipeline --chapter 22 [--skip-scrape] [--skip-fetch]
                             [--xml-path PATH] [--no-reasoner] [--force]
 """
-from __future__ import annotations
 
 import argparse
 import json
