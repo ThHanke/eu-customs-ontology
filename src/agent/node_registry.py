@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from collections.abc import Iterator
 from pathlib import Path
 
 from src.schema.axiom_candidate import AxiomCandidate
 from src.schema.node_axiom_set import NodeAxiomSet
+
+logger = logging.getLogger(__name__)
 
 
 class NodeRegistry:
@@ -50,13 +53,15 @@ class NodeRegistry:
     def iter_all(self) -> Iterator[NodeAxiomSet]:
         if not self._dir.exists():
             return
-        for path in sorted(self._dir.glob("node_*.jsonl")):
-            text = path.read_text(encoding="utf-8").strip()
-            if not text:
+        for path in sorted(self._dir.glob("node_[0-9]*.jsonl")):
+            cn_code = path.stem.removeprefix("node_")
+            try:
+                record = self._load_one(cn_code)
+            except Exception as exc:
+                logger.warning("Skipping corrupt registry file %s: %s", path, exc)
                 continue
-            last_line = text.splitlines()[-1].strip()
-            if last_line:
-                yield NodeAxiomSet.model_validate(json.loads(last_line))
+            if record is not None:
+                yield record
 
     def flatten_to_candidates(self, out_path: Path) -> None:
         candidates: list[AxiomCandidate] = []

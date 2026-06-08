@@ -324,3 +324,33 @@ def test_flatten_to_candidates_atomic_no_tmp_remains(tmp_path: Path):
 
     assert out_path.exists()
     assert not out_path.with_suffix(".jsonl.tmp").exists()
+
+
+# ---------------------------------------------------------------------------
+# iter_all: skips corrupt files and continues
+# ---------------------------------------------------------------------------
+
+
+def test_iter_all_skips_corrupt_file_and_continues(tmp_path: Path):
+    reg = NodeRegistry(tmp_path)
+    # Write a valid node
+    reg.upsert(_make_axiom_set(cn_code="2204"))
+    # Write a corrupt node file (invalid JSON)
+    corrupt_path = tmp_path / "node_2205.jsonl"
+    corrupt_path.write_text("{not valid json!!!", encoding="utf-8")
+    # Write another valid node
+    reg.upsert(_make_axiom_set(cn_code="2206"))
+
+    found = {s.cn_code for s in reg.iter_all()}
+    assert found == {"2204", "2206"}
+
+
+def test_iter_all_ignores_non_numeric_node_files(tmp_path: Path):
+    reg = NodeRegistry(tmp_path)
+    reg.upsert(_make_axiom_set(cn_code="2204"))
+    # Write a non-numeric node file that should be excluded by the glob
+    non_numeric_path = tmp_path / "node_harmonization.jsonl"
+    non_numeric_path.write_text(_make_axiom_set(cn_code="2204").model_dump_json() + "\n", encoding="utf-8")
+
+    found = {s.cn_code for s in reg.iter_all()}
+    assert found == {"2204"}
