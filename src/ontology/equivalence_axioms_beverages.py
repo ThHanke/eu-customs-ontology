@@ -5,6 +5,19 @@ using the canonical data properties from discriminating_props_beverages.py.
 
 OWL 2 DL: no punning issues — named product classes (eucn:Beer etc.) are the
 subjects of owl:equivalentClass. BNode intersection class is the object.
+
+DEPRECATION NOTICE
+------------------
+This module is superseded by the LLM axiom agent pipeline
+(src/agent/axiom_builder.py + src/agent/candidate_registry.py).
+Once agent output for Chapter 22 has been manually validated for quality and
+consistency (run Konclude check), this module should be retired by calling::
+
+    from src.scripts.retire_chapter import retire_chapter
+    retire_chapter(22)
+
+Do NOT retire before validation — this module remains the authoritative source
+until the agent pipeline is confirmed correct for all Ch22 product classes.
 """
 from __future__ import annotations
 

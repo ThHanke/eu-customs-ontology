@@ -9,6 +9,19 @@ closing the open world for process-based discrimination.
 
 No Phase 2 (negation) axioms are needed: every product class has a unique
 positive someValuesFrom axiom on its process class.
+
+DEPRECATION NOTICE
+------------------
+This module is superseded by the LLM axiom agent pipeline
+(src/agent/axiom_builder.py + src/agent/candidate_registry.py).
+Once agent output for Chapter 23 has been manually validated for quality and
+consistency (run Konclude check), this module should be retired by calling::
+
+    from src.scripts.retire_chapter import retire_chapter
+    retire_chapter(23)
+
+Do NOT retire before validation — this module remains the authoritative source
+until the agent pipeline is confirmed correct for all Ch23 product classes.
 """
 from __future__ import annotations
 

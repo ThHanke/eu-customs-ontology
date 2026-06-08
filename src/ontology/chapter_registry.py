@@ -1,3 +1,13 @@
+"""Chapter registry: maps CN chapter numbers to hand-authored ontology modules.
+
+DEPRECATION NOTICE
+------------------
+The hand-authored modules registered here (Ch22, Ch23) are superseded by the
+LLM axiom agent pipeline (src/agent/axiom_builder.py).  Once agent output for
+a chapter has been manually validated and a Konclude consistency check passes,
+run ``scripts/retire_chapter.py <N>`` to convert the module functions to
+no-op stubs and set ``add_equivalence_axioms=None`` here.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

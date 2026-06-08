@@ -6,6 +6,19 @@ value is typed as (e.g.) AnimalMealRendering, Konclude can infer
 NOT(producedBy someValuesFrom GrainMillingProcess) via class disjointness.
 
 Nine process classes map one-to-one to CN headings 2301-2309.
+
+DEPRECATION NOTICE
+------------------
+This module is superseded by the LLM axiom agent pipeline
+(src/agent/axiom_builder.py + src/agent/candidate_registry.py).
+Once agent output for Chapter 23 has been manually validated, retire via::
+
+    from src.scripts.retire_chapter import retire_chapter
+    retire_chapter(23)
+
+Do NOT retire before validation — the TBox process class vocabulary defined
+here is required for correct OWL reasoning until the agent pipeline is
+confirmed correct for all Ch23 process classes.
 """
 from __future__ import annotations
 
