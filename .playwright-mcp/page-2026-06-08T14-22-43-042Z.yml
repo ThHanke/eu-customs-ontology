@@ -1,0 +1,473 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - banner [ref=e7]:
+      - document [ref=e11]:
+        - button "How do you know?" [ref=e15] [cursor=pointer]
+    - banner [ref=e16]:
+      - generic [ref=e17]:
+        - link [ref=e20] [cursor=pointer]:
+          - /url: "#/"
+        - generic [ref=e22]: TAXATION AND CUSTOMS UNION
+        - generic [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: 
+          - generic [ref=e27]: en
+    - banner [ref=e28]:
+      - button "" [ref=e34] [cursor=pointer]:
+        - generic [ref=e36]: 
+    - main [ref=e37]:
+      - generic [ref=e40]:
+        - heading "CLASS Consultation" [level=3] [ref=e41]
+        - button "switch to Advanced mode" [ref=e43] [cursor=pointer]:
+          - generic [ref=e45]: switch to Advanced mode
+        - tablist [ref=e47]:
+          - generic [ref=e49]:
+            - tab " Consultation Information " [expanded] [ref=e51] [cursor=pointer]:
+              - generic [ref=e52]: 
+              - generic [ref=e54]:
+                - text: Consultation Information
+                - generic [ref=e56]: 
+            - region " Consultation Information " [ref=e57]:
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]:
+                    - table [ref=e61]:
+                      - row " Simulation Date " [ref=e62]:
+                        - cell "" [ref=e63]:
+                          - generic [ref=e64]: 
+                        - cell "Simulation Date " [ref=e65]:
+                          - generic [ref=e66]:
+                            - text: Simulation Date
+                            - generic [ref=e67] [cursor=pointer]: 
+                    - generic [ref=e70]:
+                      - textbox [ref=e71]: 08/06/2026
+                      - button [ref=e72] [cursor=pointer]:
+                        - generic [ref=e73]: 
+                  - generic [ref=e74]:
+                    - table [ref=e75]:
+                      - row " Information Type " [ref=e76]:
+                        - cell "" [ref=e77]:
+                          - generic [ref=e78]: 
+                        - cell "Information Type " [ref=e79]:
+                          - generic [ref=e80]:
+                            - text: Information Type
+                            - generic [ref=e81] [cursor=pointer]: 
+                    - list [ref=e82]:
+                      - listitem [ref=e83]:
+                        - generic [ref=e84]:
+                          - generic [ref=e85] [cursor=pointer]:
+                            - generic [ref=e86]:
+                              - checkbox [checked]
+                            - generic [ref=e88]: 
+                          - generic [ref=e89]: Classification Documents
+                      - listitem [ref=e90]:
+                        - generic [ref=e91]:
+                          - generic [ref=e92] [cursor=pointer]:
+                            - generic [ref=e93]:
+                              - checkbox [checked]
+                            - generic [ref=e95]: 
+                          - generic [ref=e96]: CN Notes
+                      - listitem [ref=e97]:
+                        - generic [ref=e98]:
+                          - generic [ref=e99] [cursor=pointer]:
+                            - generic [ref=e100]:
+                              - checkbox [checked]
+                            - generic [ref=e102]: 
+                          - generic [ref=e103]: TARIC Information
+                      - listitem [ref=e104]:
+                        - generic [ref=e105]:
+                          - generic [ref=e106] [cursor=pointer]:
+                            - generic [ref=e107]:
+                              - checkbox [checked]
+                            - generic [ref=e109]: 
+                          - generic [ref=e110]: ECICS Information
+                      - listitem [ref=e111]:
+                        - generic [ref=e112]:
+                          - generic [ref=e113] [cursor=pointer]:
+                            - generic [ref=e114]:
+                              - checkbox [checked]
+                            - generic [ref=e116]: 
+                          - generic [ref=e117]: BTI Decisions
+                  - generic [ref=e118]:
+                    - table [ref=e119]:
+                      - row "  Free Text  0 / 500" [ref=e120]:
+                        - cell " " [ref=e121]:
+                          - generic [ref=e122]: 
+                          - generic [ref=e123]: 
+                        - cell "Free Text " [ref=e124]:
+                          - generic [ref=e125]:
+                            - text: Free Text
+                            - generic [ref=e126] [cursor=pointer]: 
+                        - cell "0 / 500" [ref=e127]:
+                          - generic [ref=e128]: 0 / 500
+                    - textbox [ref=e129]
+                    - generic [ref=e130]: CCC conclusions are only available in English language, it is advised to use the keywords search criterion.
+                - separator [ref=e131]
+                - generic [ref=e132]:
+                  - generic [ref=e133]:
+                    - generic [ref=e134]:
+                      - table [ref=e135]:
+                        - row "Search For Keywords (applicable only for BTI Decisions and Classification Documents)  0 / 50" [ref=e136]:
+                          - cell "Search For Keywords (applicable only for BTI Decisions and Classification Documents) " [ref=e137]:
+                            - generic [ref=e138]:
+                              - text: Search For Keywords (applicable only for BTI Decisions and Classification Documents)
+                              - generic [ref=e139] [cursor=pointer]: 
+                          - cell "0 / 50" [ref=e140]:
+                            - generic [ref=e141]: 0 / 50
+                      - generic [ref=e142]:
+                        - textbox [ref=e143]
+                        - generic:
+                          - generic: 
+                        - generic [ref=e421] [cursor=pointer]: 
+                        - generic:
+                          - generic: 
+                    - generic [ref=e144]:
+                      - generic [ref=e145]:
+                        - text: Available Keywords
+                        - generic [ref=e146] [cursor=pointer]: 
+                      - table [ref=e147]:
+                        - row "" [ref=e422]:
+                          - cell [ref=e423]:
+                            - tree [ref=e425]:
+                              - listitem [ref=e427]:
+                                - treeitem "ORES, METALS AND CHEMICALS" [ref=e428] [cursor=pointer]:
+                                  - button "" [ref=e429]:
+                                    - generic [ref=e430]: 
+                                  - generic [ref=e434]: ORES, METALS AND CHEMICALS
+                              - listitem [ref=e436]:
+                                - treeitem "ELECTRON. AND INFORM. TECHNOLOGY" [ref=e437] [cursor=pointer]:
+                                  - button "" [ref=e438]:
+                                    - generic [ref=e439]: 
+                                  - generic [ref=e443]: ELECTRON. AND INFORM. TECHNOLOGY
+                              - listitem [ref=e445]:
+                                - treeitem "COMMUNICATION EQUIPMENT" [ref=e446] [cursor=pointer]:
+                                  - button "" [ref=e447]:
+                                    - generic [ref=e448]: 
+                                  - generic [ref=e452]: COMMUNICATION EQUIPMENT
+                              - listitem [ref=e454]:
+                                - treeitem "COMPONENTS AND CONTROL EQUIPMENT" [ref=e455] [cursor=pointer]:
+                                  - button "" [ref=e456]:
+                                    - generic [ref=e457]: 
+                                  - generic [ref=e461]: COMPONENTS AND CONTROL EQUIPMENT
+                              - listitem [ref=e463]:
+                                - treeitem "PRECISION EQUIPMENT" [ref=e464] [cursor=pointer]:
+                                  - button "" [ref=e465]:
+                                    - generic [ref=e466]: 
+                                  - generic [ref=e470]: PRECISION EQUIPMENT
+                              - listitem [ref=e472]:
+                                - treeitem "MECHANICAL/ELECTRICAL APPARATUS" [ref=e473] [cursor=pointer]:
+                                  - button "" [ref=e474]:
+                                    - generic [ref=e475]: 
+                                  - generic [ref=e479]: MECHANICAL/ELECTRICAL APPARATUS
+                              - listitem [ref=e481]:
+                                - treeitem "TRANSPORT EQUIPMENT" [ref=e482] [cursor=pointer]:
+                                  - button "" [ref=e483]:
+                                    - generic [ref=e484]: 
+                                  - generic [ref=e488]: TRANSPORT EQUIPMENT
+                              - listitem [ref=e490]:
+                                - treeitem "MISCELLANEOUS ITEMS" [ref=e491] [cursor=pointer]:
+                                  - button "" [ref=e492]:
+                                    - generic [ref=e493]: 
+                                  - generic [ref=e497]: MISCELLANEOUS ITEMS
+                              - listitem [ref=e499]:
+                                - treeitem "TEXTILES AND TEXTILE ARTICLES" [ref=e500] [cursor=pointer]:
+                                  - button "" [ref=e501]:
+                                    - generic [ref=e502]: 
+                                  - generic [ref=e506]: TEXTILES AND TEXTILE ARTICLES
+                              - listitem [ref=e508]:
+                                - treeitem "CHEMICAL PRODUCTS" [ref=e509] [cursor=pointer]:
+                                  - button "" [ref=e510]:
+                                    - generic [ref=e511]: 
+                                  - generic [ref=e515]: CHEMICAL PRODUCTS
+                              - listitem [ref=e517]:
+                                - treeitem "AGRICULTURAL PRODUCTS" [ref=e518] [cursor=pointer]:
+                                  - button "" [ref=e519]:
+                                    - generic [ref=e520]: 
+                                  - generic [ref=e524]: AGRICULTURAL PRODUCTS
+                              - listitem [ref=e526]:
+                                - treeitem "OTHER CATEGORY" [ref=e527] [cursor=pointer]:
+                                  - button "" [ref=e528]:
+                                    - generic [ref=e529]: 
+                                  - generic [ref=e533]: OTHER CATEGORY
+                          - cell "" [ref=e154]:
+                            - generic:
+                              - generic: 
+                  - generic [ref=e155]:
+                    - generic [ref=e156]:
+                      - generic [ref=e157]: Matching operator between selected keywords
+                      - generic [ref=e158]:
+                        - radio "OR" [checked] [ref=e159]
+                        - generic [ref=e160]: OR
+                        - radio "AND" [ref=e161]
+                        - generic [ref=e162]: AND
+                    - generic [ref=e163]:
+                      - table [ref=e164]:
+                        - row "  Selected Keywords  0 / 200" [ref=e165]:
+                          - cell " " [ref=e166]:
+                            - generic [ref=e167]: 
+                            - generic [ref=e168]: 
+                          - cell "Selected Keywords " [ref=e169]:
+                            - generic [ref=e170]:
+                              - text: Selected Keywords
+                              - generic [ref=e171] [cursor=pointer]: 
+                          - cell "0 / 200" [ref=e172]:
+                            - generic [ref=e173]: 0 / 200
+                          - cell [ref=e174]
+                      - table [ref=e175]:
+                        - row "No results found  " [ref=e176]:
+                          - cell "No results found" [ref=e177]:
+                            - generic [ref=e179]:
+                              - generic:
+                                - tree
+                              - generic [ref=e180]: No results found
+                          - cell " " [ref=e181]:
+                            - generic:
+                              - generic: 
+                            - generic:
+                              - generic: 
+          - generic [ref=e183]:
+            - tab " BTI Decisions " [expanded] [ref=e185] [cursor=pointer]:
+              - generic [ref=e186]: 
+              - generic [ref=e188]:
+                - text: BTI Decisions
+                - generic [ref=e190]: 
+            - region " BTI Decisions " [ref=e191]:
+              - generic [ref=e196]:
+                - table [ref=e197]:
+                  - row "  BTI Reference  0 / 34" [ref=e198]:
+                    - cell " " [ref=e199]:
+                      - generic [ref=e200]: 
+                      - generic [ref=e201]: 
+                    - cell "BTI Reference " [ref=e202]:
+                      - generic [ref=e203]:
+                        - text: BTI Reference
+                        - generic [ref=e204] [cursor=pointer]: 
+                    - cell "0 / 34" [ref=e205]:
+                      - generic [ref=e206]: 0 / 34
+                - textbox [ref=e208]
+          - generic [ref=e210]:
+            - tab " ECICS Information " [expanded] [ref=e212] [cursor=pointer]:
+              - generic [ref=e213]: 
+              - generic [ref=e215]:
+                - text: ECICS Information
+                - generic [ref=e217]: 
+            - region " ECICS Information " [ref=e218]:
+              - generic [ref=e220]:
+                - generic [ref=e221]:
+                  - table [ref=e222]:
+                    - row "  CUS Number " [ref=e223]:
+                      - cell "  CUS Number" [ref=e224]:
+                        - generic [ref=e225]:
+                          - generic [ref=e226]: 
+                          - generic [ref=e227]: 
+                          - text: CUS Number
+                      - cell "" [ref=e228]:
+                        - generic [ref=e229] [cursor=pointer]: 
+                  - textbox [ref=e231]
+                - generic [ref=e232]:
+                  - table [ref=e233]:
+                    - row "  CAS Number " [ref=e234]:
+                      - cell "  CAS Number" [ref=e235]:
+                        - generic [ref=e236]:
+                          - generic [ref=e237]: 
+                          - generic [ref=e238]: 
+                          - text: CAS Number
+                      - cell "" [ref=e239]:
+                        - generic [ref=e240] [cursor=pointer]: 
+                  - textbox [ref=e242]
+                - generic [ref=e243]:
+                  - table [ref=e244]:
+                    - row "  EC Number " [ref=e245]:
+                      - cell "  EC Number" [ref=e246]:
+                        - generic [ref=e247]:
+                          - generic [ref=e248]: 
+                          - generic [ref=e249]: 
+                          - text: EC Number
+                      - cell "" [ref=e250]:
+                        - generic [ref=e251] [cursor=pointer]: 
+                  - textbox [ref=e253]
+                - generic [ref=e254]:
+                  - table [ref=e255]:
+                    - row "  UN Number " [ref=e256]:
+                      - cell "  UN Number" [ref=e257]:
+                        - generic [ref=e258]:
+                          - generic [ref=e259]: 
+                          - generic [ref=e260]: 
+                          - text: UN Number
+                      - cell "" [ref=e261]:
+                        - generic [ref=e262] [cursor=pointer]: 
+                  - textbox [ref=e264]
+          - generic [ref=e266]:
+            - tab " Classification Information " [expanded] [ref=e268] [cursor=pointer]:
+              - generic [ref=e269]: 
+              - generic [ref=e271]:
+                - text: Classification Information
+                - generic [ref=e272]: 
+            - region " Classification Information " [ref=e273]:
+              - generic [ref=e276]:
+                - table [ref=e277]:
+                  - row "  Document Reference  0 / 30" [ref=e278]:
+                    - cell " " [ref=e279]:
+                      - generic [ref=e280]: 
+                      - generic [ref=e281]: 
+                    - cell "Document Reference " [ref=e282]:
+                      - generic [ref=e283]:
+                        - text: Document Reference
+                        - generic [ref=e284] [cursor=pointer]: 
+                    - cell "0 / 30" [ref=e285]:
+                      - generic [ref=e286]: 0 / 30
+                - textbox "Document Reference " [ref=e287]
+          - generic [ref=e290]:
+            - tab " Commodity Codes " [expanded] [ref=e292] [cursor=pointer]:
+              - generic [ref=e293]: 
+              - generic [ref=e295]:
+                - text: Commodity Codes
+                - generic [ref=e296]: 
+            - region " Commodity Codes " [ref=e297]:
+              - generic [ref=e299]:
+                - generic [ref=e300]:
+                  - generic [ref=e301]:
+                    - text: Input Commodity Code
+                    - generic [ref=e302] [cursor=pointer]: 
+                  - table [ref=e303]:
+                    - row "Number Range  " [ref=e304]:
+                      - cell "Number Range" [ref=e305]:
+                        - radio "Number" [checked] [ref=e306]
+                        - generic [ref=e307]: Number
+                        - radio "Range" [ref=e308]
+                        - generic [ref=e309]: Range
+                      - cell " " [ref=e310]:
+                        - generic [ref=e311]:
+                          - textbox [ref=e312]
+                          - button "":
+                            - generic: 
+                          - generic:
+                            - generic: 
+                - generic [ref=e313]:
+                  - table [ref=e314]:
+                    - row "  Selected Commodity Codes  0 / 200" [ref=e315]:
+                      - cell " " [ref=e316]:
+                        - generic [ref=e317]: 
+                        - generic [ref=e318]: 
+                      - cell "Selected Commodity Codes " [ref=e319]:
+                        - generic [ref=e320]:
+                          - text: Selected Commodity Codes
+                          - generic [ref=e321] [cursor=pointer]: 
+                      - cell "0 / 200" [ref=e322]:
+                        - generic [ref=e323]: 0 / 200
+                      - cell [ref=e324]
+                  - table [ref=e325]:
+                    - row "No results found  " [ref=e326]:
+                      - cell "No results found" [ref=e327]:
+                        - generic [ref=e329]:
+                          - generic:
+                            - tree
+                          - generic [ref=e330]: No results found
+                      - cell " " [ref=e331]:
+                        - generic:
+                          - generic: 
+                        - generic:
+                          - generic: 
+        - generic [ref=e332]:
+          - button "eUI Icon Clear Form" [ref=e333] [cursor=pointer]:
+            - generic [ref=e334]:
+              - img "eUI Icon" [ref=e335]: 
+              - generic [ref=e336]: Clear Form
+          - button "eUI Icon Search" [ref=e337] [cursor=pointer]:
+            - generic [ref=e338]:
+              - img "eUI Icon" [ref=e339]: 
+              - generic [ref=e340]: Search
+        - generic [ref=e341]:
+          - generic [ref=e342]:
+            - generic [ref=e343]: 
+            - generic [ref=e344]: Field is required.
+          - generic [ref=e345]:
+            - generic [ref=e346]: 
+            - generic [ref=e347]: 
+            - generic [ref=e348]: At least one of the fields is required.
+          - generic [ref=e349]:
+            - img "eUI Icon" [ref=e350]: 
+            - generic [ref=e351]: The European Commission maintains this website to enhance public access to information about its initiatives and European Union policies in general. Our goal is to keep this information timely and accurate. If errors are brought to our attention, we will try to correct them. However, the Commission accepts no responsibility or liability whatsoever with regard to the information on this site.
+    - contentinfo [ref=e352]:
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - text: "Last Update: 16/03/2025 Version: 2.3.1.0"
+          - generic [ref=e355] [cursor=pointer]:
+            - text: Top
+            - generic [ref=e356]: 
+        - contentinfo [ref=e358]:
+          - generic [ref=e359]:
+            - list [ref=e361]:
+              - listitem [ref=e362]:
+                - link "Taxation and Customs Union" [ref=e363] [cursor=pointer]:
+                  - /url: https://taxation-customs.ec.europa.eu/index_en
+              - listitem [ref=e364]:
+                - generic [ref=e365]:
+                  - text: "This site is managed by:"
+                  - text: Directorate-General for Taxation and Customs Union
+              - listitem [ref=e366]:
+                - link "Accessibility" [ref=e367] [cursor=pointer]:
+                  - /url: https://taxation-customs.ec.europa.eu/accessibility-statement_en
+            - generic [ref=e368]:
+              - generic [ref=e369]: Contact us
+              - list [ref=e370]:
+                - listitem [ref=e371]:
+                  - link "Contact information of the DG TAXUD" [ref=e372] [cursor=pointer]:
+                    - /url: https://ec.europa.eu/taxation_customs/contacts_en
+            - generic [ref=e373]:
+              - generic [ref=e374]: About us
+              - list [ref=e375]:
+                - listitem [ref=e376]:
+                  - link "Newsletter" [ref=e377] [cursor=pointer]:
+                    - /url: https://ec.europa.eu/taxation_customs/newsletters_en
+            - generic [ref=e378]:
+              - generic [ref=e379]: Follow us on
+              - list [ref=e380]:
+                - listitem [ref=e381]:
+                  - link "Flickr" [ref=e382] [cursor=pointer]:
+                    - /url: https://www.flickr.com/photos/146315122@N05
+                    - img [ref=e383]
+                    - text: Flickr
+                - listitem [ref=e385]:
+                  - link "Twitter" [ref=e386] [cursor=pointer]:
+                    - /url: https://twitter.com/EU_Taxud
+                    - img [ref=e387]
+                    - text: Twitter
+                - listitem [ref=e389]:
+                  - link "YouTube" [ref=e390] [cursor=pointer]:
+                    - /url: https://www.youtube.com/EUTaxud
+                    - img [ref=e391]
+                    - text: YouTube
+            - link "Home - European Commission" [ref=e395] [cursor=pointer]:
+              - /url: https://commission.europa.eu/index_en
+              - generic "European Commission" [ref=e396]:
+                - img "European Commission logo" [ref=e397]
+            - list [ref=e399]:
+              - listitem [ref=e400]:
+                - link "Contact the European Commission" [ref=e401] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/about-european-commission/contact_en
+              - listitem [ref=e402]:
+                - link "Follow the European Commission on social media" [ref=e403] [cursor=pointer]:
+                  - /url: https://europa.eu/european-union/contact/social-networks_en#n:+i:4+e:1+t:+s
+                  - text: Follow the European Commission on social media
+                  - img [ref=e404]
+              - listitem [ref=e406]:
+                - link "About the Commission's new web presence" [ref=e407] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/about-commissions-new-web-presence
+              - listitem [ref=e408]:
+                - link "Resources for partners" [ref=e409] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/resources-partners
+            - list [ref=e411]:
+              - listitem [ref=e412]:
+                - link "Languages on our website" [ref=e413] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/language-policy_en
+              - listitem [ref=e414]:
+                - link "Cookies" [ref=e415] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/cookies_en
+              - listitem [ref=e416]:
+                - link "Privacy policy" [ref=e417] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/privacy-policy_en
+              - listitem [ref=e418]:
+                - link "Legal notice" [ref=e419] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/legal-notice_en
+  - generic:
+    - region

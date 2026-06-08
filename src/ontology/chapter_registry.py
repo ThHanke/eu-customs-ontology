@@ -43,7 +43,7 @@ CHAPTERS: dict[int, ChapterModule] = {
         add_discriminating_props=add_discriminating_props_beverages,
         add_product_classes=add_product_classes_beverages,
         add_process_classes=add_process_classes_beverages,
-        add_equivalence_axioms=add_equivalence_axioms_beverages,
+        add_equivalence_axioms=None,  # retired 2026-06-08
     ),
     23: ChapterModule(
         label="Residues and waste from the food industries; prepared animal fodder",

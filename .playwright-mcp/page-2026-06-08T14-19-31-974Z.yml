@@ -1,0 +1,191 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e5]:
+    - generic [ref=e6]: An official website of the European Union
+    - button "How do you know?" [ref=e7] [cursor=pointer]:
+      - generic [ref=e8]: How do you know?
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - generic [ref=e17]:
+        - link "Home - European Commission" [ref=e18] [cursor=pointer]:
+          - /url: https://commission.europa.eu/index_en
+          - generic "European Commission" [ref=e19]:
+            - img "European Commission logo" [ref=e20]
+        - generic [ref=e21]:
+          - button "Change language, current language is English - en" [ref=e23] [cursor=pointer]:
+            - img "en" [ref=e25]
+            - text: en
+          - search [ref=e26]:
+            - link [ref=e27] [cursor=pointer]:
+              - /url: ""
+              - img [ref=e28]
+      - link "Business, Economy, Euro" [ref=e31] [cursor=pointer]:
+        - /url: https://commission.europa.eu/business-economy-euro_en
+      - generic [ref=e34]: Taxation and Customs Union
+      - navigation "Site navigation" [ref=e35]:
+        - button "Menu" [ref=e37] [cursor=pointer]:
+          - generic [ref=e41]: Menu
+    - generic [ref=e45]:
+      - navigation "You are here:" [ref=e46]:
+        - list [ref=e47]:
+          - listitem [ref=e48]
+          - listitem [ref=e50]:
+            - link "Online services" [ref=e51] [cursor=pointer]:
+              - /url: /online-services_en
+          - listitem [ref=e53]:
+            - link "Online services and databases for Customs" [ref=e54] [cursor=pointer]:
+              - /url: /online-services/online-services-and-databases-customs_en
+      - heading "Classification Information System (CLASS)" [level=1] [ref=e55]
+      - paragraph [ref=e58]: Search platform for information concerning the classification of goods for customs purposes
+    - main [ref=e59]:
+      - article [ref=e64]:
+        - generic [ref=e66]:
+          - paragraph [ref=e67]:
+            - text: Goods that are declared to customs in the EU must be classified according to the
+            - link "Combined Nomenclature (CN)" [ref=e68] [cursor=pointer]:
+              - /url: https://taxation-customs.ec.europa.eu/customs/common-customs-tariff-cct/tariff-classification-goods/combined-nomenclature
+            - text: or any other nomenclature which is wholly or partly based on the CN. This applies to both imports and exports.
+          - paragraph [ref=e69]: "The classification must include the subheading or further subdivision of the CN or other nomenclatures under which they fall. This determines:"
+          - list [ref=e70]:
+            - listitem [ref=e71]:
+              - paragraph [ref=e72]:
+                - text: the rate of customs duty of the
+                - link "Common Customs Tariff (CCT)" [ref=e73] [cursor=pointer]:
+                  - /url: https://taxation-customs.ec.europa.eu/customs/common-customs-tariff-cct
+                - text: ", or"
+            - listitem [ref=e74]:
+              - paragraph [ref=e75]: which non-tariff measures apply
+          - paragraph [ref=e76]:
+            - link "Access CLASS consultation" [ref=e77] [cursor=pointer]:
+              - /url: https://webgate.ec.europa.eu/class-public-ui-web/
+              - generic [ref=e78]: Access CLASS consultation
+          - heading "Types of information" [level=2] [ref=e79]
+          - paragraph [ref=e80]: "CLASS is a single-access point to different types of classification information. The following information is available in a consistent and coherent fashion:"
+          - list [ref=e81]:
+            - listitem [ref=e82]:
+              - paragraph [ref=e83]: conclusions of the Customs Code Committees;
+            - listitem [ref=e84]:
+              - paragraph [ref=e85]: classification regulations;
+            - listitem [ref=e86]:
+              - paragraph [ref=e87]: rulings of the European Court of Justice;
+            - listitem [ref=e88]:
+              - paragraph [ref=e89]: Combined Nomenclature (CN) and CN Explanatory Notes;
+            - listitem [ref=e90]:
+              - paragraph [ref=e91]: TARIC information.
+          - heading "eLearning" [level=2] [ref=e92]
+          - paragraph [ref=e93]: An elearning course on CLASS is available.
+          - paragraph [ref=e94]:
+            - link "CLASS eLearning" [ref=e95] [cursor=pointer]:
+              - /url: https://customs-taxation.learning.europa.eu/course/view.php?id=245
+              - generic [ref=e96]: CLASS eLearning
+    - contentinfo [ref=e99]:
+      - generic [ref=e101]:
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - link "Taxation and Customs Union" [ref=e105] [cursor=pointer]:
+              - /url: https://taxation-customs.ec.europa.eu/index_en
+            - generic [ref=e106]:
+              - text: "This site is managed by:"
+              - text: Directorate-General for Taxation and Customs Union
+            - list [ref=e108]:
+              - listitem [ref=e109]:
+                - link "Bluesky" [ref=e110] [cursor=pointer]:
+                  - /url: https://bsky.app/profile/eu-economy-finance.ec.europa.eu
+                  - generic [ref=e112]: Bluesky
+              - listitem [ref=e113]:
+                - link "X" [ref=e114] [cursor=pointer]:
+                  - /url: https://x.com/EU_Taxud
+                  - generic [ref=e116]: X
+              - listitem [ref=e117]:
+                - link "LinkedIn" [ref=e118] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/showcase/eu-economy-finance/
+                  - generic [ref=e120]: LinkedIn
+              - listitem [ref=e121]:
+                - link "YouTube" [ref=e122] [cursor=pointer]:
+                  - /url: https://www.youtube.com/EUTaxud
+                  - generic [ref=e124]: YouTube
+          - generic [ref=e125]:
+            - generic [ref=e127]:
+              - generic [ref=e128]: About us
+              - list [ref=e129]:
+                - listitem [ref=e130]:
+                  - link "Glossary" [ref=e131] [cursor=pointer]:
+                    - /url: /about-us/glossary_en
+                - listitem [ref=e132]:
+                  - link "Newsletter" [ref=e133] [cursor=pointer]:
+                    - /url: https://ec.europa.eu/newsroom/taxud/user-subscriptions/362/create
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - generic [ref=e136]: "More information on:"
+                - list [ref=e137]:
+                  - listitem [ref=e138]:
+                    - link "Business, Economy, Euro" [ref=e139] [cursor=pointer]:
+                      - /url: https://commission.europa.eu/business-economy-euro_en
+              - generic [ref=e140]:
+                - generic [ref=e141]: Related links
+                - list [ref=e142]:
+                  - listitem [ref=e143]:
+                    - link "VAT e-Commerce - One Stop Shop" [ref=e144] [cursor=pointer]:
+                      - /url: https://vat-one-stop-shop.ec.europa.eu/index_en
+                  - listitem [ref=e145]:
+                    - link "VAT rules for small enterprises – SME scheme" [ref=e146] [cursor=pointer]:
+                      - /url: https://sme-vat-rules.ec.europa.eu/index_en
+                  - listitem [ref=e147]:
+                    - link "Have your say" [ref=e148] [cursor=pointer]:
+                      - /url: https://ec.europa.eu/info/law/better-regulation/have-your-say_en
+        - generic [ref=e150]:
+          - link "European Commission logo" [ref=e151] [cursor=pointer]:
+            - /url: https://commission.europa.eu/index_en
+            - img "European Commission logo" [ref=e153]
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - paragraph [ref=e156]: Follow the European Commission
+              - list [ref=e157]:
+                - listitem [ref=e158]:
+                  - link "Mastodon" [ref=e159] [cursor=pointer]:
+                    - /url: https://ec.social-network.europa.eu/@EUCommission
+                    - generic [ref=e161]: Mastodon
+                - listitem [ref=e162]:
+                  - link "LinkedIn" [ref=e163] [cursor=pointer]:
+                    - /url: http://www.linkedin.com/company/european-commission
+                    - generic [ref=e165]: LinkedIn
+                - listitem [ref=e166]:
+                  - link "Bluesky" [ref=e167] [cursor=pointer]:
+                    - /url: https://bsky.app/profile/ec.europa.eu
+                    - generic [ref=e169]: Bluesky
+                - listitem [ref=e170]:
+                  - link "Facebook" [ref=e171] [cursor=pointer]:
+                    - /url: https://www.facebook.com/EuropeanCommission
+                    - generic [ref=e173]: Facebook
+                - listitem [ref=e174]:
+                  - link "Youtube" [ref=e175] [cursor=pointer]:
+                    - /url: https://www.youtube.com/user/eutube
+                    - generic [ref=e177]: Youtube
+                - listitem [ref=e178]:
+                  - link "Other" [ref=e179] [cursor=pointer]:
+                    - /url: https://european-union.europa.eu/contact-eu/social-media-channels_en
+                    - generic [ref=e181]: Other
+            - list [ref=e182]:
+              - listitem [ref=e183]:
+                - link "Contact us" [ref=e184] [cursor=pointer]:
+                  - /url: https://commission.europa.eu/about/contact_en
+          - list [ref=e185]:
+            - listitem [ref=e186]:
+              - link "Report an IT vulnerability" [ref=e187] [cursor=pointer]:
+                - /url: https://commission.europa.eu/legal-notice/vulnerability-disclosure-policy_en
+            - listitem [ref=e188]:
+              - link "Languages on our websites" [ref=e189] [cursor=pointer]:
+                - /url: https://commission.europa.eu/languages-our-websites_en
+            - listitem [ref=e190]:
+              - link "Cookies" [ref=e191] [cursor=pointer]:
+                - /url: https://commission.europa.eu/cookies-policy_en
+            - listitem [ref=e192]:
+              - link "Privacy policy" [ref=e193] [cursor=pointer]:
+                - /url: https://commission.europa.eu/privacy-policy-websites-managed-european-commission_en
+            - listitem [ref=e194]:
+              - link "Legal notice" [ref=e195] [cursor=pointer]:
+                - /url: https://commission.europa.eu/legal-notice_en
+            - listitem [ref=e196]:
+              - link "Accessibility" [ref=e197] [cursor=pointer]:
+                - /url: https://taxation-customs.ec.europa.eu/accessibility-statement_en

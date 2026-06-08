@@ -50,13 +50,15 @@ def test_chapter_module_optional_equivalence_axioms():
 
 
 def test_chapter_module_existing_chapters_still_have_equivalence_axioms():
-    """Existing registered chapters (22, 23) still carry add_equivalence_axioms callables."""
+    """Unretired chapters carry add_equivalence_axioms callables; retired ones have None."""
     from src.ontology.chapter_registry import get_chapter
 
-    for ch in (22, 23):
-        module = get_chapter(ch)
-        assert module.add_equivalence_axioms is not None
-        assert callable(module.add_equivalence_axioms)
+    # ch22 retired — agent output took over
+    assert get_chapter(22).add_equivalence_axioms is None
+    # ch23 still hand-authored
+    module23 = get_chapter(23)
+    assert module23.add_equivalence_axioms is not None
+    assert callable(module23.add_equivalence_axioms)
 
 
 def test_registry_returns_active_candidates(tmp_path):

@@ -33,8 +33,9 @@ class TestGetChapter:
     def test_add_process_classes_is_callable(self):
         assert callable(get_chapter(22).add_process_classes)
 
-    def test_add_equivalence_axioms_is_callable(self):
-        assert callable(get_chapter(22).add_equivalence_axioms)
+    def test_add_equivalence_axioms_none_after_retirement(self):
+        # ch22 hand-authored axioms retired — field is None
+        assert get_chapter(22).add_equivalence_axioms is None
 
     def test_slug_is_kebab_case(self):
         slug = get_chapter(22).slug
@@ -49,4 +50,5 @@ class TestGetChapter:
         ch.add_discriminating_props(g)
         ch.add_product_classes(g)
         ch.add_process_classes(g)
-        ch.add_equivalence_axioms(g)
+        if ch.add_equivalence_axioms is not None:
+            ch.add_equivalence_axioms(g)

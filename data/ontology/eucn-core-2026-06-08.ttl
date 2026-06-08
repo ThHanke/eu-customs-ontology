@@ -12,6 +12,7 @@ bfo:BFO_0000030
         "Objekt"@de ,
         "object"@en ;
     rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:subClassOf bfo:BFO_0000004 ;
     skos:definition
         "dreidimensionale materielle Entität, die räumlich zusammenhängend ist und kein kontinuierender Teil einer anderen materiellen Entität ist"@de ,
         "three-dimensional material entity that is spatially self-connected and is not a continuant part of any other material entity"@en ;
@@ -54,12 +55,35 @@ eucn:producedBy
         "production process by which a beverage is made; links a beverage individual to its named process singleton, used to discriminate between CN headings in Chapter 22"@en ;
 .
 
+bfo:BFO_0000003
+    a owl:Class ;
+    rdfs:label
+        "Okkurrent"@de ,
+        "occurrent"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    skos:definition
+        "Entität, die sich in der Zeit entfaltet oder die momentane Grenze einer solchen Entität ist"@de ,
+        "entity that unfolds itself in time or it is the instantaneous boundary of such an entity"@en ;
+.
+
+bfo:BFO_0000004
+    a owl:Class ;
+    rdfs:label
+        "unabhängige Kontinuante"@de ,
+        "independent continuant"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    skos:definition
+        "Kontinuante, die weder spezifisch noch generisch von einer anderen Entität abhängig ist"@de ,
+        "continuant that is not specifically dependent on or generically dependent on any other entity"@en ;
+.
+
 bfo:BFO_0000015
     a owl:Class ;
     rdfs:label
         "Prozess"@de ,
         "process"@en ;
     rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:subClassOf bfo:BFO_0000003 ;
     skos:definition
         "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
         "entity that exists in time by occurring or happening, and that has temporal parts"@en ;

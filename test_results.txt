@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-7.2.1, pluggy-1.0.0+repack -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/hanke/eu-customs-ontology, configfile: pyproject.toml
+plugins: anyio-4.12.1
+collecting ... collected 6 items
+
+tests/unit/test_pipeline_legal_text_integration.py::test_chapter_module_optional_equivalence_axioms PASSED [ 16%]
+tests/unit/test_pipeline_legal_text_integration.py::test_chapter_module_existing_chapters_still_have_equivalence_axioms PASSED [ 33%]
+tests/unit/test_pipeline_legal_text_integration.py::test_registry_returns_active_candidates PASSED [ 50%]
+tests/unit/test_pipeline_legal_text_integration.py::test_stale_candidate_in_summary PASSED [ 66%]
+tests/unit/test_pipeline_legal_text_integration.py::test_stale_candidate_not_in_active PASSED [ 83%]
+tests/unit/test_pipeline_legal_text_integration.py::test_pipeline_run_accepts_skip_legal_text PASSED [100%]
+
+============================== 6 passed in 0.14s ===============================

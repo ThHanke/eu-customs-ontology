@@ -1,0 +1,15 @@
+2026-06-08 22:42:57,062 INFO     __main__ — Pipeline start: chapter=22 model=n/a
+[fetch-taric] skipped (using existing taric_ch22.json)
+[scrape-wizard] skipped (using existing wizard_ch22.jsonl)
+[fetch-legal-text] skipped (--skip-legal-text)
+[build-core] starting...
+  Written: /home/hanke/eu-customs-ontology/data/ontology/eucn-core-2026-06-08.ttl (54 triples)
+[build-core] done in 0.0s
+[build-ontology] starting...
+  [wizard-axioms] ch22: 194 terminal nodes, 0 boolean, 41 quantitative, 500 fallback (coverage 7.6%)
+  Written: /home/hanke/eu-customs-ontology/data/ontology/eucn-ch22-beverages-2026-06-08.ttl (44278 triples)
+[build-ontology] done in 11.7s
+[konclude-check] skipped (--no-reasoner)
+[konclude-classify] skipped (--no-classify or --no-reasoner)
+
+Pipeline complete in 11.8s

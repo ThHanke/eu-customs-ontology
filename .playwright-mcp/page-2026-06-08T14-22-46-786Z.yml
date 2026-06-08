@@ -1,0 +1,366 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - banner [ref=e7]:
+      - document [ref=e11]:
+        - button "How do you know?" [ref=e15] [cursor=pointer]
+    - banner [ref=e16]:
+      - generic [ref=e17]:
+        - link [ref=e20] [cursor=pointer]:
+          - /url: "#/"
+        - generic [ref=e22]: TAXATION AND CUSTOMS UNION
+        - generic: 
+    - banner [ref=e28]:
+      - generic:
+        - generic: 
+    - main [ref=e37]:
+      - generic [ref=e534]:
+        - button " PDF" [ref=e536] [cursor=pointer]:
+          - generic [ref=e538]:
+            - generic [ref=e540]: 
+            - generic [ref=e541]: PDF
+        - generic [ref=e542]:
+          - generic [ref=e543]:
+            - heading "CLASS Application User Manual" [level=1] [ref=e544]:
+              - text: CLASS Application
+              - text: User Manual
+            - paragraph [ref=e545]:
+              - text: CLASS –
+              - link "eLearning module" [ref=e546] [cursor=pointer]:
+                - /url: https://customs-taxation.learning.europa.eu/course/view.php?id=245
+              - text: (module 21 of the UCC eLearning Programme)
+            - heading "Using the System as a Public User" [level=2] [ref=e547]
+            - heading "1. Searching for a CLASS entry" [level=3] [ref=e548]
+            - paragraph [ref=e549]: Any user can search for CLASS entries, using the public page.
+            - paragraph [ref=e550]: The Consultation search is divided in ‘Simplified search’ and ‘Advanced search’. In ‘Simple search’ some of the criteria are available of the ‘Advanced search’ where all actual criteria are shown.
+            - paragraph [ref=e551]: The user is initially landed on the simple search page which is by default activated. S/he has the possibility to change the search mode to ‘Advanced’ by clicking on the “switch to Advanced search” button and vice-versa. In the case where the user will be in advanced search then the label of the button will be “switch to Simple search”.
+            - list [ref=e552]:
+              - listitem [ref=e553]:
+                - generic [ref=e554]: Simulation Date
+                - text: ": The date that will be used to search for entries that are valid at the day of the simulation date. This field is disabled when the ‘ECICS information’ type is the only one selected by the User among the Information types. In this case, the current date is used for the search."
+            - figure "Simulation Date" [ref=e555]:
+              - img
+              - generic [ref=e556]: Simulation Date
+            - list [ref=e557]:
+              - listitem [ref=e558]:
+                - generic [ref=e559]: Information Type
+                - text: ": The available selections are Classification Documents, CN Notes, TARIC Information, ECICS Information and BTI Decisions. Depending on the selection, the search will retrieve results from the selected systems."
+                - list [ref=e560]:
+                  - listitem [ref=e561]: If Classification documents is selected, the area with additional criteria "Classification Information" is enabled in the form.
+                  - listitem [ref=e562]: If BTI Decisions is selected, the area “BTI Decisions” is enabled in the form with additional criteria.
+                  - listitem [ref=e563]: If ECICS Information is selected, the area "ECICS Information", with additional criteria, is enabled in the form.
+            - img
+            - generic [ref=e564]: Information Type
+            - list [ref=e565]:
+              - listitem [ref=e566]:
+                - generic [ref=e567]: Free Text
+                - text: ": Any text that will be used for searching within documents across CN, TARIC, BTI, ECICS and CLASS."
+            - figure "Free Text" [ref=e568]:
+              - img
+              - generic [ref=e569]: Free Text
+            - list [ref=e570]:
+              - listitem [ref=e571]:
+                - generic [ref=e572]: Keywords
+                - text: ": Keywords that are provided by the EBTI3 system and are associated with specific CLASS entries and BTI Information."
+                - list [ref=e573]:
+                  - listitem [ref=e574]:
+                    - text: In the text box
+                    - generic [ref=e575]: Search for Keywords
+                    - text: ", the user can enter text in order to search for the available keywords from the EBTI3 system, in the specified date in the"
+                    - generic [ref=e576]: Current Date
+                    - text: .
+                  - listitem [ref=e577]:
+                    - text: The user can select the operator between the keywords.
+                    - generic [ref=e578]: AND
+                    - text: means that all keywords must be present, while
+                    - generic [ref=e579]: OR
+                    - text: means that any of the keywords may be present.
+                  - listitem [ref=e580]:
+                    - text: After pressing the button with the magnifying glass, that implies search, a list of
+                    - generic [ref=e581]: Available Keywords
+                    - text: will be presented to the user. Every keyword has a checkbox on the left, to allow selection. When the needed keywords are selected the plus (+) button, that implies add, may be pressed, in order for the keywords to populate the
+                    - generic [ref=e582]: Selected Keywords
+                    - text: list.
+                  - listitem [ref=e583]:
+                    - text: In
+                    - generic [ref=e584]: Selected Keywords
+                    - text: ", the list of keywords that are used in searching is presented. Every keyword has a checkbox on the left, to allow selection. The user can either select as many keywords as needed and select to remove them by pressing the minus (-) button, that implies remove the selected keywords, or press the eraser button which will remove all the keywords from the selected keywords list."
+            - figure "Classification Document Keywords" [ref=e585]:
+              - img
+              - generic [ref=e586]: Classification Document Keywords
+            - list [ref=e587]:
+              - listitem [ref=e588]:
+                - generic [ref=e589]: ECICS Information
+                - text: ":"
+                - list [ref=e590]:
+                  - listitem [ref=e591]:
+                    - generic [ref=e592]: CUS Number
+                    - text: ": Every ECICS record is identified by its CUS number. It is currently an 8-digit number. The link with the other information on the page is based in CN numbers."
+                  - listitem [ref=e593]:
+                    - generic [ref=e594]: CAS Number
+                    - text: ": CAS Registry Number is a Registered Trademark of the American Chemical Society. This field contains a unique number of 5 to 10 digits associated with a chemical substance. The format is: 99-99-9. Most ECICS records have a CAS RN associated."
+                  - listitem [ref=e595]:
+                    - generic [ref=e596]: EC Number
+                    - text: ": The EC number is assigned to a chemical substance by the European Chemicals Bureau (ECB) of the DG JRC. The format is: 999-999-9."
+                  - listitem [ref=e597]:
+                    - generic [ref=e598]: UN Number
+                    - text: ": The UN number is assigned to a chemical substance by the United Nations Sub-Committee of Experts on the Transport of Dangerous Goods (UNSCETDG). It is a numerical field with a length of 4 digits"
+            - figure "ECICS Information" [ref=e599]:
+              - img
+              - generic [ref=e600]: ECICS Information
+            - list [ref=e601]:
+              - listitem [ref=e602]:
+                - generic [ref=e603]: BTI Decisions
+                - text: ":"
+                - list [ref=e604]:
+                  - listitem [ref=e605]:
+                    - generic [ref=e606]: Issuing Country (visible only in Advanced Search)
+                    - text: ": Drop-down list containing the list of European countries that will issue BTI decisions."
+                  - listitem [ref=e607]:
+                    - generic [ref=e608]: BTI Reference
+                    - text: ": Full BTI reference. Sting without specific format regarding the country’s referencing."
+                  - listitem [ref=e609]:
+                    - generic [ref=e610]: Start Date of Validity (visible only in Advanced Search)
+                    - text: ": Date format. Date of official starting of the BTI."
+                  - listitem [ref=e611]:
+                    - generic [ref=e612]: End Date of Validity (visible only in Advanced Search)
+                    - text: ": Date format. Date of official ending of the BTI."
+                  - listitem [ref=e613]:
+                    - generic [ref=e614]: Issued since (visible only in Advanced Search)
+                    - text: ": Date format. Date of issue of the BTI Decision. Can be less or equal of the ‘Start Date’."
+            - figure "BTI Decisions" [ref=e615]:
+              - img
+              - generic [ref=e616]: BTI Decisions
+            - list [ref=e617]:
+              - listitem [ref=e618]:
+                - generic [ref=e619]: Classification Document Information
+                - text: ":"
+                - list [ref=e620]:
+                  - listitem [ref=e621]:
+                    - generic [ref=e622]: Document Reference
+                    - text: ": The Reference number of CLASS Entry."
+                  - listitem [ref=e623]:
+                    - generic [ref=e624]: Classification Information Type (visible only in Advanced Search)
+                    - text: ": There are three check boxes, CCC Conclusion, Classification Regulation and EJC Ruling. According to the selection the results will be filtered to Information Types matching it."
+                  - listitem [ref=e625]:
+                    - generic [ref=e626]: Official Journal Reference Information (visible only in Advanced Search)
+                    - text: ":"
+                    - list [ref=e627]:
+                      - listitem [ref=e628]:
+                        - text: The user can set criteria regarding the Official Journal Reference. The
+                        - generic [ref=e629]: Date
+                        - text: ","
+                        - generic [ref=e630]: Series
+                        - text: or
+                        - generic [ref=e631]: Range of Series
+                        - text: ","
+                        - generic [ref=e632]: Subseries
+                        - text: of the Official Journal, as well as a specific
+                        - generic [ref=e633]: Page
+                        - text: . Note that when Number of Series is selected, a textbox is displayed, while once Range is selected, there are two textboxes,
+                        - generic [ref=e634]: From
+                        - text: and
+                        - generic [ref=e635]: To
+                        - text: ", to set the Range."
+              - listitem [ref=e636]:
+                - generic [ref=e637]: Document Publication Date (visible only in Advanced Search)
+                - text: ": A date range, during which the Document was published, will be used to filter the results. Only documents that were published within that range will be offered."
+              - listitem [ref=e638]:
+                - generic [ref=e639]: Document Validity Period
+                - text: ": A date range, during which the Document is or was valid, will be used to filter the results. Only documents that are or were valid within that range will be offered."
+          - generic [ref=e640]:
+            - figure "Classification Document Information" [ref=e641]:
+              - img
+              - generic [ref=e642]: Classification Document Information
+            - list [ref=e643]:
+              - listitem [ref=e644]:
+                - generic [ref=e645]: Commodity Codes
+                - text: ": Are received from TARIC and can be used to filter results."
+                - list [ref=e646]:
+                  - listitem [ref=e647]:
+                    - text: In the text box
+                    - generic [ref=e648]: Input Commodity Code
+                    - text: ", the user can enter text in order to search for Commodity Codes. This can be a specific number, or a range of numbers. Note that when Range is selected, then two textboxes are shown, in order for the user to define a range."
+                  - listitem [ref=e649]: The user can press the chain button in order to redirect to DDS2-TARIC to see more details about the Commodity Code.
+                  - listitem [ref=e650]:
+                    - text: After setting a code or a range, it can be added to the
+                    - generic [ref=e651]: Selected Commodity Codes
+                    - text: by pressing the plus (+) button.
+                  - listitem [ref=e652]:
+                    - text: In
+                    - generic [ref=e653]: Selected Commodity Codes
+                    - text: ", the list of codes that are used in searching is presented. Every code has a checkbox on the left, to allow selection. The user can either select as many codes as needed and select to remove them by pressing the minus (-) button, that implies remove the selected codes, or press the eraser button which will remove all the codes from the selected commodity codes list."
+            - figure "Commodity Codes" [ref=e654]:
+              - img
+              - generic [ref=e655]: Commodity Codes
+          - generic [ref=e656]:
+            - paragraph [ref=e657]: Upon completing the criteria with the desired information, the user can press "Search" in the bottom right area to search with the selected criteria, or "Clear Form" to reset the form and empty the fields.
+            - figure "Class Consultation Actions" [ref=e658]:
+              - img
+              - generic [ref=e659]: Class Consultation Actions
+            - heading "2. CLASS Consultation Results" [level=3] [ref=e660]
+            - paragraph [ref=e661]:
+              - text: All the results of CLASS entries matching the selected criteria in the search, will be presented in a list on a new page. The columns of the list are the
+              - generic [ref=e662]: Commodity Code
+              - text: and its description. The list is using the accordion type, meaning that all the list elements can be expanded within the list, in order for the user to explore the details of each entry.
+            - paragraph [ref=e663]: Depending on the sources of the CLASS entry, different options are available to the user. Another level of detail can be seen depending on the origin of the information.
+            - paragraph [ref=e664]: When the user searches free text in combination with search criteria in the Classification Information section in all five information types, the application will search for all combined matches of this, AND operation, in the Classification documents and only for the free text in CN Notes, TARIC, ECICS and BTI.
+            - paragraph [ref=e665]: When the user searches with search criteria in the Classification Information section in combination with either a single commodity or a commodity code range in all five information types, the application will search for all combined matches of this, AND operation, in the Classification documents and only for the commodity code (range) in CN Notes, TARIC, BTI and ECICS.
+            - paragraph [ref=e666]: When the user searches with search criteria in the Classification Information section in all five information types, the application will search for all combined matches of this, AND operation, in the Classification documents.
+            - paragraph [ref=e667]: All the documents can be downloaded, using the button with a downwards pointing arrow.
+            - paragraph [ref=e668]:
+              - text: Additionally, any TARIC related information can be further detailed, by visiting the DDS2-TARIC, pressing the corresponding button
+              - generic [ref=e669]: Show in DDS2-TARIC
+              - text: .
+            - paragraph [ref=e670]:
+              - text: If ECICS information is requested and found, the system will display additional information in the results page. The CUS Number in ECICS information will redirect the user to the corresponding page in
+              - generic [ref=e671]: DDS2-ECICS
+              - text: .
+            - paragraph [ref=e672]:
+              - text: If EBTI information is requested and found, the system will display additional information in the Results page. The ‘BTI’ reference will redirect the user to the corresponding page in
+              - generic [ref=e673]: DDS2-EBTI
+              - text: .
+            - paragraph [ref=e674]:
+              - text: At the top of the page, a list of the defined criteria is shown, and the user is offered with the option to alter these criteria, by pressing the
+              - generic [ref=e675]: Edit Search Criteria
+              - text: button. This will redirect him/her to the search page, with the used criteria prefilled.
+            - paragraph [ref=e676]: A Back button has been added at the bottom of the Results page. It has the same behaviour as the Edit Search Criteria button.
+            - figure "CLASS Consultation Results" [ref=e677]:
+              - img
+              - generic [ref=e678]: CLASS Consultation Results
+            - heading "3. Search Query Syntax" [level=3] [ref=e679]
+            - paragraph [ref=e680]: The way in which the search query is formed can have an impact on the search results. Other configurations and built-in algorithms have their impact as well.
+            - paragraph [ref=e681]: Below are some aspects to consider in order to understand the returned results.
+            - heading "Exact match" [level=4] [ref=e682]
+            - paragraph [ref=e683]: Use double quotes to receive results where the quoted search term is exactly matched in terms of order and without stemming. This is case insensitive.
+            - paragraph [ref=e684]: For example, searching for "better regulations" will only return documents where this is matched. It will not match better regulation or better use of regulations
+            - heading "Operators" [level=4] [ref=e685]
+            - heading "Logical Operators:" [level=5] [ref=e686]
+            - text: AND
+            - paragraph [ref=e687]: Use AND between two terms to get results that only contain both terms regardless of their location. For example search for Better AND Regulation will return documents that contain both terms such as Better understanding of regulations and regulations for better services
+            - text: OR
+            - paragraph [ref=e688]: Use OR to between two terms to get results that contain either term or both at the same time. For example searching for Better OR regulations will return better use of IT and better regulations of IT services and sick leave regulations
+            - paragraph [ref=e689]: "Note: Default operator is set to OR by default unless configured differently."
+            - heading "Inclusion/Exclusion" [level=4] [ref=e690]
+            - paragraph [ref=e691]: Use the minus symbol - to exclude results that contain a term. For example Better -Regulations will return documents that contain Better but not Regulations
+            - paragraph [ref=e692]: The use of + however does not force the results to include the term.
+            - paragraph [ref=e693]: "Notes:"
+            - paragraph [ref=e694]: Minus symbol should be prepended by a space
+            - paragraph [ref=e695]: Minus symbol should not be followed by a space
+            - heading "Wildcards" [level=4] [ref=e696]
+            - paragraph [ref=e697]: "The supported wildcard operators are the following:"
+            - paragraph [ref=e698]: "1. The asterisk * : that matches zero or more characters. 2. The question mark ?: that matches any single character. (e.g. f?rm will match farm, form and firm)"
+            - paragraph [ref=e699]: "Notes:"
+            - list [ref=e700]:
+              - listitem [ref=e701]: The use of wildcards might not be always helpful since the query terms are not stemmed when included in a wildcard pattern (e.g. fermented* will not match fermented because it is stemmed in the index to ferment but not stemmed in the search query)
+              - listitem [ref=e702]: As stated by Elastic, using patterns with * or ? at the beginning can increase the iterations needed to find matching terms and slow search performance.
+          - generic [ref=e703]:
+            - heading "Stemming" [level=4] [ref=e704]
+            - list [ref=e705]:
+              - listitem [ref=e706]: "Search terms are stemmed to their morphological root. For example: searching for player will match play, playing, players, playful, and so on because it is stemmed to play"
+              - listitem [ref=e707]: Terms are also stemmed on the index time in order to match the stemmed query terms. For example if the ingested content contais playing it is indexed as play
+              - listitem [ref=e708]: Pay attention when using wildcards and double quotes because this stops the stemming for example searching for playin* will not find play
+              - listitem [ref=e709]:
+                - text: Stemming is language dependent; this means that the term is stemmed to its morphological root in the language specified in the search or ingestion command.
+                - list [ref=e710]:
+                  - listitem [ref=e711]: For example ingesting the word playing in a french document will not make it stemmed to play because it is not a French word.
+                  - listitem [ref=e712]: On the same time, if you search for écriture in English, this will not find documents where écrit is mentioned because it is not an English word hence it does not have a morphological root.
+              - listitem [ref=e713]: musicale will not find musique the morphological root for musicale is music not musiq
+              - listitem [ref=e714]: households will be stemmed into household thus it will not match housing or holders
+            - heading "Tokenization" [level=4] [ref=e715]
+            - paragraph [ref=e716]: We use the built-in standard tokenizer from Elastic Search that provides grammar based tokenization (based on the Unicode Text Segmentation algorithm).
+            - paragraph [ref=e717]: "For example report-summary is tokenized into two items: report summary while report_summary is tokenized to only one item: report_summary"
+            - heading "4. Download Online User Manual" [level=3] [ref=e718]
+            - paragraph [ref=e719]: The application also allows the users to access the manual for CLASS Consultation by clicking on the information button that exists in every page.
+            - img
+            - paragraph [ref=e720]: When the button is clicked, a dropdown menu emerges with two options, the "Online Documentation" and the "Releases Information"; and once the user selects the "Online Documentation", this is opened in a new tab. After waiting for the new page to load, the manual can now be read directly by the user in the browser or be downloaded as a PDF.
+            - img
+            - paragraph [ref=e721]: By pressing the PDF button located in top right corner of the manual page, the PDF is downloaded to the users default Downloads folder, as CLASS_Consultation.pdf, when accessed by CLASS Consultation page.
+            - heading "5. Release Notes" [level=3] [ref=e722]
+            - paragraph [ref=e723]: The list of features provided by every CLASS release is reflected within the "Releases Information" page which can be accessed by clicking on the 'information' button that exists in every page of CLASS Consultation. When the button is clicked, a dropdown menu emerges with two options, the "Online Documentation" (that is the current page) and the "Releases Information"; and once the user selects the "Releases Information", this is opened in a new tab.
+          - generic [ref=e724]:
+            - img
+        - generic [ref=e725]: Return to top
+    - contentinfo [ref=e352]:
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - text: "Last Update: 16/03/2025 Version: 2.3.1.0"
+          - generic [ref=e355] [cursor=pointer]:
+            - text: Top
+            - generic [ref=e356]: 
+        - contentinfo [ref=e358]:
+          - generic [ref=e359]:
+            - list [ref=e361]:
+              - listitem [ref=e362]:
+                - link "Taxation and Customs Union" [ref=e363] [cursor=pointer]:
+                  - /url: https://taxation-customs.ec.europa.eu/index_en
+              - listitem [ref=e364]:
+                - generic [ref=e365]:
+                  - text: "This site is managed by:"
+                  - text: Directorate-General for Taxation and Customs Union
+              - listitem [ref=e366]:
+                - link "Accessibility" [ref=e367] [cursor=pointer]:
+                  - /url: https://taxation-customs.ec.europa.eu/accessibility-statement_en
+            - generic [ref=e368]:
+              - generic [ref=e369]: Contact us
+              - list [ref=e370]:
+                - listitem [ref=e371]:
+                  - link "Contact information of the DG TAXUD" [ref=e372] [cursor=pointer]:
+                    - /url: https://ec.europa.eu/taxation_customs/contacts_en
+            - generic [ref=e373]:
+              - generic [ref=e374]: About us
+              - list [ref=e375]:
+                - listitem [ref=e376]:
+                  - link "Newsletter" [ref=e377] [cursor=pointer]:
+                    - /url: https://ec.europa.eu/taxation_customs/newsletters_en
+            - generic [ref=e378]:
+              - generic [ref=e379]: Follow us on
+              - list [ref=e380]:
+                - listitem [ref=e381]:
+                  - link "Flickr" [ref=e382] [cursor=pointer]:
+                    - /url: https://www.flickr.com/photos/146315122@N05
+                    - img [ref=e383]
+                    - text: Flickr
+                - listitem [ref=e385]:
+                  - link "Twitter" [ref=e386] [cursor=pointer]:
+                    - /url: https://twitter.com/EU_Taxud
+                    - img [ref=e387]
+                    - text: Twitter
+                - listitem [ref=e389]:
+                  - link "YouTube" [ref=e390] [cursor=pointer]:
+                    - /url: https://www.youtube.com/EUTaxud
+                    - img [ref=e391]
+                    - text: YouTube
+            - link "Home - European Commission" [ref=e395] [cursor=pointer]:
+              - /url: https://commission.europa.eu/index_en
+              - generic "European Commission" [ref=e396]:
+                - img "European Commission logo" [ref=e397]
+            - list [ref=e399]:
+              - listitem [ref=e400]:
+                - link "Contact the European Commission" [ref=e401] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/about-european-commission/contact_en
+              - listitem [ref=e402]:
+                - link "Follow the European Commission on social media" [ref=e403] [cursor=pointer]:
+                  - /url: https://europa.eu/european-union/contact/social-networks_en#n:+i:4+e:1+t:+s
+                  - text: Follow the European Commission on social media
+                  - img [ref=e404]
+              - listitem [ref=e406]:
+                - link "About the Commission's new web presence" [ref=e407] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/about-commissions-new-web-presence
+              - listitem [ref=e408]:
+                - link "Resources for partners" [ref=e409] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/resources-partners
+            - list [ref=e411]:
+              - listitem [ref=e412]:
+                - link "Languages on our website" [ref=e413] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/language-policy_en
+              - listitem [ref=e414]:
+                - link "Cookies" [ref=e415] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/cookies_en
+              - listitem [ref=e416]:
+                - link "Privacy policy" [ref=e417] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/privacy-policy_en
+              - listitem [ref=e418]:
+                - link "Legal notice" [ref=e419] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/info/legal-notice_en
+  - generic:
+    - region

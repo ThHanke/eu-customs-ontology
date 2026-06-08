@@ -1,0 +1,11 @@
+[    4055ms] [ERROR] ERROR TypeError: Cannot read properties of undefined (reading 'activeLang')
+    at https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:196304:109
+    at recomputationWrapper (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:72317:25)
+    at memoized (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:72207:20)
+    at dependenciesChecker (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:72331:40)
+    at memoized (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:72207:20)
+    at https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:274080:92
+    at https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:74993:31
+    at OperatorSubscriber._next (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:74259:9)
+    at OperatorSubscriber.next (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:73082:12)
+    at State._subscribe (https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:72410:40) @ https://webgate.ec.europa.eu/class-public-ui-web/main.093f7f19032dff3e.js:128601

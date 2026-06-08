@@ -1,0 +1,472 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e6]:
+      - heading "ECL site switcher" [level=2] [ref=e7]
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "Commission and its priorities" [ref=e10] [cursor=pointer]:
+            - /url: https://ec.europa.eu/commission/index
+        - listitem [ref=e11]:
+          - link "Policies, information and services" [ref=e12] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/index
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "European Commission" [ref=e16] [cursor=pointer]:
+          - /url: https://ec.europa.eu
+          - img "European Commission logo" [ref=e17]
+        - generic [ref=e18]:
+          - link "en English" [ref=e19] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e20]:
+              - img [ref=e21]
+              - generic [ref=e23]: en
+            - text: English
+          - generic [ref=e25]:
+            - img [ref=e26]
+            - text: Search
+      - navigation [ref=e29]:
+        - generic [ref=e30]:
+          - link "Menu" [ref=e31] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - img [ref=e32]
+            - text: Menu
+          - generic [ref=e34]: Taxation and Customs Union
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - button "Close" [ref=e37]:
+                - generic [ref=e38]:
+                  - img [ref=e39]
+                  - generic [ref=e41]: Close
+              - generic [ref=e42]: Taxation and Customs Union
+            - list [ref=e43]:
+              - listitem [ref=e44]:
+                - link "Help" [ref=e45] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/taxation_customs/dds2/taric/help/index.jsp?Lang=en
+              - listitem [ref=e46]:
+                - link "What's new?" [ref=e47] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/taxation_customs/dds2/taric/news/newstar.jsp?Lang=en
+              - listitem [ref=e48]:
+                - link "Information" [ref=e49] [cursor=pointer]:
+                  - /url: http://ec.europa.eu/taxation_customs/business/calculation-customs-duties/what-is-common-customs-tariff/taric_en
+              - listitem [ref=e50]:
+                - link "FAQ" [ref=e51] [cursor=pointer]:
+                  - /url: https://ec.europa.eu/taxation_customs/dds2/taric/help/dds_tar_faq_en.pdf
+              - listitem [ref=e52]:
+                - link "Contact TARIC" [ref=e53] [cursor=pointer]:
+                  - /url: mailto:TAXUD-DDS-TARIC@ec.europa.eu
+  - main [ref=e54]:
+    - generic [ref=e57]:
+      - navigation "You are here:" [ref=e58]:
+        - list [ref=e59]:
+          - listitem [ref=e60]:
+            - link "European Commission" [ref=e61] [cursor=pointer]:
+              - /url: http://ec.europa.eu/index_en.htm
+            - img [ref=e62]
+          - listitem [ref=e64]:
+            - link "Taxation and Customs Union" [ref=e65] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/index_en
+            - img [ref=e66]
+          - listitem [ref=e68]:
+            - link "Databases" [ref=e69] [cursor=pointer]:
+              - /url: http://ec.europa.eu/taxation_customs/online-services_en
+            - img [ref=e70]
+          - listitem [ref=e72]:
+            - link "TARIC" [ref=e73] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en
+            - img [ref=e74]
+            - generic [ref=e76]: Measures
+      - alert [ref=e78]:
+        - img [ref=e79]
+        - generic [ref=e81]:
+          - button "Close" [ref=e82]:
+            - generic [ref=e83]:
+              - generic [ref=e84]: Close
+              - img [ref=e85]
+          - paragraph [ref=e87]:
+            - text: "The TARIC site has been upgraded :"
+            - link "[User Guide]" [ref=e88] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/dds2/taric/help/dds_user_guide.pdf
+            - text: (6.7 Mb)
+      - generic [ref=e89]:
+        - heading "TARIC Consultation" [level=1] [ref=e90]
+        - generic [ref=e91]:
+          - text: "Last TARIC update: 05-06-2026"
+          - link "TARIC Daily updates" [ref=e92] [cursor=pointer]:
+            - /url: "#"
+          - link "TARIC Full database" [ref=e93] [cursor=pointer]:
+            - /url: https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b/library/64db9d0f-e7c9-4084-afe9-f47e70e53c10?p=1&n=-1&sort=name_ASC
+    - generic [ref=e95]:
+      - generic [ref=e96]:
+        - button "Measures" [ref=e97]
+        - button "Geographical areas" [ref=e98]
+        - button "Regulations" [ref=e99]
+      - generic [ref=e100]:
+        - paragraph [ref=e101]: Search by goods code and geographical area
+        - generic [ref=e103]:
+          - table [ref=e104]:
+            - rowgroup [ref=e105]:
+              - row "Goods code [Browse the Nomenclature] 2208900000 Origin/destination Additional code" [ref=e106]:
+                - cell "Goods code [Browse the Nomenclature] 2208900000 Origin/destination Additional code" [ref=e107]:
+                  - table [ref=e108]:
+                    - rowgroup [ref=e109]:
+                      - row "Goods code [Browse the Nomenclature] 2208900000 Origin/destination" [ref=e110]:
+                        - cell "Goods code [Browse the Nomenclature] 2208900000 Origin/destination" [ref=e111]:
+                          - generic [ref=e112]:
+                            - generic [ref=e113]:
+                              - text: Goods code
+                              - link "[Browse the Nomenclature]" [ref=e115] [cursor=pointer]:
+                                - /url: "#"
+                              - textbox [active] [ref=e116]: "2208900000"
+                            - generic [ref=e118]:
+                              - text: Origin/destination
+                              - generic [ref=e119]:
+                                - combobox [ref=e120]:
+                                  - option [selected]
+                                  - option "Afghanistan - AF"
+                                  - option "Albania - AL"
+                                  - option "Algeria - DZ"
+                                  - option "American Samoa - AS"
+                                  - option "Andorra - AD"
+                                  - option "Angola - AO"
+                                  - option "Anguilla - AI"
+                                  - option "Antarctica - AQ"
+                                  - option "Antigua and Barbuda - AG"
+                                  - option "Argentina - AR"
+                                  - option "Armenia - AM"
+                                  - option "Aruba - AW"
+                                  - option "Australia - AU"
+                                  - option "Austria - AT"
+                                  - option "Azerbaijan - AZ"
+                                  - option "Bahamas - BS"
+                                  - option "Bahrain - BH"
+                                  - option "Bangladesh - BD"
+                                  - option "Barbados - BB"
+                                  - option "Belarus - BY"
+                                  - option "Belgium - BE"
+                                  - option "Belize - BZ"
+                                  - option "Benin - BJ"
+                                  - option "Bermuda - BM"
+                                  - option "Bhutan - BT"
+                                  - option "Bolivia - BO"
+                                  - option "Bonaire, Sint Eustatius and Saba - BQ"
+                                  - option "Bosnia and Herzegovina - BA"
+                                  - option "Botswana - BW"
+                                  - option "Bouvet Island - BV"
+                                  - option "Brazil - BR"
+                                  - option "British Indian Ocean Territory - IO"
+                                  - option "Brunei - BN"
+                                  - option "Bulgaria - BG"
+                                  - option "Burkina Faso - BF"
+                                  - option "Burundi - BI"
+                                  - option "Cabo Verde - CV"
+                                  - option "Cambodia - KH"
+                                  - option "Cameroon - CM"
+                                  - option "Canada - CA"
+                                  - option "Cayman Islands - KY"
+                                  - option "Central African Republic - CF"
+                                  - option "Ceuta - XC"
+                                  - option "Chad - TD"
+                                  - option "Chile - CL"
+                                  - option "China - CN"
+                                  - option "Christmas Island - CX"
+                                  - option "Cocos Islands (or Keeling Islands) - CC"
+                                  - option "Colombia - CO"
+                                  - option "Comoros (excluding Mayotte) - KM"
+                                  - option "Congo - CG"
+                                  - option "Congo, Democratic Republic of - CD"
+                                  - option "Cook Islands - CK"
+                                  - option "Costa Rica - CR"
+                                  - option "Countries and territories not specified - QU"
+                                  - option "Countries and territories not specified for commercial or military reasons - QX"
+                                  - option "Countries and territories not specified for commercial or military reasons in the framework of intra-EU trade - QY"
+                                  - option "Countries and territories not specified for commercial or military reasons in the framework of trade with third countries - QZ"
+                                  - option "Countries and territories not specified within the framework of intra-EU trade - QV"
+                                  - option "Countries and territories not specified within the framework of trade with third countries - QW"
+                                  - option "Croatia - HR"
+                                  - option "Cuba - CU"
+                                  - option "Curaçao - CW"
+                                  - option "Cyprus - CY"
+                                  - option "Czechia - CZ"
+                                  - option "Denmark - DK"
+                                  - option "Djibouti - DJ"
+                                  - option "Dominica - DM"
+                                  - option "Dominican Republic - DO"
+                                  - option "Ecuador - EC"
+                                  - option "Egypt - EG"
+                                  - option "El Salvador - SV"
+                                  - option "Equatorial Guinea - GQ"
+                                  - option "Eritrea - ER"
+                                  - option "Estonia - EE"
+                                  - option "Eswatini - SZ"
+                                  - option "Ethiopia - ET"
+                                  - option "European Union - EU"
+                                  - option "Falkland Islands - FK"
+                                  - option "Faroe Islands - FO"
+                                  - option "Fiji - FJ"
+                                  - option "Finland - FI"
+                                  - option "France - FR"
+                                  - option "French Polynesia - PF"
+                                  - option "French Southern Territories - TF"
+                                  - option "Gabon - GA"
+                                  - option "Gambia - GM"
+                                  - option "Georgia - GE"
+                                  - option "Germany - DE"
+                                  - option "Ghana - GH"
+                                  - option "Gibraltar - GI"
+                                  - option "Greece - GR"
+                                  - option "Greenland - GL"
+                                  - option "Grenada - GD"
+                                  - option "Guam - GU"
+                                  - option "Guatemala - GT"
+                                  - option "Guinea - GN"
+                                  - option "Guinea-Bissau - GW"
+                                  - option "Guyana - GY"
+                                  - option "Haiti - HT"
+                                  - option "Heard Island and McDonald Islands - HM"
+                                  - option "High seas (Maritime domain outside of territorial waters) - QP"
+                                  - option "Honduras - HN"
+                                  - option "Hong Kong - HK"
+                                  - option "Hungary - HU"
+                                  - option "Iceland - IS"
+                                  - option "India - IN"
+                                  - option "Indonesia - ID"
+                                  - option "Iran, Islamic Republic of - IR"
+                                  - option "Iraq - IQ"
+                                  - option "Ireland - IE"
+                                  - option "Israel - IL"
+                                  - option "Italy - IT"
+                                  - option "Ivory Coast - CI"
+                                  - option "Jamaica - JM"
+                                  - option "Japan - JP"
+                                  - option "Jordan - JO"
+                                  - option "Kazakhstan - KZ"
+                                  - option "Kenya - KE"
+                                  - option "Kiribati - KI"
+                                  - option "Korea, Republic of (South Korea) - KR"
+                                  - option "Kosovo - XK"
+                                  - option "Kuwait - KW"
+                                  - option "Kyrgyzstan - KG"
+                                  - option "Laos - LA"
+                                  - option "Latvia - LV"
+                                  - option "Lebanon - LB"
+                                  - option "Lesotho - LS"
+                                  - option "Liberia - LR"
+                                  - option "Libya - LY"
+                                  - option "Liechtenstein - LI"
+                                  - option "Lithuania - LT"
+                                  - option "Luxembourg - LU"
+                                  - option "Macao - MO"
+                                  - option "Madagascar - MG"
+                                  - option "Malawi - MW"
+                                  - option "Malaysia - MY"
+                                  - option "Maldives - MV"
+                                  - option "Mali - ML"
+                                  - option "Malta - MT"
+                                  - option "Marshall Islands, Republic of - MH"
+                                  - option "Mauritania - MR"
+                                  - option "Mauritius - MU"
+                                  - option "Melilla - XL"
+                                  - option "Mexico - MX"
+                                  - option "Micronesia, Federated States of - FM"
+                                  - option "Moldova, Republic of - MD"
+                                  - option "Mongolia - MN"
+                                  - option "Montenegro - ME"
+                                  - option "Montserrat - MS"
+                                  - option "Morocco - MA"
+                                  - option "Mozambique - MZ"
+                                  - option "Myanmar - MM"
+                                  - option "Namibia - NA"
+                                  - option "Nauru - NR"
+                                  - option "Nepal - NP"
+                                  - option "Netherlands - NL"
+                                  - option "New Caledonia and dependencies - NC"
+                                  - option "New Zealand - NZ"
+                                  - option "Nicaragua - NI"
+                                  - option "Niger - NE"
+                                  - option "Nigeria - NG"
+                                  - option "Niue - NU"
+                                  - option "Norfolk Island - NF"
+                                  - option "North Korea (Democratic People’s Republic of Korea) - KP"
+                                  - option "North Macedonia - MK"
+                                  - option "Northern Mariana Islands - MP"
+                                  - option "Norway - NO"
+                                  - option "Occupied palestinian Territory - PS"
+                                  - option "Oman - OM"
+                                  - option "Pakistan - PK"
+                                  - option "Palau - PW"
+                                  - option "Panama - PA"
+                                  - option "Papua New Guinea - PG"
+                                  - option "Paraguay - PY"
+                                  - option "Peru - PE"
+                                  - option "Philippines - PH"
+                                  - option "Pitcairn - PN"
+                                  - option "Poland - PL"
+                                  - option "Portugal - PT"
+                                  - option "Qatar - QA"
+                                  - option "Romania - RO"
+                                  - option "Russian Federation - RU"
+                                  - option "Rwanda - RW"
+                                  - option "Saint Barthélemy - BL"
+                                  - option "Saint Helena, Ascension and Tristan da Cunha - SH"
+                                  - option "Samoa - WS"
+                                  - option "San Marino - SM"
+                                  - option "Sao Tome and Principe - ST"
+                                  - option "Saudi Arabia - SA"
+                                  - option "Senegal - SN"
+                                  - option "Serbia - XS"
+                                  - option "Seychelles and dependencies - SC"
+                                  - option "Sierra Leone - SL"
+                                  - option "Singapore - SG"
+                                  - option "Sint Maarten (Dutch part) - SX"
+                                  - option "Slovakia - SK"
+                                  - option "Slovenia - SI"
+                                  - option "Solomon Islands - SB"
+                                  - option "Somalia - SO"
+                                  - option "South Africa - ZA"
+                                  - option "South Georgia and South Sandwich Islands - GS"
+                                  - option "South Sudan - SS"
+                                  - option "Spain (excluding XC XL) - ES"
+                                  - option "Sri Lanka - LK"
+                                  - option "St Kitts and Nevis - KN"
+                                  - option "St Lucia - LC"
+                                  - option "St Pierre and Miquelon - PM"
+                                  - option "St Vincent and the Grenadines - VC"
+                                  - option "Stores and provisions - QQ"
+                                  - option "Stores and provisions within the framework of intra-EU trade - QR"
+                                  - option "Stores and provisions within the framework of trade with Third Countries - QS"
+                                  - option "Sudan - SD"
+                                  - option "Suriname - SR"
+                                  - option "Sweden - SE"
+                                  - option "Switzerland - CH"
+                                  - option "Syria - SY"
+                                  - option "Taiwan - TW"
+                                  - option "Tajikistan - TJ"
+                                  - option "Tanzania, United Republic of - TZ"
+                                  - option "Thailand - TH"
+                                  - option "Timor-Leste - TL"
+                                  - option "Togo - TG"
+                                  - option "Tokelau - TK"
+                                  - option "Tonga - TO"
+                                  - option "Trinidad and Tobago - TT"
+                                  - option "Tunisia - TN"
+                                  - option "Turkmenistan - TM"
+                                  - option "Turks and Caicos Islands - TC"
+                                  - option "Tuvalu - TV"
+                                  - option "Türkiye - TR"
+                                  - option "Uganda - UG"
+                                  - option "Ukraine - UA"
+                                  - option "United Arab Emirates - AE"
+                                  - option "United Kingdom - GB"
+                                  - option "United Kingdom (Northern Ireland) - XI"
+                                  - option "United Kingdom (excluding Northern Ireland) - XU"
+                                  - option "United States - US"
+                                  - option "United States Minor Outlying Islands - UM"
+                                  - option "Uruguay - UY"
+                                  - option "Uzbekistan - UZ"
+                                  - option "Vanuatu - VU"
+                                  - option "Vatican City State - VA"
+                                  - option "Venezuela - VE"
+                                  - option "Viet Nam - VN"
+                                  - option "Virgin Islands, British - VG"
+                                  - option "Virgin Islands, United States - VI"
+                                  - option "Wallis and Futuna - WF"
+                                  - option "Western Sahara - EH"
+                                  - option "Yemen - YE"
+                                  - option "Zambia - ZM"
+                                  - option "Zimbabwe - ZW"
+                                - img [ref=e122]
+                      - row "Additional code" [ref=e124]:
+                        - cell "Additional code" [ref=e125]:
+                          - generic [ref=e126]:
+                            - text: Additional code
+                            - textbox [ref=e127]
+              - row [ref=e128]:
+                - cell [ref=e129]
+              - row "[Advanced search]" [ref=e130]:
+                - cell "[Advanced search]" [ref=e131]:
+                  - link "[Advanced search]" [ref=e134] [cursor=pointer]:
+                    - /url: "#"
+              - row [ref=e135]:
+                - cell [ref=e136]
+              - row [ref=e137]:
+                - cell [ref=e138]
+              - row [ref=e139]:
+                - cell [ref=e140]
+              - row "Retrieve Measures" [ref=e141]:
+                - cell "Retrieve Measures" [ref=e142]:
+                  - button "Retrieve Measures" [ref=e145]:
+                    - generic [ref=e147]: Retrieve Measures
+          - generic [ref=e149]:
+            - text: The current reference date for the query is
+            - generic [ref=e151]:
+              - textbox [ref=e152]: 08-06-2026
+              - img
+  - link "Top" [ref=e154] [cursor=pointer]:
+    - /url: "#top"
+  - contentinfo [ref=e156]:
+    - generic [ref=e157]:
+      - link "Taxation and Custom Union" [ref=e159] [cursor=pointer]:
+        - /url: https://ec.europa.eu/taxation_customs/home_en
+      - generic [ref=e160]:
+        - generic [ref=e161]: Contact us
+        - list [ref=e162]:
+          - listitem [ref=e163]:
+            - link "Contact information of the DG TAXUD" [ref=e164] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/contacts_en
+      - generic [ref=e165]:
+        - generic [ref=e166]: About us
+        - list [ref=e167]:
+          - listitem [ref=e168]:
+            - link "Newsletter" [ref=e169] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/newsletters_en
+          - listitem [ref=e170]:
+            - link "Contact List" [ref=e171] [cursor=pointer]:
+              - /url: https://ec.europa.eu/taxation_customs/dds2/taric/faq/20131127-Contact-List.pdf#zoom=125
+      - generic [ref=e172]:
+        - generic [ref=e173]: Follow us on
+        - list [ref=e174]:
+          - listitem [ref=e175]:
+            - link "Flickr" [ref=e176] [cursor=pointer]:
+              - /url: https://www.flickr.com/photos/146315122@N05
+              - img [ref=e177]
+              - text: Flickr
+          - listitem [ref=e179]:
+            - link "Twitter" [ref=e180] [cursor=pointer]:
+              - /url: https://twitter.com/EU_Taxud
+              - img [ref=e181]
+              - text: Twitter
+          - listitem [ref=e183]:
+            - link "YouTube" [ref=e184] [cursor=pointer]:
+              - /url: https://www.youtube.com/EUTaxud
+              - img [ref=e185]
+              - text: YouTube
+      - link "European Commission" [ref=e188] [cursor=pointer]:
+        - /url: https://ec.europa.eu/info/index_en
+      - list [ref=e190]:
+        - listitem [ref=e191]:
+          - link "Contact the European Commission" [ref=e192] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/about-european-commission/contact_en
+        - listitem [ref=e193]:
+          - link "Follow the European Commission on social media" [ref=e194] [cursor=pointer]:
+            - /url: https://europa.eu/european-union/contact/social-networks_en#n:+i:4+e:1+t:+s
+            - text: Follow the European Commission on social media
+            - img [ref=e195]
+        - listitem [ref=e197]:
+          - link "About the Commission's new web presence" [ref=e198] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/about-commissions-new-web-presence
+        - listitem [ref=e199]:
+          - link "Resources for partners" [ref=e200] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/resources-partners
+      - list [ref=e202]:
+        - listitem [ref=e203]:
+          - link "Language policy" [ref=e204] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/language-policy_en
+        - listitem [ref=e205]:
+          - link "Cookies" [ref=e206] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/cookies_en
+        - listitem [ref=e207]:
+          - link "Privacy policy" [ref=e208] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/privacy-policy_en
+        - listitem [ref=e209]:
+          - link "Legal notice" [ref=e210] [cursor=pointer]:
+            - /url: https://ec.europa.eu/info/legal-notice_en

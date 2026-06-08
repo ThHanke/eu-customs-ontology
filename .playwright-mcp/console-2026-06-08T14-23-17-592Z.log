@@ -1,0 +1,7 @@
+[   48590ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/search:0
+[   59483ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://webgate.ec.europa.eu/class-public-ui-rest/api/:0
+[  136375ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/searchFirstLevel:0
+[  233714ms] [ERROR] Failed to load resource: the server responded with a status of 420 () @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/searchFirstLevel:0
+[  446546ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/getNotesById?noteId=82da68aabc8aa51fa036b486fb7ec6a4&language=en:0
+[  449290ms] [ERROR] Failed to load resource: the server responded with a status of 420 () @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/searchSecondLevel:0
+[  460791ms] [ERROR] Failed to load resource: the server responded with a status of 420 () @ https://webgate.ec.europa.eu/class-public-ui-rest/api/consultation/searchSecondLevel:0
