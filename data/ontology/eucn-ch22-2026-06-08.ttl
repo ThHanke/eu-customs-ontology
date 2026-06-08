@@ -51215,6 +51215,66 @@ eucn:EthylAlcohol
                             ) ;
                         ] ;
                 ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "malt"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "fruit"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "grape-flavoured"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "sweetened-water"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "acetic"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "grape"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
             ) ;
         ] ;
     skos:definition
@@ -51369,6 +51429,66 @@ eucn:Spirit
                             ) ;
                         ] ;
                 ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "malt"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "fruit"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "grape-flavoured"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "sweetened-water"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "acetic"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
+                
+                [
+                    a owl:Class ;
+                    owl:complementOf
+                        [
+                            a owl:Restriction ;
+                            owl:hasValue "grape"^^xsd:string ;
+                            owl:onProperty eucn:fermentationBase ;
+                        ] ;
+                ]
             ) ;
         ] ;
     skos:definition
@@ -51450,17 +51570,6 @@ eucn:Water
         "water (including natural or artificial mineral waters and aerated waters), ice, and snow, classified under CN heading 2201 (Chapter 22)"@en ;
 .
 
-eucn:fermentationBase
-    a owl:DatatypeProperty ;
-    rdfs:label
-        "Fermentationsgrundlage"@de ,
-        "fermentation base"@en ;
-    rdfs:range xsd:string ;
-    skos:definition
-        "Ausgangsrohstoff, aus dem ein fermentiertes Getränk hergestellt wird, ausgedrückt als kontrollierter Zeichenkettenwert: 'malt' (Bier), 'grape' (Wein), 'fruit' (Apfel-/Birnenwein), 'grain' (Spirituosen); zur Unterscheidung zwischen den KN-Positionen 2203 (Malz), 2204/2205 (Traube), 2206 (sonstige) und 2208 (Getreide-/Fruchtdestillate)"@de ,
-        "raw material from which a fermented beverage is produced, expressed as a controlled string value: 'malt' (beer), 'grape' (wine), 'fruit' (cider/perry), 'grain' (spirits); used to discriminate between CN headings 2203 (malt), 2204/2205 (grape), 2206 (other), and 2208 (grain/fruit distillates)"@en ;
-.
-
 eucn:Beverage
     a owl:Class ;
     rdfs:label
@@ -51502,6 +51611,19 @@ eucn:Wine
     skos:definition
         "Wein aus frischen Weintrauben, einschließlich mit Alkohol stummgemachten Weins, eingereiht in KN-Position 2204 (Kapitel 22)"@de ,
         "wine of fresh grapes, including grape must with fermentation arrested by the addition of alcohol, classified under CN heading 2204 (Chapter 22)"@en ;
+.
+
+eucn:fermentationBase
+    a
+        owl:DatatypeProperty ,
+        owl:FunctionalProperty ;
+    rdfs:label
+        "Fermentationsgrundlage"@de ,
+        "fermentation base"@en ;
+    rdfs:range xsd:string ;
+    skos:definition
+        "Ausgangsrohstoff, aus dem ein fermentiertes Getränk hergestellt wird, ausgedrückt als kontrollierter Zeichenkettenwert: 'malt' (Bier), 'grape' (Wein), 'fruit' (Apfel-/Birnenwein), 'grain' (Spirituosen); zur Unterscheidung zwischen den KN-Positionen 2203 (Malz), 2204/2205 (Traube), 2206 (sonstige) und 2208 (Getreide-/Fruchtdestillate)"@de ,
+        "raw material from which a fermented beverage is produced, expressed as a controlled string value: 'malt' (beer), 'grape' (wine), 'fruit' (cider/perry), 'grain' (spirits); used to discriminate between CN headings 2203 (malt), 2204/2205 (grape), 2206 (other), and 2208 (grain/fruit distillates)"@en ;
 .
 
 <https://w3id.org/eucn/ind/68d68320-06d1-5a6b-9c13-aae795a3defe>
