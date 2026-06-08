@@ -40,6 +40,13 @@ def _different_pairs(g: Graph, individuals: list[URIRef]) -> None:
         g.add((b, OWL.differentFrom, a))
 
 
+def _disjoint_pairs(g: Graph, classes: list[URIRef]) -> None:
+    """Assert pairwise owl:disjointWith for all pairs (symmetric)."""
+    for a, b in itertools.combinations(classes, 2):
+        g.add((a, OWL.disjointWith, b))
+        g.add((b, OWL.disjointWith, a))
+
+
 def add_process_classes_ch22(graph: Graph) -> None:
     """Declare Ch22 process class vocabulary and singletons. Idempotent."""
     g = graph
@@ -153,7 +160,7 @@ def add_process_classes_ch22(graph: Graph) -> None:
         "sweetened water process", "Süßwasserprozess",
     )
 
-    # ── Pairwise owl:differentFrom ────────────────────────────────────────────
+    # ── Pairwise owl:differentFrom (individuals) ──────────────────────────────
     _different_pairs(g, [
         EUCN["malt-fermentation"],
         EUCN["grape-fermentation"],
@@ -162,4 +169,17 @@ def add_process_classes_ch22(graph: Graph) -> None:
         EUCN["grain-distillation"],
         EUCN["acetic-fermentation"],
         EUCN["sweetened-water-process"],
+    ])
+
+    # ── Pairwise owl:disjointWith (classes) ───────────────────────────────────
+    # Required for Konclude realization: it infers individual distinctness from
+    # class disjointness + class membership, not from owl:differentFrom alone.
+    _disjoint_pairs(g, [
+        EUCN.MaltFermentation,
+        EUCN.GrapeFermentation,
+        EUCN.GrapeFlavouringProcess,
+        EUCN.FruitFermentation,
+        EUCN.GrainDistillation,
+        EUCN.AceticFermentation,
+        EUCN.SweetenedWaterProcess,
     ])

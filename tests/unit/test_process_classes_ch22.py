@@ -150,6 +150,22 @@ class TestDifferentFrom:
         assert count == 42, f"Expected 42 owl:differentFrom triples, got {count}"
 
 
+# ── Pairwise owl:disjointWith tests (classes) ────────────────────────────────
+
+class TestDisjointWith:
+    def test_all_21_pairs_have_disjointWith_forward(self):
+        g = _graph()
+        for a, b in itertools.combinations(PROCESS_CLASSES, 2):
+            assert (a, OWL.disjointWith, b) in g, \
+                f"Missing {a} owl:disjointWith {b}"
+
+    def test_all_21_pairs_have_disjointWith_symmetric(self):
+        g = _graph()
+        for a, b in itertools.combinations(PROCESS_CLASSES, 2):
+            assert (b, OWL.disjointWith, a) in g, \
+                f"Missing symmetric {b} owl:disjointWith {a}"
+
+
 # ── Integration tests ─────────────────────────────────────────────────────────
 
 class TestIntegration:
