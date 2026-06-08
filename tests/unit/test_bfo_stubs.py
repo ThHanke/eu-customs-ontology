@@ -1,9 +1,9 @@
 import pytest
 from rdflib import Graph
-from rdflib.namespace import OWL, RDF, RDFS
+from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 from src.ontology.bfo_stubs import add_bfo_stubs
-from src.ontology.namespaces import BFO, BFO_OBJECT
+from src.ontology.namespaces import BFO, BFO_OBJECT, BFO_PROCESS, RO_HAS_OUTPUT
 from src.ontology.tbox import build_tbox
 
 
@@ -46,3 +46,49 @@ class TestBFOStubs:
     def test_tbox_contains_bfo_stub(self):
         g = build_tbox(Graph())
         assert (BFO_OBJECT, RDF.type, OWL.Class) in g
+
+    def test_bfo_process_is_owl_class(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        assert (BFO_PROCESS, RDF.type, OWL.Class) in g
+
+    def test_bfo_process_en_label(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        labels = [o for o in g.objects(BFO_PROCESS, RDFS.label) if hasattr(o, "language") and o.language == "en"]
+        assert labels
+
+    def test_bfo_process_de_label(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        labels = [o for o in g.objects(BFO_PROCESS, RDFS.label) if hasattr(o, "language") and o.language == "de"]
+        assert labels
+
+    def test_bfo_process_en_definition(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        defs = [o for o in g.objects(BFO_PROCESS, SKOS.definition) if hasattr(o, "language") and o.language == "en"]
+        assert defs
+
+    def test_bfo_process_de_definition(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        defs = [o for o in g.objects(BFO_PROCESS, SKOS.definition) if hasattr(o, "language") and o.language == "de"]
+        assert defs
+
+    def test_ro_has_output_is_owl_objectproperty(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        assert (RO_HAS_OUTPUT, RDF.type, OWL.ObjectProperty) in g
+
+    def test_ro_has_output_en_label(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        labels = [o for o in g.objects(RO_HAS_OUTPUT, RDFS.label) if hasattr(o, "language") and o.language == "en"]
+        assert labels
+
+    def test_ro_has_output_de_label(self):
+        g = Graph()
+        add_bfo_stubs(g)
+        labels = [o for o in g.objects(RO_HAS_OUTPUT, RDFS.label) if hasattr(o, "language") and o.language == "de"]
+        assert labels
