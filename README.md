@@ -174,9 +174,17 @@ build-and-deploy
 
 ---
 
+## Live Demo
+
+**[Open in Ontosphere →](https://thhanke.github.io/ontosphere/?rdfUrl=https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/demo/ch22-beverages-demo.ttl)**
+
+Ontosphere runs WASM Konclude in the browser. It loads [`demo/ch22-beverages-demo.ttl`](demo/ch22-beverages-demo.ttl) — which imports the main ontology — then classifies 10 beverage individuals in real time.
+
 ## Product Classification Demo
 
-The ontology uses OWL 2 DL equivalence axioms to classify products automatically. Describing a beverage with its physical properties is enough for a reasoner to infer its CN product class — no explicit type assertion needed.
+The ontology uses OWL 2 DL equivalence axioms to classify products automatically. Describing a beverage with its production process and physical properties is enough for a reasoner to infer its CN product class — no explicit type assertion needed.
+
+Each CN heading is linked to a named **process singleton** (e.g. `eucn:malt-fermentation`) via `eucn:producedBy`, an `owl:FunctionalProperty` `owl:ObjectProperty`. The singletons are typed as `bfo:Process` subclasses with pairwise `owl:disjointWith` between classes, enabling world-closure under OWA.
 
 ### Describe a product
 
@@ -187,26 +195,26 @@ The ontology uses OWL 2 DL equivalence axioms to classify products automatically
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 
 demo:champagne-brut a owl:NamedIndividual ;
-    eucn:fermentationBase "grape"^^xsd:string ;
-    eucn:isCarbonated     "true"^^xsd:boolean .
+    eucn:producedBy      eucn:grape-fermentation ;
+    eucn:isCarbonated    "true"^^xsd:boolean .
 
 demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:fermentationBase "grape"^^xsd:string ;
-    eucn:isCarbonated     "false"^^xsd:boolean .
+    eucn:producedBy      eucn:grape-fermentation ;
+    eucn:isCarbonated    "false"^^xsd:boolean .
 
 demo:apple-cider a owl:NamedIndividual ;
-    eucn:fermentationBase "fruit"^^xsd:string .
+    eucn:producedBy      eucn:fruit-fermentation .
 
 demo:czech-lager a owl:NamedIndividual ;
-    eucn:fermentationBase       "malt"^^xsd:string ;
+    eucn:producedBy             eucn:malt-fermentation ;
     eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
 
 demo:whisky-12y a owl:NamedIndividual ;
-    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
 
 demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:fermentationBase       "grain"^^xsd:string ;
+    eucn:producedBy             eucn:grain-distillation ;
     eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
 
 demo:still-water a owl:NamedIndividual ;
@@ -215,13 +223,14 @@ demo:still-water a owl:NamedIndividual ;
 
 ### What the reasoner infers
 
-Feed the TBox + individuals to native Konclude (`realization` mode) and it infers:
-
 | Individual | Inferred types (via `owl:equivalentClass`) |
 |------------|-------------------------------------------|
 | `demo:champagne-brut` | `eucn:SparklingWine` · `eucn:Wine` · `eucn:Beverage` |
 | `demo:bordeaux-rouge` | `eucn:StillWine` · `eucn:Wine` · `eucn:Beverage` |
 | `demo:apple-cider` | `eucn:FermentedBeverage` · `eucn:Beverage` |
+| `demo:dry-vermouth` | `eucn:FlavouredWine` · `eucn:Beverage` |
+| `demo:malt-vinegar` | `eucn:Vinegar` · `eucn:Beverage` |
+| `demo:sparkling-lemonade` | `eucn:NonAlcoholicBeverage` · `eucn:Beverage` |
 | `demo:czech-lager` | `eucn:Beer` · `eucn:Beverage` |
 | `demo:whisky-12y` | `eucn:Spirit` · `eucn:Beverage` |
 | `demo:grain-spirit-96` | `eucn:EthylAlcohol` · `eucn:Beverage` |
@@ -235,54 +244,15 @@ Feed the TBox + individuals to native Konclude (`realization` mode) and it infer
 eucn:SparklingWine owl:equivalentClass [
     a owl:Class ;
     owl:intersectionOf (
-        [ owl:onProperty eucn:fermentationBase ; owl:hasValue "grape"^^xsd:string ]
-        [ owl:onProperty eucn:isCarbonated     ; owl:hasValue "true"^^xsd:boolean ]
+        [ owl:onProperty eucn:producedBy  ; owl:hasValue eucn:grape-fermentation ]
+        [ owl:onProperty eucn:isCarbonated ; owl:hasValue "true"^^xsd:boolean ]
     )
 ] .
 ```
 
-Any individual satisfying both restrictions is automatically classified as `SparklingWine`, and — by `rdfs:subClassOf` transitivity — as `Wine` and `Beverage` too. Disjointness axioms (`owl:disjointWith`) guarantee a sparkling wine cannot simultaneously be a beer or a spirit.
+Any individual satisfying both restrictions is automatically classified as `SparklingWine`, and — by `rdfs:subClassOf` transitivity — as `Wine` and `Beverage` too. Disjointness axioms (`owl:disjointWith`) between beverage classes guarantee a sparkling wine cannot simultaneously be a beer or a spirit.
 
-### Run the demo
-
-```python
-from rdflib import Graph
-from src.ontology.equivalence_axioms import add_ch22_equivalence_axioms
-from src.ontology.tbox import build_tbox
-from src.reasoning.konclude import parse_realization, realize
-
-g = Graph()
-build_tbox(g)
-add_ch22_equivalence_axioms(g)
-g.parse("tests/fixtures/beverages_demo.ttl", format="turtle")
-g.serialize("/tmp/combined.ttl", format="longturtle")
-
-realize("/tmp/combined.ttl", "/tmp/realization.xml")
-types = parse_realization("/tmp/realization.xml")
-
-for ind, classes in types.items():
-    print(ind.split("/")[-1], "→", [c.split("/")[-1] for c in classes])
-```
-
-Output:
-
-```
-champagne-brut     → ['SparklingWine', 'Wine', 'Beverage', 'BFO_0000030']
-bordeaux-rouge     → ['StillWine', 'Wine', 'Beverage', 'BFO_0000030']
-apple-cider        → ['FermentedBeverage', 'Beverage', 'BFO_0000030']
-dry-vermouth       → ['FlavouredWine', 'Beverage', 'BFO_0000030']
-malt-vinegar       → ['Vinegar', 'Beverage', 'BFO_0000030']
-sparkling-lemonade → ['NonAlcoholicBeverage', 'Beverage', 'BFO_0000030']
-czech-lager        → ['Beer', 'Beverage', 'BFO_0000030']
-whisky-12y         → ['Spirit', 'Beverage', 'BFO_0000030']
-grain-spirit-96    → ['EthylAlcohol', 'Beverage', 'BFO_0000030']
-still-water        → ['Water', 'Beverage', 'BFO_0000030']
-```
-
-`BFO_0000030` is the BFO 2020 *object* class — inferred because `eucn:Beverage rdfs:subClassOf bfo:BFO_0000030`.
-
-Beer, Spirit, and EthylAlcohol discrimination relies on two OWL 2 DL features working in tandem:
-`eucn:fermentationBase` is declared `owl:FunctionalProperty` (each beverage has exactly one fermentation base), and the `owl:equivalentClass` axioms for Spirit and EthylAlcohol include `owl:complementOf` restrictions derived from their disjoint siblings' `hasValue` conditions. Together these let Konclude infer, for example, that a grain-fermented 43 % ABV individual is a Spirit and not a Beer.
+Spirit and EthylAlcohol discrimination uses `owl:complementOf` restrictions: the reasoner proves `demo:whisky-12y` is a Spirit (not EthylAlcohol) because `eucn:producedBy` is `owl:FunctionalProperty`, `eucn:grain-distillation ∈ eucn:GrainDistillation`, and `eucn:GrainDistillation owl:disjointWith eucn:MaltFermentation` (etc.) — so Konclude can derive the individual is distinct from all other process singletons and apply the complement exclusions.
 
 ---
 
