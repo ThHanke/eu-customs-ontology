@@ -18,6 +18,7 @@ from src.ontology.iri import (
     heading_iri,
     measure_condition_iri,
     measure_type_iri,
+    measurement_unit_iri,
     regulation_iri,
     taric_measure_iri,
 )
@@ -122,9 +123,16 @@ def _add_measure_condition(g: Graph, measure_iri: URIRef,
     if cond.condition_duty_amount is not None:
         g.add((iri, EUCN.dutyAmount, Literal(cond.condition_duty_amount, datatype=XSD.decimal)))
     if cond.condition_measurement_unit_code:
-        g.add((iri, EUCN.measureTypeCode,
-               Literal(cond.condition_measurement_unit_code, datatype=XSD.string)))
+        unit_iri = _ensure_measurement_unit(g, cond.condition_measurement_unit_code)
+        g.add((iri, EUCN.hasMeasurementUnit, unit_iri))
     g.add((measure_iri, EUCN.hasCondition, iri))
+    return iri
+
+
+def _ensure_measurement_unit(g: Graph, unit_code: str) -> URIRef:
+    iri = measurement_unit_iri(unit_code)
+    g.add((iri, RDF.type, EUCN.MeasurementUnit))
+    g.add((iri, RDFS.label, Literal(unit_code, lang="en")))
     return iri
 
 
@@ -161,13 +169,21 @@ def _add_measure(g: Graph, measure: TARICMeasure) -> URIRef:
                 parts.append("%")
             g.add((iri, EUCN.dutyRate, Literal(" ".join(parts), datatype=XSD.string)))
 
-    # Rich entity graph (UK API source)
+    # Rich entity graph (UK API source) — fall back to flat strings for XLSX-only measures
     if measure.measure_type is not None:
         mt_iri = _ensure_measure_type(g, measure.measure_type)
+        g.add((iri, EUCN.hasMeasureType, mt_iri))
+    elif measure.measure_type_id:
+        mt_iri = _ensure_measure_type(g, MeasureTypeRecord(code=measure.measure_type_id,
+                                                           description=""))
         g.add((iri, EUCN.hasMeasureType, mt_iri))
 
     if measure.geographical_area is not None:
         ga_iri = _ensure_geographic_area(g, measure.geographical_area)
+        g.add((iri, EUCN.hasGeographicArea, ga_iri))
+    elif measure.geographical_area_id:
+        ga_iri = _ensure_geographic_area(g, GeographicAreaRecord(code=measure.geographical_area_id,
+                                                                  description=""))
         g.add((iri, EUCN.hasGeographicArea, ga_iri))
 
     if measure.duty_expression is not None:
@@ -182,6 +198,9 @@ def _add_measure(g: Graph, measure: TARICMeasure) -> URIRef:
 
     for reg in measure.regulations:
         reg_iri = _ensure_regulation(g, reg)
+        g.add((iri, EUCN.hasRegulation, reg_iri))
+    if not measure.regulations and measure.regulation_id:
+        reg_iri = _ensure_regulation(g, RegulationRecord(regulation_id=measure.regulation_id))
         g.add((iri, EUCN.hasRegulation, reg_iri))
 
     for ac in measure.additional_codes:
@@ -213,6 +232,7 @@ def _ensure_cn_code(g: Graph, code: str, cn_iris: dict[str, URIRef]) -> URIRef:
     if len(code) >= 4:
         hd = heading_iri(code[:4])
         g.add((hd, RDF.type, EUCN.Heading))
+        g.add((hd, EUCN.codeString, Literal(code[:4], datatype=XSD.string)))
         g.add((iri, EUCN.belongsToHeading, hd))
     return iri
 

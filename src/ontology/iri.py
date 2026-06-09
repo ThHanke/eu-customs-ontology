@@ -64,3 +64,7 @@ def measure_condition_iri(condition_sid: str) -> URIRef:
 
 def additional_code_iri(code: str) -> URIRef:
     return mint_iri(f"addcode:{code}")
+
+
+def measurement_unit_iri(code: str) -> URIRef:
+    return mint_iri(f"unit:{code}")
