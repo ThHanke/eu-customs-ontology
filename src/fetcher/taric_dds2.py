@@ -309,8 +309,15 @@ def fetch_commodity_measures(
             f"?Lang=en&Taric={code_10d}&SimDate={date_str}"
         )
         logger.info("DDS2 Step 1: %s", step1_url)
-        resp1 = client.get(step1_url)
-        resp1.raise_for_status()
+        try:
+            resp1 = client.get(step1_url)
+            resp1.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            logger.warning("DDS2 measures.jsp HTTP %s for %s", exc.response.status_code, code_10d)
+            return []
+        except httpx.HTTPError as exc:
+            logger.warning("DDS2 measures.jsp error for %s: %s", code_10d, exc)
+            return []
         html1 = resp1.text
 
         soup1 = BeautifulSoup(html1, "html.parser")
@@ -339,8 +346,15 @@ def fetch_commodity_measures(
             f"?Sid={sid}&Taric={code_10d}&Offset=0&Lang=en&SimDate={date_str}"
         )
         logger.info("DDS2 Step 2: %s", step2_url)
-        resp2 = client.get(step2_url)
-        resp2.raise_for_status()
+        try:
+            resp2 = client.get(step2_url)
+            resp2.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            logger.warning("DDS2 measures_details.jsp HTTP %s for %s", exc.response.status_code, code_10d)
+            return []
+        except httpx.HTTPError as exc:
+            logger.warning("DDS2 measures_details.jsp error for %s: %s", code_10d, exc)
+            return []
         html2 = resp2.text
 
     measures = _parse_measures_details_html(html2, code_10d)
