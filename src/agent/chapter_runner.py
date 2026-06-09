@@ -125,6 +125,15 @@ class ChapterRunner:
                 result.skipped += 1
                 continue
 
+            # Stale but approved — preserve; TBox additions don't invalidate approved axioms
+            if not force:
+                existing = node_registry.get_approved(cn_code)
+                if existing is not None:
+                    logger.info("[agent] skip %s (approved, tbox bump only)", cn_code)
+                    result.approved += 1
+                    self._append_to_running_tbox(existing, running_tbox_path)
+                    continue
+
             logger.info("[agent] process %s", cn_code)
 
             # Build node context
