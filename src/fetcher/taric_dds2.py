@@ -8,7 +8,16 @@ from datetime import date
 from pathlib import Path
 
 import httpx
+from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict
+
+from src.schema.taric import (
+    FootnoteRecord,
+    GeographicAreaRecord,
+    MeasureTypeRecord,
+    RegulationRecord,
+    TARICMeasure,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -140,3 +149,204 @@ def fetch_section_hierarchy(
 ) -> list[SectionEntry]:
     """Alias for fetch_nomenclaturetree; used by pipeline."""
     return fetch_nomenclaturetree(lang, sim_date, cache_dir, force=force)
+
+
+# ---------------------------------------------------------------------------
+# Commodity measures (measures_details.jsp)
+# ---------------------------------------------------------------------------
+
+def _parse_dds2_date(s: str) -> date | None:
+    """Parse DD-MM-YYYY from DDS2 HTML."""
+    m = re.search(r'(\d{2})-(\d{2})-(\d{4})', s)
+    if not m:
+        return None
+    return date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+
+
+def _parse_footnotes_js(html: str) -> dict[str, FootnoteRecord]:
+    """Extract footnote map {code: FootnoteRecord} from pageDisplayedFootnotes JS block."""
+    m = re.search(
+        r'pageDisplayedFootnotes\s*=\s*new Array\((.*?)\)\s*;',
+        html,
+        re.DOTALL,
+    )
+    if not m:
+        return {}
+    block = m.group(1)
+    footnotes: dict[str, FootnoteRecord] = {}
+    # Match: new Array("CODE", new Footnote("CODE", "TEXT"
+    for fn_m in re.finditer(r'new Array\s*\(\s*"([^"]+)"\s*,\s*new Footnote\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"', block):
+        code = fn_m.group(2)
+        text = fn_m.group(3)
+        footnotes[code] = FootnoteRecord(code=code, description=text)
+    return footnotes
+
+
+def _parse_measures_details_html(html: str, code_10d: str) -> list[TARICMeasure]:
+    """Parse measures_details.jsp HTML into a list of TARICMeasure objects."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    footnote_map = _parse_footnotes_js(html)
+
+    measures: list[TARICMeasure] = []
+
+    # Walk the document tracking current geographic area from measure_area headers
+    geo_name: str | None = None
+    geo_code: str | None = None
+
+    # Process all divs with class "measure_area" and id "measure_*" in document order
+    for tag in soup.find_all(True):
+        # Detect measure_area header
+        if tag.name == "div" and "measure_area" in (tag.get("class") or []):
+            header_text = tag.get_text(separator=" ", strip=True)
+            area_m = re.search(r'\(([^()]+?)\s+(\d+)\)\s*$', header_text)
+            if area_m:
+                geo_name = area_m.group(1).strip()
+                geo_code = area_m.group(2).strip()
+            continue
+
+        # Detect individual measure blocks
+        tag_id = tag.get("id", "")
+        if tag.name == "div" and tag_id.startswith("measure_"):
+            sid = tag_id[len("measure_"):]
+
+            # Measure type description: td with class td_measure_description
+            mt_desc = ""
+            mt_td = tag.find("td", class_=lambda c: c and "td_measure_description" in c)
+            if mt_td:
+                # Get text before first span
+                parts = []
+                for child in mt_td.children:
+                    if hasattr(child, "name") and child.name is not None:
+                        break
+                    text = str(child).strip()
+                    if text:
+                        parts.append(text)
+                mt_desc = " ".join(parts).strip()
+                if not mt_desc:
+                    # Fallback: get all text, strip span content
+                    for span in mt_td.find_all("span"):
+                        span.decompose()
+                    mt_desc = mt_td.get_text(strip=True)
+
+            # Validity from span text like "(01-01-1999 - )" or "(01-01-1999 - 31-12-2025)"
+            v_start: date | None = None
+            v_end: date | None = None
+            validity_span = tag.find("span", string=re.compile(r'\d{2}-\d{2}-\d{4}'))
+            if validity_span:
+                span_text = validity_span.get_text()
+                dates_found = re.findall(r'\d{2}-\d{2}-\d{4}', span_text)
+                if dates_found:
+                    v_start = _parse_dds2_date(dates_found[0])
+                if len(dates_found) >= 2:
+                    v_end = _parse_dds2_date(dates_found[1])
+
+            # Duty rate
+            duty_span = tag.find("span", class_="duty_rate")
+            # (not stored in TARICMeasure directly — stored in duty_expression)
+
+            # Regulation ID from hidden anchor
+            regulation_id = ""
+            reg_anchor = tag.find("a", id=re.compile(r"db_regulation_id_"))
+            if reg_anchor:
+                regulation_id = reg_anchor.get_text(strip=True)
+
+            # Footnotes for this measure — currently the HTML doesn't map per-measure
+            # so we attach all page footnotes (spec says footnotes_for_this_measure)
+            measure_footnotes = list(footnote_map.values())
+
+            geo_area = (
+                GeographicAreaRecord(code=geo_code, description=geo_name)
+                if geo_code else None
+            )
+
+            measure = TARICMeasure(
+                sid=sid,
+                commodity_code=code_10d,
+                measure_type_id="",
+                geographical_area_id=geo_code or "",
+                validity_start=v_start or date(1972, 1, 1),
+                validity_end=v_end,
+                regulation_id=regulation_id or "",
+                components=[],
+                measure_type=MeasureTypeRecord(code="", description=mt_desc),
+                geographical_area=geo_area,
+                regulations=[RegulationRecord(regulation_id=regulation_id)] if regulation_id else [],
+                footnotes=measure_footnotes,
+            )
+            measures.append(measure)
+
+    return measures
+
+
+def fetch_commodity_measures(
+    code_10d: str,
+    sim_date: date,
+    cache_dir: Path,
+    *,
+    force: bool = False,
+) -> list[TARICMeasure]:
+    """Fetch regulatory measures for a 10-digit commodity code from DDS2.
+
+    Two-step: first fetches measures.jsp to get the Sid, then fetches
+    measures_details.jsp to get the full measure details.
+
+    Returns list of TARICMeasure. Caches to cache_dir/{code_10d}.json.
+    """
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = cache_dir / f"{code_10d}.json"
+
+    if cache_file.exists() and not force:
+        raw = json.loads(cache_file.read_text(encoding="utf-8"))
+        return [TARICMeasure.model_validate(item) for item in raw]
+
+    date_str = sim_date.strftime("%Y%m%d")
+
+    with httpx.Client(timeout=30) as client:
+        # Step 1: get measures.jsp to extract Sid
+        step1_url = (
+            f"{DDS2_BASE}/measures.jsp"
+            f"?Lang=en&Taric={code_10d}&SimDate={date_str}"
+        )
+        logger.info("DDS2 Step 1: %s", step1_url)
+        resp1 = client.get(step1_url)
+        resp1.raise_for_status()
+        html1 = resp1.text
+
+        soup1 = BeautifulSoup(html1, "html.parser")
+        iframe = soup1.find("iframe")
+        if not iframe:
+            logger.warning("DDS2: no iframe found for %s", code_10d)
+            return []
+
+        iframe_src = iframe.get("src", "")
+        if "deferred_measures.jsp" in iframe_src:
+            logger.warning("DDS2 deferred for %s", code_10d)
+            cache_file.write_text("[]", encoding="utf-8")
+            return []
+
+        sid_m = re.search(r'Sid=([^&]+)', iframe_src)
+        if not sid_m:
+            logger.warning("DDS2: no Sid in iframe src for %s: %s", code_10d, iframe_src)
+            return []
+        sid = sid_m.group(1)
+
+        time.sleep(0.2)
+
+        # Step 2: get measures_details.jsp
+        step2_url = (
+            f"{DDS2_BASE}/measures_details.jsp"
+            f"?Sid={sid}&Taric={code_10d}&Offset=0&Lang=en&SimDate={date_str}"
+        )
+        logger.info("DDS2 Step 2: %s", step2_url)
+        resp2 = client.get(step2_url)
+        resp2.raise_for_status()
+        html2 = resp2.text
+
+    measures = _parse_measures_details_html(html2, code_10d)
+
+    cache_file.write_text(
+        json.dumps([m.model_dump(mode="json") for m in measures], indent=2),
+        encoding="utf-8",
+    )
+    return measures
