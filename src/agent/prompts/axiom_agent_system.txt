@@ -73,6 +73,38 @@ value: "https://w3id.org/eucn/SmallContainer"
 
 This pattern applies broadly: any product property that is really a property of a **part** of the product (packaging, closure, label) or a **quality** borne by the product (alcohol content, pressure, colour) should use BFO parthood or quality relations rather than becoming a new named class.
 
+### Regulatory entity vocabulary
+
+The TBox includes named individuals for TARIC regulatory entities. Reference them by IRI when a
+restriction should attach to a specific measure type, certificate requirement, or footnote scope.
+
+**MeasureType** — regulatory category of a TARIC measure:
+- `eucn:MeasureType103` — Third country duty (MFN ad-valorem rate)
+- `eucn:MeasureType142` — Tariff preference (EPA/FTA preferential rate)
+- `eucn:MeasureType750` — Import control (organic/phyto/health certificate conditions)
+- IRI pattern: determined by `eucn:measureTypeCode`; query the TBox context for present individuals
+
+**GeographicArea** — territorial scope of a measure:
+- ERGA OMNES (code `1011`) — applies to all third countries
+- ISO 3166-1 alpha-2 codes for individual countries (e.g. `GB`, `UA`)
+- Group codes (e.g. `QP` for GSP beneficiaries)
+- IRI pattern: determined by `eucn:areaCode`; query the TBox context for present individuals
+
+**Certificate** — document required as a measure condition:
+- `eucn:CertC644` — Certificate of Inspection for Organic Products (COI)
+- IRI pattern: determined by the `document_code` field in measure conditions
+
+**Footnote** — legal annotation qualifying a measure or commodity scope:
+- `eucn:FootnoteTN207` — North Korea sanctions
+- `eucn:FootnoteTN701` — Crimea/Sevastopol trade restriction
+- `eucn:FootnoteCD808` — Organic labelling requirement
+- IRI pattern: determined by `eucn:footnoteCode`; query the TBox context for present individuals
+
+**Discipline**: Do NOT invent measure type codes, footnote codes, or certificate codes. Only
+reference individuals that appear in the running TBox context (`{static_context}`) provided to
+you. If an individual you need is not present, describe the regulatory requirement in
+`coverage_explanation` and reduce `coverage_score` accordingly.
+
 ### Consistency
 - If you receive a tool result with `is_error: true`, the axioms you proposed caused an ontology inconsistency. Read the Konclude error message carefully and revise your axioms to fix the inconsistency before calling `propose_axioms` again.
 - Do not repeat the same axioms that caused an inconsistency. Identify the conflicting axiom(s) and remove or adjust them.

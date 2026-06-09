@@ -4,6 +4,7 @@ import hashlib
 import logging
 import re
 from datetime import date
+from pathlib import Path
 
 from rdflib import Graph
 
@@ -14,6 +15,16 @@ from src.schema.wizard import ClassificationNode
 logger = logging.getLogger(__name__)
 
 _TRIPLE_CAP = 500
+
+_DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
+
+
+def _load_heading_labels(chapter: int) -> dict:
+    cache = _DATA_ROOT / "intermediate" / f"tariffnumber_ch{chapter:02d}.json"
+    if not cache.exists():
+        return {}
+    from src.ontology.heading_classes import load_heading_labels
+    return load_heading_labels(cache)
 
 
 def build_static_context(chapter: int, extract_date: date | None = None) -> str:
@@ -33,7 +44,8 @@ def build_static_context(chapter: int, extract_date: date | None = None) -> str:
     """
     g = Graph()
     kwargs = {} if extract_date is None else {"extract_date": extract_date}
-    build_tbox(g, chapter=chapter, **kwargs)
+    heading_labels = _load_heading_labels(chapter)
+    build_tbox(g, chapter=chapter, heading_labels=heading_labels or None, **kwargs)
     triple_count = len(g)
     if triple_count > _TRIPLE_CAP:
         logger.warning(
