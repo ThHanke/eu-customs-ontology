@@ -22,6 +22,9 @@ from src.schema.taric import (
 logger = logging.getLogger(__name__)
 
 DDS2_BASE = "https://ec.europa.eu/taxation_customs/dds2/taric"
+_DDS2_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+}
 
 
 class SectionEntry(BaseModel):
@@ -129,7 +132,7 @@ def fetch_nomenclaturetree(
     logger.info("Fetching nomenclaturetree: %s", url)
     time.sleep(0.2)
     try:
-        resp = httpx.get(url, timeout=30)
+        resp = httpx.get(url, headers=_DDS2_HEADERS, timeout=30)
         resp.raise_for_status()
     except httpx.HTTPError as exc:
         logger.warning("DDS2 nomenclaturetree fetch failed: %s", exc)
@@ -302,7 +305,7 @@ def fetch_commodity_measures(
 
     date_str = sim_date.strftime("%Y%m%d")
 
-    with httpx.Client(timeout=30) as client:
+    with httpx.Client(timeout=30, headers=_DDS2_HEADERS) as client:
         # Step 1: get measures.jsp to extract Sid
         step1_url = (
             f"{DDS2_BASE}/measures.jsp"
