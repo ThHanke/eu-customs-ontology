@@ -350,3 +350,27 @@ def fetch_commodity_measures(
         encoding="utf-8",
     )
     return measures
+
+
+def fetch_chapter_commodities(
+    chapter: int,
+    cn_codes_8d: list[str],
+    cache_dir: Path,
+    *,
+    force: bool = False,
+) -> dict[str, list[TARICMeasure]]:
+    """Fetch DDS2 measures for all CN codes in a chapter.
+
+    cn_codes_8d: 8-digit codes; padded to 10d with '00' suffix.
+    Returns {code_8d: [TARICMeasure, ...]}.
+    Cache directory: cache_dir / f"dds2_ch{chapter:02d}".
+    """
+    from datetime import date as _date
+    chapter_cache = cache_dir / f"dds2_ch{chapter:02d}"
+    sim_date = _date.today()
+    result: dict[str, list[TARICMeasure]] = {}
+    for code in cn_codes_8d:
+        code_10d = (code + "00")[:10]
+        measures = fetch_commodity_measures(code_10d, sim_date, chapter_cache, force=force)
+        result[code] = measures
+    return result

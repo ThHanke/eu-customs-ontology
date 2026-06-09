@@ -81,6 +81,7 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=False,
             no_classify=True,
             extract_date=ed,
@@ -105,6 +106,7 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=False,
             no_classify=False,
             extract_date=ed,
@@ -122,7 +124,7 @@ class TestPipelineIntegration:
         # Must not raise even with no_classify=True
         pipeline_mod.run(
             chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-            no_reasoner=True, no_classify=True, extract_date=ed,
+            skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
         )
         trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
         assert trig.exists(), ".trig written from build step regardless of classify"
@@ -139,14 +141,14 @@ class TestPipelineIntegration:
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed)
         nt1 = sorted((out1 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed)
         nt2 = sorted((out2 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"
@@ -207,6 +209,7 @@ class TestPipelineIntegration:
                 skip_fetch=True,
                 skip_scrape=True,
                 skip_legal_text=True,
+                skip_commodity_details=True,
                 no_reasoner=True,
                 no_classify=True,
                 extract_date=ed,
@@ -234,12 +237,60 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=True,
             no_classify=True,
             extract_date=ed,
         )
         ttl = tmp_path / "eucn-ch22-beverages-2026-06-05.ttl"
         assert ttl.exists()
+
+    def test_fetch_commodity_details_uses_dds2(self, tmp_path, monkeypatch):
+        """fetch-commodity-details step calls taric_dds2.fetch_chapter_commodities."""
+        import src.pipeline as pipeline_mod
+        from src.schema.taric import ChapterData
+
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+
+        called_with = {}
+
+        def mock_fetch_chapter_commodities(chapter, cn_codes, cache_dir, *, force=False):
+            called_with['chapter'] = chapter
+            called_with['called'] = True
+            return {}
+
+        with patch("src.fetcher.taric_dds2.fetch_chapter_commodities", mock_fetch_chapter_commodities):
+            pipeline_mod.run(
+                chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
+                no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+            )
+
+        assert called_with.get('called'), "fetch_chapter_commodities was not called"
+        assert called_with['chapter'] == 22
+
+    def test_pipeline_section_entries_passed_to_abox(self, tmp_path, monkeypatch):
+        """Pipeline passes section_entries to build_abox when fetch_section_hierarchy succeeds."""
+        import src.pipeline as pipeline_mod
+        from src.fetcher.taric_dds2 import SectionEntry
+
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+
+        fixture_entries = [SectionEntry(roman_numeral="IV", label_en="Prepared foodstuffs",
+                                        label_de=None, chapter_codes=["22"])]
+
+        with patch("src.fetcher.taric_dds2.fetch_section_hierarchy", return_value=fixture_entries):
+            pipeline_mod.run(
+                chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
+                skip_commodity_details=True,
+                no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+            )
+
+        ttl = (tmp_path / "eucn-ch22-beverages-2026-06-05.ttl").read_text()
+        assert "TARICSection" in ttl or "belongsToSection" in ttl
 
 
 class TestAboxNodeRegistryDispatch:

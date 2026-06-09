@@ -65,6 +65,7 @@ def pipeline_output(tmp_path, monkeypatch):
         skip_fetch=True,
         skip_scrape=True,
         skip_legal_text=True,
+        skip_commodity_details=True,
         no_reasoner=True,
         no_classify=True,
         extract_date=ed,

@@ -126,11 +126,11 @@ def run(
         root_id = next((n["node_id"] for n in raw_nodes if not n["path_from_root"]), "")
         wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
 
-    # ── Step 2.5b: Fetch commodity details from UK Trade Tariff API ─────────
+    # ── Step 2.5b: Fetch commodity details from EU TARIC DDS2 ───────────────
     enriched_json = DATA_INTERMEDIATE / f"taric_ch{chapter:02d}_enriched.json"
     if not skip_commodity_details and (force or not enriched_json.exists()):
         with _step("fetch-commodity-details"):
-            from src.fetcher.uk_trade_tariff_api import fetch_chapter_commodities
+            from src.fetcher.taric_dds2 import fetch_chapter_commodities
             from src.schema.taric import ChapterData as _CD
 
             cn_codes_8d: list[str] = []
@@ -142,14 +142,14 @@ def run(
                 raw_cd = _CD.model_validate_json(taric_json.read_text())
                 cn_codes_8d = sorted({m.commodity_code[:8] for m in raw_cd.measures})
 
-            uk_measures_by_code = fetch_chapter_commodities(
+            dds2_measures_by_code = fetch_chapter_commodities(
                 chapter, cn_codes_8d, DATA_INTERMEDIATE, force=force
             )
-            all_uk_measures = [m for ms in uk_measures_by_code.values() for m in ms]
-            enriched = _CD(chapter=chapter, measures=all_uk_measures)
+            all_dds2_measures = [m for ms in dds2_measures_by_code.values() for m in ms]
+            enriched = _CD(chapter=chapter, measures=all_dds2_measures)
             enriched_json.write_text(enriched.model_dump_json())
             print(f"  [fetch-commodity-details] {len(cn_codes_8d)} codes, "
-                  f"{len(all_uk_measures)} measures")
+                  f"{len(all_dds2_measures)} measures (EU DDS2)")
     else:
         if skip_commodity_details:
             print("[fetch-commodity-details] skipped (--skip-commodity-details)")
@@ -319,6 +319,14 @@ def run(
     else:
         print(f"[build-core] skipped (using existing {core_ttl_out.name})")
 
+    # ── Step 2.5c: Fetch DDS2 section hierarchy ──────────────────────────────
+    section_entries = None
+    try:
+        from src.fetcher.taric_dds2 import fetch_section_hierarchy
+        section_entries = fetch_section_hierarchy("en", extract_date, DATA_INTERMEDIATE)
+    except Exception as exc:
+        logger.warning("DDS2 section hierarchy fetch failed: %s — continuing without sections", exc)
+
     # ── Step 3: Build ontology ───────────────────────────────────────────────
     if force or not ttl_out.exists():
         with _step("build-ontology"):
@@ -374,7 +382,7 @@ def run(
                 heading_labels=_heading_labels or None,
                 uncovered_cn_codes=_uncovered_cn or None,
             )
-            g, wizard_coverage = build_abox(chapter_data, wizard_tree, g)
+            g, wizard_coverage = build_abox(chapter_data, wizard_tree, g, section_entries=section_entries)
 
             # Provenance in named graph
             ds = Dataset()
