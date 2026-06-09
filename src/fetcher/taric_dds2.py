@@ -209,6 +209,8 @@ def _parse_measures_details_html(html: str, code_10d: str) -> list[TARICMeasure]
             continue
 
         # Detect individual measure blocks
+        if tag.attrs is None:
+            continue
         tag_id = tag.get("id", "")
         if tag.name == "div" and tag_id.startswith("measure_"):
             sid = tag_id[len("measure_"):]
