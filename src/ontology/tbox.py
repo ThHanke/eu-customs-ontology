@@ -118,7 +118,7 @@ def build_tbox(
     # ── Heading classes from tariffnumber.com labels (if available) ───────────
     if heading_labels:
         from src.ontology.heading_classes import add_heading_classes
-        add_heading_classes(g, chapter, heading_labels, uncovered_cn_codes or set())
+        add_heading_classes(g, chapter, heading_labels, uncovered_cn_codes or set(), chapter_root_iri=ch.root_class_iri)
 
     # ── Classes ────────────────────────────────────────────────────────────────
     _class(g, EUCN.CNCode, "CN Code", "KN-Code",

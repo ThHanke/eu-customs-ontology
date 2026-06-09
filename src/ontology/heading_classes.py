@@ -32,6 +32,7 @@ def add_heading_classes(
     chapter: int,
     labels: dict[str, dict[str, str]],
     uncovered_cn_codes: set[str] | None = None,
+    chapter_root_iri: URIRef | None = None,
 ) -> None:
     """Add heading-level and uncovered-terminal OWL classes to *g*.
 
@@ -61,7 +62,7 @@ def add_heading_classes(
         iri = EUCN[local_name]
         heading_iris[code] = iri
         g.add((iri, RDF.type, OWL.Class))
-        g.add((iri, RDFS.subClassOf, BFO_OBJECT))
+        g.add((iri, RDFS.subClassOf, chapter_root_iri or BFO_OBJECT))
         g.add((iri, RDFS.label, Literal(label_en, lang="en")))
         if label_de:
             g.add((iri, RDFS.label, Literal(label_de, lang="de")))
