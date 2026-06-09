@@ -6,6 +6,23 @@ You MUST call the `propose_axioms` tool to return your answer. Do not return pla
 
 {static_context}
 
+## Classification semantics — READ THIS FIRST
+
+Every new class you define will be built as an **owl:equivalentClass** — a defined class with both necessary AND sufficient conditions:
+
+```
+NewClass ≡ ParentClass ⊓ restriction₁ ⊓ restriction₂ ⊓ …
+```
+
+This means: any individual that is a `ParentClass` and satisfies ALL the restrictions will be **automatically classified** as `NewClass` by a reasoner. Conversely, any individual of `NewClass` must satisfy all restrictions.
+
+**Consequence for you**: the restrictions you propose are SUFFICIENT CONDITIONS for classification. They must together uniquely discriminate this CN subheading from all its siblings under the same parent. Too few conditions → wrong individuals get classified into this class. Spurious conditions → correct individuals fail to classify.
+
+**How to think about it**:
+1. Read the legal text and identify EVERY product-discriminating criterion (substance, origin, process, container, composition, strength, etc.).
+2. Ask: if a customs officer checks these criteria, do they uniquely land on THIS CN code and no other?
+3. If yes, encode them as restrictions. If a criterion is shared with siblings, it still needs to be included (the intersection of all criteria must discriminate).
+
 ## Ontology engineering rules
 
 ### Class reuse
@@ -14,19 +31,23 @@ You MUST call the `propose_axioms` tool to return your answer. Do not return pla
 
 ### BFO alignment
 - Every new class must declare a `bfo_parent_iri`:
-  - Use `http://purl.obolibrary.org/obo/BFO_0000030` (Object) as the parent for material entities (physical goods, products, substances).
-  - Use `http://purl.obolibrary.org/obo/BFO_0000015` (Process) as the parent for processes (production methods, treatments, manufacturing steps).
-  - Use an existing EUCN class IRI (`https://w3id.org/eucn/...`) when a narrower existing parent is available.
+  - Use an existing EUCN class IRI (`https://w3id.org/eucn/...`) when a narrower existing parent is available — this forms the first member of the equivalentClass intersection.
+  - Use `http://purl.obolibrary.org/obo/BFO_0000030` (Object) for material entities with no suitable EUCN parent.
+  - Use `http://purl.obolibrary.org/obo/BFO_0000015` (Process) for processes (production methods, treatments).
 
 ### Functional properties
 - Declare `is_functional: true` for any single-valued object property (e.g. a property that assigns exactly one category to a product).
 - Declare `is_functional: false` for multi-valued properties.
 
 ### Disjointness
-- Use `owl:disjointWith` (via `restrictions` with `restriction_type: "complement"`) between process classes that discriminate the same CN branch (i.e. sibling classes under the same parent that classify mutually exclusive products).
+- Use `owl:disjointWith` (via `restrictions` with `restriction_type: "complement"`) between sibling classes that classify mutually exclusive products under the same parent heading.
 
-### Narrow over broad
-- When uncertain about the scope of an axiom, prefer narrower, more specific axioms over broad ones. It is better to under-commit than to over-generalise.
+### Complete and discriminating conditions
+- Include ALL conditions that together uniquely identify this CN subheading.
+- Do NOT omit conditions because they "seem obvious from context" — the reasoner only knows what you state.
+- Do NOT add conditions unrelated to the legal text — spurious restrictions prevent correct classification.
+- If two sibling CN codes differ only by container size, create separate classes and include the container size condition (`hasPart some SmallContainer` / `hasPart some LargeContainer`) in EACH class's restrictions.
+- If two sibling CN codes differ only by geographic origin, include the origin quality in each class's restrictions.
 
 ### Coverage score
 - Set `coverage_score` to 1.0 if all distinguishing criteria from the legal text are captured by the proposed axioms.
@@ -59,19 +80,17 @@ property_iri:     "http://purl.obolibrary.org/obo/RO_0000086"
 value:            "<IRI of the quality class>"
 ```
 
-**Equivalence axioms via existing TBox classes**: Before defining a new subclass for a product variant, check whether the variant can instead be expressed as an intersection using existing TBox classes and BFO relations. The TBox already defines:
+**Container size**: The TBox already defines:
 - `eucn:SmallContainer` ≡ Packaging ⊓ (has_quality some (Volume ⊓ ∃inLitres.[< 2.0]))
 - `eucn:LargeContainer` ≡ Packaging ⊓ (has_quality some (Volume ⊓ ∃inLitres.[≥ 2.0]))
 
-**Do NOT** create flat product–container compound classes like `GinSmallContainer`. Instead, express a gin in a small container as a restriction on the gin class:
+When a CN subheading is specifically for products in containers ≤ 2 L, create a named class (e.g. `GinSmallContainer22085011`) and include:
 ```
-owl_class_iri: "https://w3id.org/eucn/Gin"
 restriction_type: "someValuesFrom"
-property_iri: "http://purl.obolibrary.org/obo/BFO_0000051"
-value: "https://w3id.org/eucn/SmallContainer"
+property_iri:     "http://purl.obolibrary.org/obo/BFO_0000051"
+value:            "https://w3id.org/eucn/SmallContainer"
 ```
-
-This pattern applies broadly: any product property that is really a property of a **part** of the product (packaging, closure, label) or a **quality** borne by the product (alcohol content, pressure, colour) should use BFO parthood or quality relations rather than becoming a new named class.
+This restriction, combined with the parent Gin class, gives the complete sufficient condition.
 
 ### Regulatory entity vocabulary
 
