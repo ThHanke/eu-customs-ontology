@@ -17,7 +17,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     dcterms:description
         "OWL-2-DL-Ontologie zur Modellierung der Kombinierten Nomenklatur (KN) der EU und des integrierten TARIC-Zolltarifs: Warenpositionen, Zollmaßnahmen und Einreihungshilfen aus EZT-Online. Einreihungspfade aus EZT-Online haben nur Beratungscharakter und stellen kein rechtsverbindliches EU-Instrument dar."@de ,
         "OWL 2 DL ontology modelling the EU Combined Nomenclature (CN) and TARIC integrated tariff: commodity codes, duty measures, and EZT-Online classification guidance. Data extracted from the European Commission CIRCABC TARIC & Quota space. Classification paths sourced from the EZT-Online advisory wizard carry advisory status only and do not constitute legally binding EU instruments."@en ;
-    dcterms:issued "2026-06-08"^^xsd:date ;
+    dcterms:issued "2026-06-09"^^xsd:date ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:source
         <https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b> ,
@@ -27,8 +27,8 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         "EU Customs Combined Nomenclature Ontology"@en ;
     vann:preferredNamespacePrefix "eucn" ;
     vann:preferredNamespaceUri "https://w3id.org/eucn/" ;
-    owl:versionIRI <https://w3id.org/eucn/2026/06/08> ;
-    owl:versionInfo "TARIC extract 2026-06-08" ;
+    owl:versionIRI <https://w3id.org/eucn/2026/06/09> ;
+    owl:versionInfo "TARIC extract 2026-06-09" ;
 .
 
 eucn:ArrackSmallContainer22089011
@@ -1606,11 +1606,6 @@ eucn:belongsToChapter
         "relation between a CN code and the two-digit Harmonized System chapter in whose nomenclature scope the code is situated"@en ;
 .
 
-eucn:ch22-beverages
-    a owl:Ontology ;
-    owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-core-latest.ttl> ;
-.
-
 eucn:classifiesAs
     a owl:ObjectProperty ;
     rdfs:label
@@ -1653,8 +1648,8 @@ eucn:core
     dcterms:creator <https://github.com/ThHanke> ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:source <https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31987R2658> ;
-    owl:versionIRI <https://w3id.org/eucn/core/2026/06/08> ;
-    owl:versionInfo "EUCN core ontology 2026-06-08" ;
+    owl:versionIRI <https://w3id.org/eucn/core/2026/06/09> ;
+    owl:versionInfo "EUCN core ontology 2026-06-09" ;
 .
 
 eucn:description

@@ -287,11 +287,10 @@ def run(
                 f"(coverage {wizard_coverage.coverage_pct:.1f}%)"
             )
 
-            # Add chapter ontology header with owl:imports to core
+            # Add owl:imports core to the main ontology IRI
             from src.ontology.core import CORE_RAW_URL
-            ch_iri = URIRef(f"https://w3id.org/eucn/ch{chapter:02d}-{slug}")
-            g.add((ch_iri, RDF.type, OWL.Ontology))
-            g.add((ch_iri, OWL.imports, URIRef(CORE_RAW_URL)))
+            from src.ontology.namespaces import ONTOLOGY_IRI
+            g.add((ONTOLOGY_IRI, OWL.imports, URIRef(CORE_RAW_URL)))
 
             # Serialize chapter TTL (with owl:imports)
             g.serialize(destination=str(ttl_out), format="longturtle")
