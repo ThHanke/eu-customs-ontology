@@ -67,7 +67,7 @@ def run(
     no_classify: bool = False,
     force: bool = False,
     extract_date: Date | None = None,
-    run_axiom_agent: bool = False,
+    run_axiom_agent: bool = True,
     agent_model: str = "claude-sonnet-4-6",
 ) -> None:
     if extract_date is None:
@@ -218,7 +218,7 @@ def run(
             import os
             if not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("ANTHROPIC_FOUNDRY_API_KEY"):
                 raise EnvironmentError(
-                    "ANTHROPIC_API_KEY or ANTHROPIC_FOUNDRY_API_KEY environment variable is required for --run-axiom-agent"
+                    "ANTHROPIC_API_KEY or ANTHROPIC_FOUNDRY_API_KEY environment variable is required for axiom agent (use --skip-axiom-agent to skip)"
                 )
             from src.agent.chapter_runner import ChapterRunner
             from src.agent.coverage_reporter import build_report, write_report
@@ -496,10 +496,10 @@ def main() -> None:
     p.add_argument("--force", action="store_true")
     p.add_argument("--extract-date", type=Date.fromisoformat, default=None,
                    metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
-    p.add_argument("--run-axiom-agent", action="store_true",
-                   help="Run LLM-based axiom agent (requires ANTHROPIC_API_KEY)")
+    p.add_argument("--skip-axiom-agent", dest="run_axiom_agent", action="store_false",
+                   help="Skip LLM-based axiom agent")
     p.add_argument("--agent-model", default="claude-sonnet-4-6",
-                   metavar="MODEL", help="Model for --run-axiom-agent (default: claude-sonnet-4-6)")
+                   metavar="MODEL", help="Model for axiom agent (default: claude-sonnet-4-6)")
     args = p.parse_args()
 
     run(

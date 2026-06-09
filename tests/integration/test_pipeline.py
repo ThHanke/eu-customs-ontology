@@ -125,6 +125,7 @@ class TestPipelineIntegration:
         pipeline_mod.run(
             chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
             skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+            run_axiom_agent=False,
         )
         trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
         assert trig.exists(), ".trig written from build step regardless of classify"
@@ -141,14 +142,16 @@ class TestPipelineIntegration:
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+                         run_axiom_agent=False)
         nt1 = sorted((out1 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+                         run_axiom_agent=False)
         nt2 = sorted((out2 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"
@@ -222,15 +225,14 @@ class TestPipelineIntegration:
         content = ttl.read_text()
         assert "w3id.org/eucn" in content
 
-    def test_pipeline_without_run_axiom_agent_uses_hand_authored(self, tmp_path, monkeypatch):
-        """Without --run-axiom-agent the pipeline uses hand-authored axioms (flag defaults to False)."""
+    def test_pipeline_skip_axiom_agent_no_api_key_needed(self, tmp_path, monkeypatch):
+        """With run_axiom_agent=False the pipeline skips the agent and needs no API key."""
         import src.pipeline as pipeline_mod
         monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
         ed = date(2026, 6, 5)
 
-        # run_axiom_agent not passed → defaults to False, must not raise even without API key
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         pipeline_mod.run(
             chapter=22,
@@ -241,6 +243,7 @@ class TestPipelineIntegration:
             no_reasoner=True,
             no_classify=True,
             extract_date=ed,
+            run_axiom_agent=False,
         )
         ttl = tmp_path / "eucn-ch22-beverages-2026-06-05.ttl"
         assert ttl.exists()
@@ -265,6 +268,7 @@ class TestPipelineIntegration:
             pipeline_mod.run(
                 chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
                 no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+                run_axiom_agent=False,
             )
 
         assert called_with.get('called'), "fetch_chapter_commodities was not called"
@@ -287,6 +291,7 @@ class TestPipelineIntegration:
                 chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
                 skip_commodity_details=True,
                 no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+                run_axiom_agent=False,
             )
 
         ttl = (tmp_path / "eucn-ch22-beverages-2026-06-05.ttl").read_text()
