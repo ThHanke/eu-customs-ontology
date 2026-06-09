@@ -9,42 +9,49 @@ PREFIX demo: <https://w3id.org/eucn/demo/>
     a owl:Ontology .
 
 # ── ABox: beverage product individuals ────────────────────────────────────────
-# Individuals are explicitly typed as the most-specific agent-defined subclass.
-# The reasoner infers membership in all superclasses (subClassOf transitivity).
+# Individuals are explicitly typed as the most-specific agent-generated class.
+# The reasoner infers membership in all superclasses via subClassOf transitivity:
+#   agent class → heading class (2201-2209) → eucn:Beverage
 
-# CN 2204 10 — Champagne subClassOf SparklingWine
-demo:champagne-brut a owl:NamedIndividual, eucn:Champagne .
+# CN 2204 10 11 — Champagne22041011 → WineOfFreshGrapes2204
+#                                   → WineFreshGrapesInclFortifiedWines2204 → eucn:Beverage
+demo:champagne-brut a owl:NamedIndividual, eucn:Champagne22041011 .
 
-# CN 2204 — WineOfFreshGrapes (agent-defined top-level wine class)
-demo:bordeaux-rouge a owl:NamedIndividual, eucn:WineOfFreshGrapes .
+# CN 2204 — WineOfFreshGrapes2204 → WineFreshGrapesInclFortifiedWines2204
+demo:bordeaux-rouge a owl:NamedIndividual, eucn:WineOfFreshGrapes2204 .
 
-# CN 2204 — FortifiedWine subClassOf WineOfFreshGrapes
-demo:port-wine a owl:NamedIndividual, eucn:FortifiedWine .
+# CN 2204 — FortifiedWine2204 → WineFreshGrapesInclFortifiedWines2204
+demo:port-wine a owl:NamedIndividual, eucn:FortifiedWine2204 .
 
-# CN 2205 — FlavouredWineOfFreshGrapes subClassOf WineOfFreshGrapes
-demo:dry-vermouth a owl:NamedIndividual, eucn:FlavouredWineOfFreshGrapes .
+# CN 2205 — VermouthWineFreshGrapesFlavouredPlants2205 → eucn:Beverage
+demo:dry-vermouth a owl:NamedIndividual, eucn:VermouthWineFreshGrapesFlavouredPlants2205 .
 
-# CN 2206 — CiderPerryMeadSakFermentedBeverages2206 (agent-defined)
+# CN 2206 — CiderPerryMeadSakFermentedBeverages2206 → eucn:Beverage
 demo:apple-cider a owl:NamedIndividual, eucn:CiderPerryMeadSakFermentedBeverages2206 .
 
-# CN 2202 — NonAlcoholicBeverage (agent-defined)
-demo:sparkling-lemonade a owl:NamedIndividual, eucn:NonAlcoholicBeverage .
+# CN 2202 — NonAlcoholicFlavouredBeverage2202 → eucn:Beverage
+demo:sparkling-lemonade a owl:NamedIndividual, eucn:NonAlcoholicFlavouredBeverage2202 .
 
-# CN 2208 — Whisky subClassOf SpiritousBeverage
-demo:whisky-12y a owl:NamedIndividual, eucn:Whisky .
+# CN 2208 — ScotchWhisky2208 → SpiritsBeverages2208 → eucn:Beverage
+demo:scotch-whisky a owl:NamedIndividual, eucn:ScotchWhisky2208 .
 
-# CN 2208 05 11 — GinInSmallContainer subClassOf Gin subClassOf SpiritousBeverage
-demo:gin-small a owl:NamedIndividual, eucn:GinInSmallContainer .
+# CN 2208 30 30 — SingleMaltWhisky22083030 → SpiritsBeverages2208 → eucn:Beverage
+# Reasoner infers 4 restriction axioms (pot still, malted barley mash, single distillery, etc.)
+demo:single-malt-glenlivet a owl:NamedIndividual, eucn:SingleMaltWhisky22083030 .
 
-# CN 2208 05 19 — GinInLargeContainer subClassOf Gin subClassOf SpiritousBeverage
-demo:gin-large a owl:NamedIndividual, eucn:GinInLargeContainer .
+# CN 2208 05 11 — GinSmallContainer22085011 → Gin2208 → SpiritsBeverages2208
+demo:gin-small a owl:NamedIndividual, eucn:GinSmallContainer22085011 .
 
-# CN 2209 — WineVinegarSmallContainer subClassOf WineVinegar
-demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer .
+# CN 2208 05 19 — GinLargeContainer22085019 → Gin2208 → SpiritsBeverages2208
+demo:gin-large a owl:NamedIndividual, eucn:GinLargeContainer22085019 .
 
-# ── ABox: packaging individuals (demonstrate equivalence axiom inference) ──────
-# SmallContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres < 2.0))
-# → demo:bottle-075 should be inferred as eucn:SmallContainer
+# CN 2209 00 11 — WineVinegarSmallContainer22090011 → WineVinegar2209 → Vinegar2209
+demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer22090011 .
+
+# ── ABox: packaging size inference (equivalence axiom reasoning) ───────────────
+# SmallContainer ≡ Packaging ⊓ ∃RO:0000086 (Volume ⊓ ∃inLitres < 2.0)
+# LargeContainer ≡ Packaging ⊓ ∃RO:0000086 (Volume ⊓ ∃inLitres ≥ 2.0)
+# Typed only as eucn:Packaging; SmallContainer / LargeContainer inferred from volume.
 
 demo:vol-075 a owl:NamedIndividual, eucn:Volume ;
     eucn:inLitres "0.75"^^xsd:decimal .
@@ -52,11 +59,27 @@ demo:vol-075 a owl:NamedIndividual, eucn:Volume ;
 demo:bottle-075 a owl:NamedIndividual, eucn:Packaging ;
     obo:RO_0000086 demo:vol-075 .
 
-# LargeContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres ≥ 2.0))
-# → demo:keg-20 should be inferred as eucn:LargeContainer
-
 demo:vol-20 a owl:NamedIndividual, eucn:Volume ;
     eucn:inLitres "20.0"^^xsd:decimal .
 
 demo:keg-20 a owl:NamedIndividual, eucn:Packaging ;
     obo:RO_0000086 demo:vol-20 .
+
+# ── ABox: Bordeaux wine in a 0.75 L bottle (combined reasoning) ───────────────
+# Demonstrates two reasoning modes in one pattern:
+#   (a) subClassOf chain: WinesProducedBordeauxContainersActualAlcoholic22042142
+#       → WineFreshGrapesInclFortifiedWines2204 → eucn:Beverage
+#   (b) equivalence axiom: bordeaux-bottle (Packaging + 0.75 L Volume)
+#       inferred as eucn:SmallContainer by the reasoner
+#
+# CN 2204 21 42: wines from Bordeaux, containers ≤ 2 l, actual alc. strength ≤ 13% vol.
+
+demo:vol-bordeaux-bottle a owl:NamedIndividual, eucn:Volume ;
+    eucn:inLitres "0.75"^^xsd:decimal .
+
+demo:bordeaux-bottle a owl:NamedIndividual, eucn:Packaging ;
+    obo:RO_0000086 demo:vol-bordeaux-bottle .
+
+demo:bordeaux-small-bottle-wine a owl:NamedIndividual,
+        eucn:WinesProducedBordeauxContainersActualAlcoholic22042142 ;
+    obo:BFO_0000051 demo:bordeaux-bottle .
