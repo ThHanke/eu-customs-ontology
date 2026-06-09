@@ -257,7 +257,6 @@ class TestBuildNodeContext:
         result = build_node_context(
             cn_code="22041013",
             legal_sections=[],
-            wizard_nodes={},
             running_tbox_ttl="",
             all_wizard_nodes=all_wizard_nodes,
         )
@@ -278,7 +277,7 @@ class TestBuildNodeContext:
             "22041013": node_terminal,
         }
 
-        result = build_node_context("22041013", [], {}, "", all_wizard_nodes=all_wizard_nodes)
+        result = build_node_context("22041013", [], "", all_wizard_nodes=all_wizard_nodes)
         hierarchy = result["hierarchy_path"]
         entry = next(e for e in hierarchy if e["cn_code"] == "22000000")
         assert "What is the chapter?" in entry["question_texts"]
@@ -288,50 +287,49 @@ class TestBuildNodeContext:
         result = build_node_context(
             cn_code="22041013",
             legal_sections=[],
-            wizard_nodes={},
             running_tbox_ttl="",
         )
         assert result["hierarchy_path"] == []
 
     def test_en_notes_included(self):
         section = _make_legal_section("2204", "en", "Wines of fresh grapes.")
-        result = build_node_context("2204", [section], {}, "")
+        result = build_node_context("2204", [section], "")
         assert "Wines of fresh grapes." in result["notes_en"]
 
     def test_de_notes_included(self):
         section = _make_legal_section("2204", "de", "Wein aus frischen Weintrauben.")
-        result = build_node_context("2204", [section], {}, "")
+        result = build_node_context("2204", [section], "")
         assert "Wein aus frischen Weintrauben." in result["notes_de"]
 
     def test_notes_filtered_by_cn_code(self):
         section_match = _make_legal_section("2204", "en", "Wines.")
         section_other = _make_legal_section("2203", "en", "Beer.")
-        result = build_node_context("2204", [section_match, section_other], {}, "")
+        result = build_node_context("2204", [section_match, section_other], "")
         assert "Wines." in result["notes_en"]
         assert "Beer." not in result["notes_en"]
 
     def test_node_with_no_notes_returns_empty_lists_not_error(self):
-        result = build_node_context("2204", [], {}, "")
+        result = build_node_context("2204", [], "")
         assert result["notes_en"] == []
         assert result["notes_de"] == []
 
     def test_running_tbox_included_in_result(self):
         ttl = "@prefix eucn: <https://w3id.org/eucn/> .\neucn:Wine a owl:Class ."
-        result = build_node_context("2204", [], {}, ttl)
+        result = build_node_context("2204", [], ttl)
         assert result["running_tbox"] == ttl
 
     def test_existing_axioms_contains_matching_lines(self):
         ttl = "eucn:Wine2204 a owl:Class .\neucn:Beer2203 a owl:Class ."
-        result = build_node_context("2204", [], {}, ttl)
+        result = build_node_context("2204", [], ttl)
         assert any("2204" in line for line in result["existing_axioms"])
         assert not any("2203" in line for line in result["existing_axioms"])
 
     def test_existing_axioms_empty_when_no_tbox(self):
-        result = build_node_context("2204", [], {}, "")
+        result = build_node_context("2204", [], "")
         assert result["existing_axioms"] == []
 
     def test_result_has_required_keys(self):
-        result = build_node_context("2204", [], {}, "")
+        result = build_node_context("2204", [], "")
         assert set(result.keys()) == {
             "hierarchy_path",
             "notes_en",

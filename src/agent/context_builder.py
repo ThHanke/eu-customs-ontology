@@ -62,7 +62,6 @@ def build_static_context(chapter: int, extract_date: date | None = None) -> str:
 def build_node_context(
     cn_code: str,
     legal_sections: list[LegalSection],
-    wizard_nodes: dict[str, list[ClassificationNode]],
     running_tbox_ttl: str,
     all_wizard_nodes: dict[str, ClassificationNode] | None = None,
 ) -> dict:
@@ -74,9 +73,6 @@ def build_node_context(
         The CN code for which the context is assembled.
     legal_sections:
         Legal text sections relevant to this node (filtered by caller).
-    wizard_nodes:
-        Mapping of cn_code -> list[ClassificationNode].  Kept for backward
-        compatibility; no longer used for hierarchy path computation.
     running_tbox_ttl:
         Current TBox Turtle string (grows as the agent emits new axioms).
     all_wizard_nodes:
