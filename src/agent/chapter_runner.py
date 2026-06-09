@@ -146,6 +146,7 @@ class ChapterRunner:
                 legal_sections=sections,
                 wizard_nodes=wizard_nodes_by_cn,
                 running_tbox_ttl=running_tbox_ttl,
+                all_wizard_nodes=wizard_tree.nodes,
             )
 
             # Call agent

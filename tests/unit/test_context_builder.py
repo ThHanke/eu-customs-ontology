@@ -4,6 +4,7 @@ import pytest
 from rdflib import Graph
 
 from src.agent.context_builder import (
+    _compute_hierarchy_path,
     build_node_context,
     build_static_context,
     compute_tbox_hash,
@@ -77,7 +78,7 @@ class TestComputeTboxHash:
         assert h22 != h23
 
 
-# ── build_node_context ────────────────────────────────────────────────────────
+# ── helpers ───────────────────────────────────────────────────────────────────
 
 def _make_node(node_id: str, question_text: str, cn_code: str | None = None,
                path_from_root: list[str] | None = None) -> ClassificationNode:
@@ -106,49 +107,191 @@ def _make_legal_section(cn_code: str, language: str, source_text: str) -> LegalS
     )
 
 
-class TestBuildNodeContext:
-    def test_happy_path_2204_includes_ancestor_22(self):
-        node_22 = _make_node("n_22", "What is the chapter?", path_from_root=[])
-        node_2204 = _make_node("n_2204", "Is it wine?", cn_code="2204", path_from_root=["n_22"])
+# ── _compute_hierarchy_path ───────────────────────────────────────────────────
 
-        wizard_nodes = {
-            "22": [node_22],
-            "2204": [node_2204],
+class TestComputeHierarchyPath:
+    """Tests for the rewritten _compute_hierarchy_path using all_wizard_nodes."""
+
+    def test_happy_path_two_ancestors(self):
+        """node 22041013 with path_from_root=[22000000, 22040000] returns 2 ancestor dicts."""
+        node_chapter = _make_node("22000000", "Is it an alcoholic beverage?", path_from_root=[])
+        node_heading = _make_node("22040000", "Is it wine?", path_from_root=["22000000"])
+        node_target = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000", "22040000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_chapter,
+            "22040000": node_heading,
+            "22041013": node_target,
+        }
+        result = _compute_hierarchy_path("22041013", all_wizard_nodes)
+        assert len(result) == 2
+        assert result[0]["cn_code"] == "22000000"
+        assert result[1]["cn_code"] == "22040000"
+
+    def test_happy_path_ancestor_question_texts_included(self):
+        """Question texts from ancestor nodes are included in result dicts."""
+        node_chapter = _make_node("22000000", "Is it an alcoholic beverage?", path_from_root=[])
+        node_heading = _make_node("22040000", "Is it wine?", path_from_root=["22000000"])
+        node_target = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000", "22040000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_chapter,
+            "22040000": node_heading,
+            "22041013": node_target,
+        }
+        result = _compute_hierarchy_path("22041013", all_wizard_nodes)
+        assert "Is it an alcoholic beverage?" in result[0]["question_texts"]
+        assert "Is it wine?" in result[1]["question_texts"]
+
+    def test_cn_code_padded_to_8_digits_for_lookup(self):
+        """A 4-digit heading code is padded to 8 chars before lookup."""
+        node_chapter = _make_node("22000000", "Chapter question?", path_from_root=[])
+        node_heading = _make_node("22050000", "Heading question?", path_from_root=["22000000"])
+        all_wizard_nodes = {
+            "22000000": node_chapter,
+            "22050000": node_heading,
+        }
+        # "2205" pads to "22050000" which exists and has path_from_root=["22000000"]
+        result = _compute_hierarchy_path("2205", all_wizard_nodes)
+        assert len(result) == 1
+        assert result[0]["cn_code"] == "22000000"
+
+    def test_cn_code_not_found_returns_empty_list(self):
+        """A cn_code that doesn't exist after padding returns empty list, no exception."""
+        all_wizard_nodes = {
+            "22000000": _make_node("22000000", "Chapter?", path_from_root=[]),
+        }
+        result = _compute_hierarchy_path("99999999", all_wizard_nodes)
+        assert result == []
+
+    def test_empty_all_wizard_nodes_returns_empty_list(self):
+        """Empty all_wizard_nodes dict returns empty list."""
+        result = _compute_hierarchy_path("22041013", {})
+        assert result == []
+
+    def test_chapter_root_with_empty_path_from_root_returns_empty(self):
+        """A chapter root node (path_from_root=[]) yields no ancestors."""
+        node_chapter = _make_node("22000000", "Chapter question?", path_from_root=[])
+        all_wizard_nodes = {"22000000": node_chapter}
+        # "22" pads to "22000000"
+        result = _compute_hierarchy_path("22", all_wizard_nodes)
+        assert result == []
+
+    def test_ancestor_not_in_dict_is_skipped(self):
+        """An ancestor_id in path_from_root that has no entry in all_wizard_nodes is skipped."""
+        node_target = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000", "22040000"],
+        )
+        # Only include target node, not its ancestors
+        all_wizard_nodes = {"22041013": node_target}
+        result = _compute_hierarchy_path("22041013", all_wizard_nodes)
+        assert result == []
+
+    def test_node_with_empty_question_text_has_empty_question_texts_list(self):
+        """Nodes with empty question_text produce question_texts=[]."""
+        node_chapter = _make_node("22000000", "", path_from_root=[])
+        node_target = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_chapter,
+            "22041013": node_target,
+        }
+        result = _compute_hierarchy_path("22041013", all_wizard_nodes)
+        assert len(result) == 1
+        assert result[0]["question_texts"] == []
+
+    def test_order_follows_path_from_root_order(self):
+        """Ancestors are returned in path_from_root order (root first)."""
+        node_a = _make_node("22000000", "A?", path_from_root=[])
+        node_b = _make_node("22040000", "B?", path_from_root=["22000000"])
+        node_c = _make_node("22041000", "C?", path_from_root=["22000000", "22040000"])
+        node_target = _make_node(
+            "22041013", "D?",
+            cn_code="22041013",
+            path_from_root=["22000000", "22040000", "22041000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_a,
+            "22040000": node_b,
+            "22041000": node_c,
+            "22041013": node_target,
+        }
+        result = _compute_hierarchy_path("22041013", all_wizard_nodes)
+        assert [r["cn_code"] for r in result] == ["22000000", "22040000", "22041000"]
+
+
+# ── build_node_context ────────────────────────────────────────────────────────
+
+class TestBuildNodeContext:
+    def test_happy_path_2204_includes_ancestor_22_via_all_wizard_nodes(self):
+        """Ancestor 22000000 appears when all_wizard_nodes is passed correctly."""
+        node_22 = _make_node("22000000", "What is the chapter?", path_from_root=[])
+        node_2204 = _make_node(
+            "22040000", "Is it wine?",
+            cn_code=None,
+            path_from_root=["22000000"],
+        )
+        # Terminal node for cn_code "22041013" padded to "22041013"
+        node_terminal = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000", "22040000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_22,
+            "22040000": node_2204,
+            "22041013": node_terminal,
         }
 
         result = build_node_context(
-            cn_code="2204",
+            cn_code="22041013",
             legal_sections=[],
-            wizard_nodes=wizard_nodes,
+            wizard_nodes={},
             running_tbox_ttl="",
+            all_wizard_nodes=all_wizard_nodes,
         )
 
         hierarchy = result["hierarchy_path"]
         ancestor_codes = [entry["cn_code"] for entry in hierarchy]
-        assert "22" in ancestor_codes
+        assert "22000000" in ancestor_codes
 
-    def test_happy_path_2204_ancestor_22_has_question_text(self):
-        node_22 = _make_node("n_22", "What is the chapter?", path_from_root=[])
-
-        wizard_nodes = {
-            "22": [node_22],
-            "2204": [_make_node("n_2204", "Is it wine?", cn_code="2204", path_from_root=["n_22"])],
+    def test_happy_path_ancestor_has_question_text(self):
+        node_22 = _make_node("22000000", "What is the chapter?", path_from_root=[])
+        node_terminal = _make_node(
+            "22041013", "Is it sparkling?",
+            cn_code="22041013",
+            path_from_root=["22000000"],
+        )
+        all_wizard_nodes = {
+            "22000000": node_22,
+            "22041013": node_terminal,
         }
 
-        result = build_node_context("2204", [], wizard_nodes, "")
+        result = build_node_context("22041013", [], {}, "", all_wizard_nodes=all_wizard_nodes)
         hierarchy = result["hierarchy_path"]
-        entry_22 = next(e for e in hierarchy if e["cn_code"] == "22")
-        assert "What is the chapter?" in entry_22["question_texts"]
+        entry = next(e for e in hierarchy if e["cn_code"] == "22000000")
+        assert "What is the chapter?" in entry["question_texts"]
 
-    def test_hierarchy_path_ordered_shortest_first(self):
-        wizard_nodes = {
-            "22": [_make_node("n_22", "Chapter?")],
-            "2204": [_make_node("n_2204", "Heading?")],
-            "220421": [_make_node("n_220421", "Sub?", cn_code="220421", path_from_root=[])],
-        }
-        result = build_node_context("220421", [], wizard_nodes, "")
-        codes = [e["cn_code"] for e in result["hierarchy_path"]]
-        assert codes == sorted(codes, key=len)
+    def test_no_all_wizard_nodes_returns_empty_hierarchy(self):
+        """Without all_wizard_nodes, hierarchy_path is empty (safe default)."""
+        result = build_node_context(
+            cn_code="22041013",
+            legal_sections=[],
+            wizard_nodes={},
+            running_tbox_ttl="",
+        )
+        assert result["hierarchy_path"] == []
 
     def test_en_notes_included(self):
         section = _make_legal_section("2204", "en", "Wines of fresh grapes.")
@@ -196,11 +339,3 @@ class TestBuildNodeContext:
             "running_tbox",
             "existing_axioms",
         }
-
-    def test_node_not_its_own_ancestor(self):
-        wizard_nodes = {
-            "2204": [_make_node("n_2204", "Is it wine?", cn_code="2204")],
-        }
-        result = build_node_context("2204", [], wizard_nodes, "")
-        ancestor_codes = [e["cn_code"] for e in result["hierarchy_path"]]
-        assert "2204" not in ancestor_codes

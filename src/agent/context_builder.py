@@ -64,6 +64,7 @@ def build_node_context(
     legal_sections: list[LegalSection],
     wizard_nodes: dict[str, list[ClassificationNode]],
     running_tbox_ttl: str,
+    all_wizard_nodes: dict[str, ClassificationNode] | None = None,
 ) -> dict:
     """Return structured per-node context for the LLM prompt.
 
@@ -74,12 +75,16 @@ def build_node_context(
     legal_sections:
         Legal text sections relevant to this node (filtered by caller).
     wizard_nodes:
-        Mapping of cn_code -> list[ClassificationNode].  Used to look up
-        ancestor nodes and collect question_text for the hierarchy path.
+        Mapping of cn_code -> list[ClassificationNode].  Kept for backward
+        compatibility; no longer used for hierarchy path computation.
     running_tbox_ttl:
         Current TBox Turtle string (grows as the agent emits new axioms).
+    all_wizard_nodes:
+        Flat mapping of node_id (8-digit zero-padded) -> ClassificationNode
+        covering all nodes in the wizard tree (including intermediate nodes).
+        Used by _compute_hierarchy_path to resolve the ancestor chain.
     """
-    hierarchy_path = _compute_hierarchy_path(cn_code, wizard_nodes)
+    hierarchy_path = _compute_hierarchy_path(cn_code, all_wizard_nodes or {})
 
     notes_en = [
         s.source_text
@@ -114,20 +119,36 @@ def compute_tbox_hash(chapter: int) -> str:
 
 def _compute_hierarchy_path(
     cn_code: str,
-    wizard_nodes: dict[str, list[ClassificationNode]],
+    all_wizard_nodes: dict[str, ClassificationNode],
 ) -> list[dict]:
-    """Return ordered list of ancestor dicts from shortest prefix to longest."""
+    """Return ordered ancestor dicts from chapter root down to direct parent.
+
+    Parameters
+    ----------
+    cn_code:
+        The CN code to resolve ancestors for.  Padded to 8 digits with
+        trailing zeros before lookup (e.g. ``"2205"`` → ``"22050000"``).
+    all_wizard_nodes:
+        Flat mapping of node_id (8-digit zero-padded) -> ClassificationNode
+        covering all nodes in the wizard tree.
+    """
+    if not all_wizard_nodes:
+        return []
+    node_id = cn_code.ljust(8, "0")
+    node = all_wizard_nodes.get(node_id)
+    if node is None:
+        return []
     ancestors = []
-    for candidate_code, nodes in wizard_nodes.items():
-        if candidate_code != cn_code and cn_code.startswith(candidate_code):
-            question_texts = [n.question_text for n in nodes] if nodes else []
-            ancestors.append(
-                {
-                    "cn_code": candidate_code,
-                    "question_texts": question_texts,
-                }
-            )
-    ancestors.sort(key=lambda x: len(x["cn_code"]))
+    for ancestor_id in node.path_from_root:
+        ancestor = all_wizard_nodes.get(ancestor_id)
+        if ancestor is None:
+            continue
+        ancestors.append(
+            {
+                "cn_code": ancestor_id,
+                "question_texts": [ancestor.question_text] if ancestor.question_text else [],
+            }
+        )
     return ancestors
 
 
