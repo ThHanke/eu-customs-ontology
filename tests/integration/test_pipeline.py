@@ -160,8 +160,9 @@ class TestPipelineIntegration:
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
 
-        # Ensure the env var is absent
+        # Ensure both API key env vars are absent
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.delenv("ANTHROPIC_FOUNDRY_API_KEY", raising=False)
 
         with pytest.raises(EnvironmentError, match="ANTHROPIC_API_KEY"):
             pipeline_mod.run(
@@ -169,6 +170,7 @@ class TestPipelineIntegration:
                 skip_fetch=True,
                 skip_scrape=True,
                 skip_legal_text=True,
+                skip_commodity_details=True,
                 no_reasoner=True,
                 no_classify=True,
                 extract_date=date(2026, 6, 5),
