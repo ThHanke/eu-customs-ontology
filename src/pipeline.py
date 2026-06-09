@@ -335,13 +335,13 @@ def run(
             from src.ontology.tbox import build_tbox
             from src.schema.taric import ChapterData
 
-            # Load intermediate data (XLSX base + UK API enrichment if available)
+            # Load intermediate data (XLSX base + DDS2 enrichment if available)
             chapter_data = ChapterData.model_validate_json(taric_json.read_text())
             if enriched_json.exists():
-                uk_cd = ChapterData.model_validate_json(enriched_json.read_text())
+                dds2_cd = ChapterData.model_validate_json(enriched_json.read_text())
                 chapter_data = ChapterData(
                     chapter=chapter_data.chapter,
-                    measures=list(chapter_data.measures) + list(uk_cd.measures),
+                    measures=list(chapter_data.measures) + list(dds2_cd.measures),
                 )
 
             # Re-use wizard_tree loaded earlier; fall back to loading from disk if needed

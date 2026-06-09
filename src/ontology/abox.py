@@ -180,7 +180,7 @@ def _add_measure(g: Graph, measure: TARICMeasure) -> URIRef:
                 parts.append("%")
             g.add((iri, EUCN.dutyRate, Literal(" ".join(parts), datatype=XSD.string)))
 
-    # Rich entity graph (UK API source) — fall back to flat strings for XLSX-only measures
+    # Rich entity graph (DDS2 source) — fall back to flat strings for XLSX-only measures
     if measure.measure_type is not None:
         mt_iri = _ensure_measure_type(g, measure.measure_type)
         g.add((iri, EUCN.hasMeasureType, mt_iri))
