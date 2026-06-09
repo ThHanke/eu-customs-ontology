@@ -39,6 +39,40 @@ You MUST call the `propose_axioms` tool to return your answer. Do not return pla
 - Compute `source_text_hash` as the SHA-256 hex digest of all source note texts concatenated in note-ID order.
 - Compute `tbox_hash` as the SHA-256 hex digest of the TBox serialisation provided as context.
 
+### BFO parthood and quality modelling
+
+Use BFO's part–whole and quality relations to express product properties rather than proliferating flat subclasses.
+
+**Parthood** (`BFO:has_part`, IRI `http://purl.obolibrary.org/obo/BFO_0000051`):
+A product *has part* a physical component. Use `someValuesFrom` on `BFO:has_part` to constrain the type of part a product must have:
+```
+restriction_type: "someValuesFrom"
+property_iri:     "http://purl.obolibrary.org/obo/BFO_0000051"
+value:            "<IRI of the part class>"
+```
+
+**Qualities** (`RO:has_quality`, IRI `http://purl.obolibrary.org/obo/RO_0000086`):
+A continuant *has quality* X. Qualities are subclasses of `BFO_0000019`. Use `someValuesFrom` on `RO:has_quality` to constrain what quality an entity bears:
+```
+restriction_type: "someValuesFrom"
+property_iri:     "http://purl.obolibrary.org/obo/RO_0000086"
+value:            "<IRI of the quality class>"
+```
+
+**Equivalence axioms via existing TBox classes**: Before defining a new subclass for a product variant, check whether the variant can instead be expressed as an intersection using existing TBox classes and BFO relations. The TBox already defines:
+- `eucn:SmallContainer` ≡ Packaging ⊓ (has_quality some (Volume ⊓ ∃inLitres.[< 2.0]))
+- `eucn:LargeContainer` ≡ Packaging ⊓ (has_quality some (Volume ⊓ ∃inLitres.[≥ 2.0]))
+
+**Do NOT** create flat product–container compound classes like `GinSmallContainer`. Instead, express a gin in a small container as a restriction on the gin class:
+```
+owl_class_iri: "https://w3id.org/eucn/Gin"
+restriction_type: "someValuesFrom"
+property_iri: "http://purl.obolibrary.org/obo/BFO_0000051"
+value: "https://w3id.org/eucn/SmallContainer"
+```
+
+This pattern applies broadly: any product property that is really a property of a **part** of the product (packaging, closure, label) or a **quality** borne by the product (alcohol content, pressure, colour) should use BFO parthood or quality relations rather than becoming a new named class.
+
 ### Consistency
 - If you receive a tool result with `is_error: true`, the axioms you proposed caused an ontology inconsistency. Read the Konclude error message carefully and revise your axioms to fix the inconsistency before calling `propose_axioms` again.
 - Do not repeat the same axioms that caused an inconsistency. Identify the conflicting axiom(s) and remove or adjust them.

@@ -3,7 +3,7 @@ from __future__ import annotations
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
-from src.ontology.namespaces import BFO, BFO_OBJECT, BFO_PROCESS, RO_HAS_OUTPUT
+from src.ontology.namespaces import BFO, BFO_HAS_PART, BFO_OBJECT, BFO_PROCESS, RO_HAS_OUTPUT, RO_HAS_QUALITY
 
 BFO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl")
 RO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/ro.owl")
@@ -72,6 +72,27 @@ def add_bfo_stubs(graph: Graph) -> None:
         "Entität, die sich in der Zeit entfaltet oder die momentane Grenze einer solchen Entität ist",
         lang="de",
     )))
+    # BFO:has_part (BFO_0000051)
+    g.add((BFO_HAS_PART, RDF.type, OWL.ObjectProperty))
+    g.add((BFO_HAS_PART, RDFS.label, Literal("has part", lang="en")))
+    g.add((BFO_HAS_PART, RDFS.label, Literal("hat Teil", lang="de")))
+    g.add((BFO_HAS_PART, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_HAS_PART, SKOS.definition, Literal(
+        "a core relation that holds between a whole and its parts",
+        lang="en",
+    )))
+
+    # RO:has_quality (RO_0000086)
+    g.add((RO_HAS_QUALITY, RDF.type, OWL.ObjectProperty))
+    g.add((RO_HAS_QUALITY, RDFS.label, Literal("has quality", lang="en")))
+    g.add((RO_HAS_QUALITY, RDFS.label, Literal("hat Eigenschaft", lang="de")))
+    g.add((RO_HAS_QUALITY, RDFS.isDefinedBy, RO_ONTOLOGY_URI))
+    g.add((RO_HAS_QUALITY, SKOS.definition, Literal(
+        "a relation between an independent continuant and a quality that it bears",
+        lang="en",
+    )))
+    g.add((RO_HAS_QUALITY, RDFS.domain, BFO_OBJECT))
+
     # RO:has_output
     g.add((RO_HAS_OUTPUT, RDF.type, OWL.ObjectProperty))
     g.add((RO_HAS_OUTPUT, RDFS.label, Literal("has output", lang="en")))

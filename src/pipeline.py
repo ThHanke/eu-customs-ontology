@@ -116,6 +116,7 @@ def run(
 
     # ── Load wizard tree (needed for run-axiom-agent and build-ontology) ─────
     wizard_tree = None
+    ds = None
     if wizard_jsonl.exists():
         from src.schema.wizard import ClassificationNode, WizardTree
         from src.scraper.checkpoint import load_nodes_jsonl
@@ -128,9 +129,9 @@ def run(
     if run_axiom_agent:
         with _step("run-axiom-agent"):
             import os
-            if not os.environ.get("ANTHROPIC_API_KEY"):
+            if not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("ANTHROPIC_FOUNDRY_API_KEY"):
                 raise EnvironmentError(
-                    "ANTHROPIC_API_KEY environment variable is required for --run-axiom-agent"
+                    "ANTHROPIC_API_KEY or ANTHROPIC_FOUNDRY_API_KEY environment variable is required for --run-axiom-agent"
                 )
             from src.agent.chapter_runner import ChapterRunner
             from src.agent.coverage_reporter import build_report, write_report
@@ -140,8 +141,8 @@ def run(
             run_result = runner.run(wizard_tree, force=force)
             print(
                 f"  [axiom-agent] ch{chapter:02d}: total={run_result.total}, "
-                f"proposed={run_result.proposed}, failed={run_result.failed}, "
-                f"skipped={run_result.skipped}"
+                f"approved={run_result.approved}, proposed={run_result.proposed}, "
+                f"failed={run_result.failed}, skipped={run_result.skipped}"
             )
 
             # Harmonization pass

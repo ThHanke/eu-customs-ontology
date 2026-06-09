@@ -15,8 +15,11 @@ from datetime import date as Date
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, XSD
 
-from src.ontology.namespaces import BFO_PROCESS, EUCN, RO_HAS_OUTPUT
+from src.ontology.namespaces import (
+    BFO_HAS_PART, BFO_OBJECT, BFO_PROCESS, BFO_QUALITY, EUCN, RO_HAS_OUTPUT, RO_HAS_QUALITY,
+)
 from src.ontology.bfo_stubs import add_bfo_stubs
+from src.ontology.owl_helpers import _bnode, _build_list, _cls, _decimal_range_restr, _equiv, _sub
 
 # Stable IRI for the core ontology
 CORE_IRI = URIRef("https://w3id.org/eucn/core")
@@ -107,5 +110,65 @@ def build_core_tbox(g: Graph, extract_date: Date | None = None) -> Graph:
         lang="de",
     )))
     g.add((EUCN.cnHeadingCode, RDFS.range, XSD.string))
+
+    # ── Packaging model ────────────────────────────────────────────────────────
+    # eucn:Packaging — material entity that is the container of a product
+    _cls(g, EUCN.Packaging,
+         "packaging", "Verpackung",
+         "A material entity that serves as the container or packaging of a product.",
+         "Eine materielle Entität, die als Behälter oder Verpackung eines Produkts dient.")
+    _sub(g, EUCN.Packaging, BFO_OBJECT)
+
+    # eucn:Volume — quality borne by packaging; its value is measured in litres
+    _cls(g, EUCN.Volume,
+         "volume", "Volumen",
+         "A quality of a packaging entity that represents its capacity, measured in litres.",
+         "Eine Eigenschaft einer Verpackungsentität, die ihre Kapazität in Litern angibt.")
+    _sub(g, EUCN.Volume, BFO_QUALITY)
+
+    # eucn:inLitres — datatype property relating a Volume quality to its decimal value
+    g.add((EUCN.inLitres, RDF.type, OWL.DatatypeProperty))
+    g.add((EUCN.inLitres, RDF.type, OWL.FunctionalProperty))
+    g.add((EUCN.inLitres, RDFS.label, Literal("in litres", lang="en")))
+    g.add((EUCN.inLitres, RDFS.label, Literal("in Litern", lang="de")))
+    g.add((EUCN.inLitres, SKOS.definition, Literal(
+        "the numeric volume value in litres of a Volume quality individual", lang="en")))
+    g.add((EUCN.inLitres, RDFS.domain, EUCN.Volume))
+    g.add((EUCN.inLitres, RDFS.range, XSD.decimal))
+
+    # eucn:SmallContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ ∃inLitres.[< 2.0]))
+    vol_small = _decimal_range_restr(g, EUCN.inLitres, XSD.maxExclusive, 2.0, "pkg:small:vol")
+    cv_small = _bnode("pkg:small:vol_inter")
+    g.add((cv_small, RDF.type, OWL.Class))
+    g.add((cv_small, OWL.intersectionOf, _build_list(g, [EUCN.Volume, vol_small], "pkg:small:cv")))
+    hq_small = _bnode("pkg:small:hq")
+    g.add((hq_small, RDF.type, OWL.Restriction))
+    g.add((hq_small, OWL.onProperty, RO_HAS_QUALITY))
+    g.add((hq_small, OWL.someValuesFrom, cv_small))
+    _cls(g, EUCN.SmallContainer,
+         "small container (< 2 L)", "Kleinbehälter (< 2 L)",
+         "Packaging whose Volume quality has a value of less than 2 litres.",
+         "Verpackung, deren Volumeneigenschaft einen Wert von weniger als 2 Litern hat.")
+    _equiv(g, EUCN.SmallContainer, [EUCN.Packaging, hq_small], "pkg:small")
+
+    # eucn:LargeContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ ∃inLitres.[≥ 2.0]))
+    vol_large = _decimal_range_restr(g, EUCN.inLitres, XSD.minInclusive, 2.0, "pkg:large:vol")
+    cv_large = _bnode("pkg:large:vol_inter")
+    g.add((cv_large, RDF.type, OWL.Class))
+    g.add((cv_large, OWL.intersectionOf, _build_list(g, [EUCN.Volume, vol_large], "pkg:large:cv")))\
+
+    hq_large = _bnode("pkg:large:hq")
+    g.add((hq_large, RDF.type, OWL.Restriction))
+    g.add((hq_large, OWL.onProperty, RO_HAS_QUALITY))
+    g.add((hq_large, OWL.someValuesFrom, cv_large))
+    _cls(g, EUCN.LargeContainer,
+         "large container (≥ 2 L)", "Großbehälter (≥ 2 L)",
+         "Packaging whose Volume quality has a value of at least 2 litres.",
+         "Verpackung, deren Volumeneigenschaft einen Wert von mindestens 2 Litern hat.")
+    _equiv(g, EUCN.LargeContainer, [EUCN.Packaging, hq_large], "pkg:large")
+
+    # hasPart scoped to Packaging: Beverage hasPart some Packaging
+    g.add((BFO_HAS_PART, RDFS.domain, BFO_OBJECT))
+    g.add((BFO_HAS_PART, RDFS.range, BFO_OBJECT))
 
     return g

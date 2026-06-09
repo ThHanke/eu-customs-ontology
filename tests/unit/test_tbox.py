@@ -26,15 +26,21 @@ class TestBuildTBox:
         assert len(obj) + len(data) >= 10, f"Expected ≥10 properties, got {len(obj)+len(data)}"
 
     def test_every_class_has_en_definition(self):
+        from rdflib import URIRef
         g = self._tbox()
         for cls in g.subjects(RDF.type, OWL.Class):
+            if not isinstance(cls, URIRef):
+                continue  # skip anonymous intersection/restriction BNodes
             en_defs = [o for o in g.objects(cls, SKOS.definition)
                        if hasattr(o, 'language') and o.language == "en"]
             assert en_defs, f"{cls} missing skos:definition@en"
 
     def test_every_class_has_de_definition(self):
+        from rdflib import URIRef
         g = self._tbox()
         for cls in g.subjects(RDF.type, OWL.Class):
+            if not isinstance(cls, URIRef):
+                continue  # skip anonymous intersection/restriction BNodes
             de_defs = [o for o in g.objects(cls, SKOS.definition)
                        if hasattr(o, 'language') and o.language == "de"]
             assert de_defs, f"{cls} missing skos:definition@de"

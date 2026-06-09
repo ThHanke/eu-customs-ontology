@@ -43,6 +43,7 @@ class ChapterRunResult:
     total: int = 0
     skipped: int = 0
     proposed: int = 0
+    approved: int = 0
     failed: int = 0
 
 
@@ -156,8 +157,11 @@ class ChapterRunner:
             node_registry.upsert(axiom_set)
             _log_axiom_set(cn_code, axiom_set)
 
-            if axiom_set.status == "proposed":
-                result.proposed += 1
+            if axiom_set.status in ("proposed", "approved"):
+                if axiom_set.status == "proposed":
+                    result.proposed += 1
+                else:
+                    result.approved += 1
                 # Append new classes/properties to running TBox
                 self._append_to_running_tbox(axiom_set, running_tbox_path)
             else:

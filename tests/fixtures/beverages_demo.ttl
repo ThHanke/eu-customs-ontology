@@ -1,81 +1,63 @@
-@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-@prefix obo:  <http://purl.obolibrary.org/obo/> .
-@prefix eucn: <https://w3id.org/eucn/> .
-@prefix demo: <https://w3id.org/eucn/demo/> .
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+PREFIX eucn: <https://w3id.org/eucn/>
+PREFIX demo: <https://w3id.org/eucn/demo/>
 
-# ---------------------------------------------------------------------------
-# Beverage demo ABox — process instances + product individuals.
-# Each process instance is typed as a eucn:*Process class and linked to its
-# beverage output via obo:RO_0002234 (has_output).
-# eucn:producedBy (inverseOf obo:RO_0002234) is inferred by the reasoner.
-# ---------------------------------------------------------------------------
+<https://w3id.org/eucn/demo>
+    a owl:Ontology ;
+    owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-ch22-beverages-latest.ttl> .
 
-# ── Process instances ───────────────────────────────────────────────────────
+# ── ABox: beverage product individuals ────────────────────────────────────────
+# Individuals are explicitly typed as the most-specific agent-defined subclass.
+# The reasoner infers membership in all superclasses (subClassOf transitivity).
 
-# CN 2203 — malt fermentation → Beer
-demo:malt-brew-1 a owl:NamedIndividual, eucn:MaltFermentation ;
-    obo:RO_0002234 demo:czech-lager .
+# CN 2204 10 — SparklingWine (agent-defined)
+demo:champagne-brut a owl:NamedIndividual, eucn:SparklingWine .
 
-# CN 2204 — grape fermentation → Wine (sparkling and still)
-demo:grape-ferment-1 a owl:NamedIndividual, eucn:GrapeFermentation ;
-    obo:RO_0002234 demo:champagne-brut, demo:bordeaux-rouge .
+# CN 2204 — WineOfFreshGrapes (agent-defined)
+demo:bordeaux-rouge a owl:NamedIndividual, eucn:WineOfFreshGrapes .
 
-# CN 2206 — fruit fermentation → FermentedBeverage
-demo:fruit-ferment-1 a owl:NamedIndividual, eucn:FruitFermentation ;
-    obo:RO_0002234 demo:apple-cider .
+# CN 2204 — FortifiedWine subClassOf WineOfFreshGrapes
+demo:port-wine a owl:NamedIndividual, eucn:FortifiedWine .
 
-# CN 2205 — grape flavouring → FlavouredWine
-demo:grape-flavour-1 a owl:NamedIndividual, eucn:GrapeFlavouringProcess ;
-    obo:RO_0002234 demo:dry-vermouth .
+# CN 2205 — AromatizedWine2205 subClassOf WineOfFreshGrapes
+demo:dry-vermouth a owl:NamedIndividual, eucn:AromatizedWine2205 .
 
-# CN 2209 — acetic fermentation → Vinegar
-demo:acetic-ferment-1 a owl:NamedIndividual, eucn:AceticFermentation ;
-    obo:RO_0002234 demo:malt-vinegar .
+# CN 2206 — OtherFermentedBeverage2206 (agent-defined)
+demo:apple-cider a owl:NamedIndividual, eucn:OtherFermentedBeverage2206 .
 
-# CN 2202 — sweetened water → NonAlcoholicBeverage
-demo:sweet-water-1 a owl:NamedIndividual, eucn:SweetenedWaterProcess ;
-    obo:RO_0002234 demo:sparkling-lemonade .
+# CN 2202 — NonAlcoholicBeverage (agent-defined)
+demo:sparkling-lemonade a owl:NamedIndividual, eucn:NonAlcoholicBeverage .
 
-# CN 2207/2208 — grain distillation → EthylAlcohol / Spirit
-demo:grain-distil-1 a owl:NamedIndividual, eucn:GrainDistillation ;
-    obo:RO_0002234 demo:whisky-12y, demo:grain-spirit-96 .
+# CN 2208 — SpiritousBeverage2208 (agent-defined)
+demo:whisky-12y a owl:NamedIndividual, eucn:SpiritousBeverage2208 .
 
-# ── Beverage individuals (eucn:producedBy inferred from inverse) ────────────
+# CN 2208 05 11 — GinSmallContainer22085011 subClassOf Gin subClassOf SpiritousBeverage2208
+demo:gin-small a owl:NamedIndividual, eucn:GinSmallContainer22085011 .
 
-# CN 2204 10 — Sparkling wine (eucn:SparklingWine)
-demo:champagne-brut a owl:NamedIndividual ;
-    eucn:isCarbonated "true"^^xsd:boolean .
+# CN 2208 05 19 — GinLargeContainer22085019 subClassOf Gin subClassOf SpiritousBeverage2208
+demo:gin-large a owl:NamedIndividual, eucn:GinLargeContainer22085019 .
 
-# CN 2204 21/29 — Still wine (eucn:StillWine)
-demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:isCarbonated "false"^^xsd:boolean .
+# CN 2209 11 — WineVinegarSmallContainer22090011 subClassOf WineVinegar
+demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer22090011 .
 
-# CN 2206 — Other fermented beverage, apple cider (eucn:FermentedBeverage)
-demo:apple-cider a owl:NamedIndividual .
+# ── ABox: packaging individuals (demonstrate equivalence axiom inference) ──────
+# SmallContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres < 2.0))
+# → demo:bottle-075 should be inferred as eucn:SmallContainer
 
-# CN 2205 — Flavoured wine, vermouth (eucn:FlavouredWine)
-demo:dry-vermouth a owl:NamedIndividual .
+demo:vol-075 a owl:NamedIndividual, eucn:Volume ;
+    eucn:inLitres "0.75"^^xsd:decimal .
 
-# CN 2209 — Vinegar (eucn:Vinegar)
-demo:malt-vinegar a owl:NamedIndividual .
+demo:bottle-075 a owl:NamedIndividual, eucn:Packaging ;
+    obo:RO_0000086 demo:vol-075 .
 
-# CN 2202 — Non-alcoholic beverage, lemonade (eucn:NonAlcoholicBeverage)
-demo:sparkling-lemonade a owl:NamedIndividual .
+# LargeContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres ≥ 2.0))
+# → demo:keg-20 should be inferred as eucn:LargeContainer
 
-# CN 2203 — Beer (eucn:Beer)
-demo:czech-lager a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
+demo:vol-20 a owl:NamedIndividual, eucn:Volume ;
+    eucn:inLitres "20.0"^^xsd:decimal .
 
-# CN 2208 — Spirit (eucn:Spirit)
-demo:whisky-12y a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
-
-# CN 2207 — Ethyl alcohol (eucn:EthylAlcohol)
-demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
-
-# CN 2201 — Water (eucn:Water)
-demo:still-water a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "0.0"^^xsd:decimal .
+demo:keg-20 a owl:NamedIndividual, eucn:Packaging ;
+    obo:RO_0000086 demo:vol-20 .

@@ -112,7 +112,13 @@ class LLMAxiomAgent:
     def __init__(self, model: str, static_context: str) -> None:
         self.model = model
         self.static_context = static_context
-        self._client = anthropic.Anthropic()
+        import os
+        api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_FOUNDRY_API_KEY")
+        base_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("ANTHROPIC_FOUNDRY_BASE_URL")
+        client_kwargs = {"api_key": api_key} if api_key else {}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        self._client = anthropic.Anthropic(**client_kwargs)
         self._system_prompt = _load_system_prompt(static_context)
         # Cache the system prompt — identical for every node in the chapter
         self._system_blocks = [
@@ -159,7 +165,7 @@ class LLMAxiomAgent:
 
             response = self._client.messages.create(
                 model=self.model,
-                max_tokens=1500,
+                max_tokens=4096,
                 system=self._system_blocks,
                 tools=[PROPOSE_AXIOMS_TOOL_SCHEMA],
                 tool_choice={"type": "any"},

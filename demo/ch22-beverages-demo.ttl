@@ -9,68 +9,55 @@ PREFIX demo: <https://w3id.org/eucn/demo/>
     a owl:Ontology ;
     owl:imports <https://raw.githubusercontent.com/ThHanke/eu-customs-ontology/refs/heads/main/data/ontology/eucn-ch22-beverages-latest.ttl> .
 
-# ── ABox: process instances ────────────────────────────────────────────────
-# Each process is typed as a eucn:*Process class and linked to its beverage
-# output via obo:RO_0002234 (has_output).
-# eucn:producedBy (inverseOf obo:RO_0002234) is then inferred by the reasoner,
-# which classifies each beverage into the correct CN product class.
+# ── ABox: beverage product individuals ────────────────────────────────────────
+# Individuals are explicitly typed as the most-specific agent-defined subclass.
+# The reasoner infers membership in all superclasses (subClassOf transitivity).
 
-demo:malt-brew-1 a owl:NamedIndividual, eucn:MaltFermentation ;
-    obo:RO_0002234 demo:czech-lager .
+# CN 2204 10 — SparklingWine (agent-defined)
+demo:champagne-brut a owl:NamedIndividual, eucn:SparklingWine .
 
-demo:grape-ferment-1 a owl:NamedIndividual, eucn:GrapeFermentation ;
-    obo:RO_0002234 demo:champagne-brut, demo:bordeaux-rouge .
+# CN 2204 — WineOfFreshGrapes (agent-defined)
+demo:bordeaux-rouge a owl:NamedIndividual, eucn:WineOfFreshGrapes .
 
-demo:fruit-ferment-1 a owl:NamedIndividual, eucn:FruitFermentation ;
-    obo:RO_0002234 demo:apple-cider .
+# CN 2204 — FortifiedWine subClassOf WineOfFreshGrapes
+demo:port-wine a owl:NamedIndividual, eucn:FortifiedWine .
 
-demo:grape-flavour-1 a owl:NamedIndividual, eucn:GrapeFlavouringProcess ;
-    obo:RO_0002234 demo:dry-vermouth .
+# CN 2205 — AromatizedWine2205 subClassOf WineOfFreshGrapes
+demo:dry-vermouth a owl:NamedIndividual, eucn:AromatizedWine2205 .
 
-demo:acetic-ferment-1 a owl:NamedIndividual, eucn:AceticFermentation ;
-    obo:RO_0002234 demo:malt-vinegar .
+# CN 2206 — OtherFermentedBeverage2206 (agent-defined)
+demo:apple-cider a owl:NamedIndividual, eucn:OtherFermentedBeverage2206 .
 
-demo:sweet-water-1 a owl:NamedIndividual, eucn:SweetenedWaterProcess ;
-    obo:RO_0002234 demo:sparkling-lemonade .
+# CN 2202 — NonAlcoholicBeverage (agent-defined)
+demo:sparkling-lemonade a owl:NamedIndividual, eucn:NonAlcoholicBeverage .
 
-demo:grain-distil-1 a owl:NamedIndividual, eucn:GrainDistillation ;
-    obo:RO_0002234 demo:whisky-12y, demo:grain-spirit-96 .
+# CN 2208 — SpiritousBeverage2208 (agent-defined)
+demo:whisky-12y a owl:NamedIndividual, eucn:SpiritousBeverage2208 .
 
-# ── ABox: beverage individuals ─────────────────────────────────────────────
-# eucn:producedBy is inferred — only assert the discriminating data properties.
+# CN 2208 05 11 — GinSmallContainer22085011 subClassOf Gin subClassOf SpiritousBeverage2208
+demo:gin-small a owl:NamedIndividual, eucn:GinSmallContainer22085011 .
 
-# CN 2204 10 — Sparkling wine (eucn:SparklingWine)
-demo:champagne-brut a owl:NamedIndividual ;
-    eucn:isCarbonated "true"^^xsd:boolean .
+# CN 2208 05 19 — GinLargeContainer22085019 subClassOf Gin subClassOf SpiritousBeverage2208
+demo:gin-large a owl:NamedIndividual, eucn:GinLargeContainer22085019 .
 
-# CN 2204 21/29 — Still wine (eucn:StillWine)
-demo:bordeaux-rouge a owl:NamedIndividual ;
-    eucn:isCarbonated "false"^^xsd:boolean .
+# CN 2209 11 — WineVinegarSmallContainer22090011 subClassOf WineVinegar
+demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer22090011 .
 
-# CN 2206 — Apple cider (eucn:FermentedBeverage)
-demo:apple-cider a owl:NamedIndividual .
+# ── ABox: packaging individuals (demonstrate equivalence axiom inference) ──────
+# SmallContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres < 2.0))
+# → demo:bottle-075 should be inferred as eucn:SmallContainer
 
-# CN 2205 — Vermouth (eucn:FlavouredWine)
-demo:dry-vermouth a owl:NamedIndividual .
+demo:vol-075 a owl:NamedIndividual, eucn:Volume ;
+    eucn:inLitres "0.75"^^xsd:decimal .
 
-# CN 2209 — Vinegar (eucn:Vinegar)
-demo:malt-vinegar a owl:NamedIndividual .
+demo:bottle-075 a owl:NamedIndividual, eucn:Packaging ;
+    obo:RO_0000086 demo:vol-075 .
 
-# CN 2202 — Non-alcoholic beverage (eucn:NonAlcoholicBeverage)
-demo:sparkling-lemonade a owl:NamedIndividual .
+# LargeContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres ≥ 2.0))
+# → demo:keg-20 should be inferred as eucn:LargeContainer
 
-# CN 2203 — Beer (eucn:Beer)
-demo:czech-lager a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "5.0"^^xsd:decimal .
+demo:vol-20 a owl:NamedIndividual, eucn:Volume ;
+    eucn:inLitres "20.0"^^xsd:decimal .
 
-# CN 2208 — Spirit / whisky (eucn:Spirit)
-demo:whisky-12y a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "43.0"^^xsd:decimal .
-
-# CN 2207 — Ethyl alcohol >= 80 % vol (eucn:EthylAlcohol)
-demo:grain-spirit-96 a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "96.0"^^xsd:decimal .
-
-# CN 2201 — Water (eucn:Water)
-demo:still-water a owl:NamedIndividual ;
-    eucn:alcoholByVolumePercent "0.0"^^xsd:decimal .
+demo:keg-20 a owl:NamedIndividual, eucn:Packaging ;
+    obo:RO_0000086 demo:vol-20 .
