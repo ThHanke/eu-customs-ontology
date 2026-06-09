@@ -497,15 +497,4 @@ def build_tbox(
                "liegenden Rechtsakts, z. B. 'R2658/87'",
                range_=XSD.string)
 
-    _data_prop(g, EUCN.isUKOnlyMeasure, "is UK-only measure", "ist UK-exklusive Maßnahme",
-               "boolean flag set to true when a TARIC measure is sourced from the UK Trade "
-               "Tariff API and has diverged from or has no equivalent in the EU TARIC since "
-               "2021-01-01; consumers should filter with isUKOnlyMeasure=false for "
-               "EU-applicable measures",
-               "boolesches Kennzeichen, das auf wahr gesetzt wird, wenn eine TARIC-Maßnahme "
-               "aus der UK Trade Tariff API stammt und seit dem 01.01.2021 vom EU-TARIC "
-               "abweicht oder kein EU-Äquivalent hat; Verbraucher sollten mit "
-               "isUKOnlyMeasure=false nach EU-anwendbaren Maßnahmen filtern",
-               range_=XSD.boolean)
-
     return g

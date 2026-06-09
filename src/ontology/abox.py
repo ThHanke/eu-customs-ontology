@@ -211,9 +211,6 @@ def _add_measure(g: Graph, measure: TARICMeasure) -> URIRef:
         g.add((iri, EUCN.quotaOrderNumber,
                Literal(measure.quota_order_number, datatype=XSD.string)))
 
-    if measure.is_uk_only:
-        g.add((iri, EUCN.isUKOnlyMeasure, Literal(True, datatype=XSD.boolean)))
-
     return iri
 
 

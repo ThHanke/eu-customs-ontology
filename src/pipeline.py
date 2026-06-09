@@ -146,11 +146,10 @@ def run(
                 chapter, cn_codes_8d, DATA_INTERMEDIATE, force=force
             )
             all_uk_measures = [m for ms in uk_measures_by_code.values() for m in ms]
-            uk_only_count = sum(1 for m in all_uk_measures if m.is_uk_only)
             enriched = _CD(chapter=chapter, measures=all_uk_measures)
             enriched_json.write_text(enriched.model_dump_json())
             print(f"  [fetch-commodity-details] {len(cn_codes_8d)} codes, "
-                  f"{len(all_uk_measures)} measures, {uk_only_count} is_uk_only")
+                  f"{len(all_uk_measures)} measures")
     else:
         if skip_commodity_details:
             print("[fetch-commodity-details] skipped (--skip-commodity-details)")

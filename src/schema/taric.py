@@ -100,7 +100,6 @@ class TARICMeasure(BaseModel):
     additional_codes: list[AdditionalCodeRecord] = []
     regulations: list[RegulationRecord] = []
     quota_order_number: str | None = None
-    is_uk_only: bool = False
 
 
 class ChapterData(BaseModel):

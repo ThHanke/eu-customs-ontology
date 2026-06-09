@@ -22,18 +22,6 @@ from src.schema.taric import (
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.trade-tariff.service.gov.uk/api/v2/commodities"
-_UK_ONLY_TYPES = {"305", "306"}
-_UK_SI_PREFIX = "S.I."
-
-
-def _is_uk_only(measure_attrs: dict, legal_acts: list[dict]) -> bool:
-    if measure_attrs.get("vat") or measure_attrs.get("excise"):
-        return True
-    if measure_attrs.get("measure_type_id") in _UK_ONLY_TYPES:
-        return True
-    return any(
-        la.get("regulation_code", "").startswith(_UK_SI_PREFIX) for la in legal_acts
-    )
 
 
 def _parse_date(s: str | None) -> date | None:
@@ -182,12 +170,6 @@ def parse_commodity_measures(raw: dict) -> list[TARICMeasure]:
         on_ref = rels.get("order_number", {}).get("data")
         quota_order_number = str(on_ref["id"]) if on_ref else None
 
-        # is_uk_only
-        uk_only = _is_uk_only(
-            {**attrs, "measure_type_id": mt_id},
-            la_list,
-        )
-
         # validity dates
         v_start_raw = attrs.get("effective_start_date")
         v_end_raw = attrs.get("effective_end_date")
@@ -214,7 +196,6 @@ def parse_commodity_measures(raw: dict) -> list[TARICMeasure]:
             additional_codes=additional_codes,
             regulations=regulations,
             quota_order_number=quota_order_number,
-            is_uk_only=uk_only,
         ))
 
     return measures
