@@ -85,7 +85,7 @@ def add_heading_classes(
         local_name = _to_local_name(label_en, code)
         iri = EUCN[local_name]
         g.add((iri, RDF.type, OWL.Class))
-        parent = heading_iris.get(code[:4], BFO_OBJECT)
+        parent = heading_iris.get(code[:4]) or chapter_root_iri or BFO_OBJECT
         g.add((iri, RDFS.subClassOf, parent))
         g.add((iri, RDFS.label, Literal(label_en, lang="en")))
         if label_de:

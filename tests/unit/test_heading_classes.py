@@ -77,6 +77,27 @@ class TestAddHeadingClassesBackwardCompat:
                 raise AssertionError("eucn:Beverage found when chapter_root_iri=None")
 
 
+class TestUncoveredTerminalFallback:
+    """Orphaned 8-digit terminal: heading absent → fall back to chapter_root_iri."""
+
+    def test_uncovered_terminal_falls_back_to_chapter_root_iri(self):
+        g = Graph()
+        labels = {"22041013": {"en": "Red wine", "de": "Rotwein"}}
+        # no "2204" key in labels, so heading_iris["2204"] is absent
+        uncovered = {"22041013"}
+        add_heading_classes(g, 22, labels, uncovered_cn_codes=uncovered, chapter_root_iri=EUCN.Beverage)
+        terminal_iris = [s for s, p, o in g.triples((None, RDFS.subClassOf, EUCN.Beverage))]
+        assert terminal_iris, "terminal class should fall back to eucn:Beverage"
+
+    def test_uncovered_terminal_falls_back_to_bfo_object_when_no_root(self):
+        g = Graph()
+        labels = {"22041013": {"en": "Red wine", "de": "Rotwein"}}
+        uncovered = {"22041013"}
+        add_heading_classes(g, 22, labels, uncovered_cn_codes=uncovered)
+        bfo_parents = [s for s, p, o in g.triples((None, RDFS.subClassOf, BFO_OBJECT))]
+        assert bfo_parents, "terminal class should fall back to BFO_OBJECT when no chapter_root_iri"
+
+
 class TestBuildTboxIntegration:
     """Integration: build_tbox for chapter 22 uses eucn:Beverage as heading parent."""
 
