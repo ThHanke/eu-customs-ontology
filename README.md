@@ -6,30 +6,37 @@ OWL classes and individuals are published under the persistent IRI base **`https
 
 ## Ontology Architecture
 
-The OWL 2 DL ontology uses a **production-process restriction pattern** for individual classification. Each CN heading is defined by an `owl:equivalentClass` axiom combining `eucn:producedBy` (an `owl:FunctionalProperty` `owl:ObjectProperty`) `hasValue` restrictions on named process singleton individuals (e.g. `eucn:malt-fermentation`) with numeric range restrictions on `eucn:alcoholByVolumePercent`. Process singletons are typed as `bfo:Process` subclasses with pairwise `owl:disjointWith` between classes and `owl:differentFrom` between individuals to enable world-closure under OWA. Phase 2 classes (Spirit, EthylAlcohol) use graph-derived `NOT(producedBy = X)` complement restrictions for the remaining headings.
+The ontology is built by two parallel tracks that run inside the pipeline:
 
-```turtle
-# Example: Beer ≡ (malt fermentation ∩ ABV > 0.5%)
-eucn:Beer owl:equivalentClass [
-    owl:intersectionOf (
-        [ owl:onProperty eucn:producedBy ; owl:hasValue eucn:malt-fermentation ]
-        [ owl:onProperty eucn:alcoholByVolumePercent ;
-          owl:someValuesFrom [ owl:onDatatype xsd:decimal ;
-            owl:withRestrictions ([ xsd:minExclusive 0.5 ]) ] ]
-    )
-] .
+**Track A — Structural skeleton (`heading_classes.py`)**
+Creates named OWL classes for each 4-digit CN heading (e.g. `eucn:WineFreshGrapes2204`) directly from tariffnumber.com label data. These classes form the skeleton of the product hierarchy: each heading class is wired as `rdfs:subClassOf` the chapter-root class (e.g. `eucn:Beverage` for chapter 22), which in turn sits under `bfo:BFO_0000030`. No LLM is involved; output is deterministic.
+
+**Track B — Semantic axioms (LLM axiom agent)**
+Processes each terminal CN code's legal text through an LLM (Claude). The agent receives: the static TBox (including heading class IRIs from Track A), the EZT-Online wizard ancestor chain for the CN code (chapter → heading → subheading question texts), the legal text notes in EN and DE, and all running TBox axioms emitted so far. It proposes OWL classes, object/data properties, and `owl:someValuesFrom` / `owl:hasValue` restrictions. Output is saved in `data/axiom_candidates/ch{N}/` and merged into the ontology after human review or automatic approval.
+
+The resulting hierarchy (ch22 example):
+```
+bfo:BFO_0000030 (Material Entity)
+  └─ eucn:Beverage                              ← chapter-level class
+       ├─ eucn:WineFreshGrapes2204              ← heading class (Track A)
+       │    └─ eucn:SparklingWine               ← terminal class (Track B)
+       ├─ eucn:VermouthWine2205                 ← heading class (Track A)
+       └─ ...
 ```
 
-See [docs/ontology-patterns.md](docs/ontology-patterns.md) for the full pattern specification, world-closure mechanics, and a step-by-step guide for adding new chapters.
+For world-closure in OWA, process singleton individuals (e.g. `eucn:malt-fermentation`) typed as `bfo:Process` subclasses are used with `owl:FunctionalProperty eucn:producedBy` and pairwise `owl:disjointWith` / `owl:differentFrom` constraints. See [docs/ontology-patterns.md](docs/ontology-patterns.md) for details.
 
 ## Data Sources
 
 | Source | What it provides | URL |
 |--------|-----------------|-----|
 | CIRCABC Duties Import | TARIC tariff measures for CN chapters 01-99 (duty rates, validity dates, geographic scope) | [CIRCABC group](https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b) |
+| EU TARIC DDS2 | Per-code hierarchy pages with full ancestor path + regulatory measure details | [ec.europa.eu/taxation_customs/dds2](https://ec.europa.eu/taxation_customs/dds2/taric/measures.jsp) |
 | EZT-Online wizard | EU Commission classification decision tree (non-binding advisory guidance) | [auskunft.ezt-online.de](https://auskunft.ezt-online.de/ezto/SeqEinreihungSucheAnzeige.do) |
+| tariffnumber.com API | Bilingual (EN/DE/FR) CN code labels for heading and terminal codes | cnSuggest endpoint, no auth required |
+| EU CLASS API | Official legal text notes for each CN code (EN + DE) | ec.europa.eu CLASS service |
 
-Both sources are public and require no authentication.
+All sources are public and require no authentication except the LLM API.
 
 ## Local Usage
 
@@ -38,6 +45,7 @@ Both sources are public and require no authentication.
 - Python ≥ 3.11
 - Node.js ≥ 20 (for the bundled Konclude WASM reasoner)
 - Playwright Chromium: `playwright install --with-deps chromium`
+- `ANTHROPIC_API_KEY` or `ANTHROPIC_FOUNDRY_API_KEY` env var (for the LLM axiom agent)
 
 ### Install
 
@@ -48,25 +56,34 @@ pip install -r requirements.txt
 ### Run the pipeline
 
 ```bash
-# Build chapter 22 (Beverages) — the current pilot chapter
+# Build chapter 22 (Beverages) — full run including LLM axiom agent
 python -m src.pipeline --chapter 22
 
+# Skip the LLM agent (structural skeleton only, no API key needed)
+python -m src.pipeline --chapter 22 --skip-axiom-agent
+
 # Common flags
-python -m src.pipeline --chapter 22 --skip-scrape   # reuse cached wizard data
-python -m src.pipeline --chapter 22 --skip-fetch    # reuse cached TARIC data
-python -m src.pipeline --chapter 22 --no-reasoner   # skip Konclude check
-python -m src.pipeline --chapter 22 --force         # rebuild all outputs
+python -m src.pipeline --chapter 22 --skip-scrape    # reuse cached wizard data
+python -m src.pipeline --chapter 22 --skip-fetch     # reuse cached TARIC data
+python -m src.pipeline --chapter 22 --no-reasoner    # skip Konclude check
+python -m src.pipeline --chapter 22 --force          # rebuild all outputs from scratch
 ```
 
-The pipeline runs five stages in sequence:
+The pipeline runs these stages in order:
 
 | Stage | Output |
 |-------|--------|
 | Fetch TARIC | `data/intermediate/taric_ch{N}.json` |
 | Scrape EZT-Online wizard | `data/intermediate/wizard_ch{N}.jsonl` |
-| Build core TBox | `data/ontology/eucn-core-{date}.ttl` + `eucn-core-latest.ttl` |
-| Build chapter ontology | `data/ontology/eucn-ch{N}-{slug}-{date}.ttl` + `eucn-ch{N}-{slug}-latest.ttl` + `.trig` |
+| Fetch commodity details (DDS2) | `data/intermediate/taric_ch{N}_enriched.json` |
+| Build heading labels | `data/intermediate/tariffnumber_ch{N}.json` |
+| Fetch legal text (CLASS API) | `data/legal_text/ch{N}/notes.jsonl` + full text |
+| Run LLM axiom agent | `data/axiom_candidates/ch{N}/` (one JSONL per CN code) |
+| Build ontology | `data/ontology/eucn-ch{N}-{slug}-{date}.ttl` + `-latest.ttl` + `.trig` + `-flat.ttl` |
 | Konclude consistency check | OWL DL consistency (exit 1 if inconsistent) |
+| Konclude classify | Inferred named graph merged into `.trig` |
+
+Stages 1–5 are cached: re-running skips any stage whose output already exists unless `--force` is passed. The axiom agent stage is also cached per-node via a content hash — only CN codes with changed legal text or a changed TBox hash are re-processed. Approved axioms are never discarded on TBox bumps.
 
 The Konclude OWL reasoner is bundled in `tools/konclude/` (WASM, requires Node.js). Override the path with the `KONCLUDE_CLI_PATH` environment variable.
 
@@ -77,6 +94,8 @@ All automation lives in [`.github/workflows/`](.github/workflows/).
 ### `build-release.yml` — Weekly rebuild and release
 
 Runs every Monday at 06:00 UTC. Also triggered manually.
+
+**Requires** the `ANTHROPIC_API_KEY` Actions secret (or `ANTHROPIC_FOUNDRY_API_KEY`) to run the axiom agent.
 
 **Workflow dispatch inputs:**
 
@@ -99,6 +118,10 @@ build  [one job per chapter, parallel]
   3. python -m src.pipeline --chapter N --force
        → fetches TARIC XLSX from CIRCABC (public URL, no auth)
        → scrapes EZT-Online wizard via Playwright / Chromium
+       → fetches commodity details from EU TARIC DDS2
+       → fetches CN code labels from tariffnumber.com API
+       → fetches legal text from EU CLASS API
+       → runs LLM axiom agent (requires ANTHROPIC_API_KEY secret)
        → builds OWL ontology (TBox + ABox + provenance graph)
        → Konclude WASM consistency check (tools/konclude/cli.js)
        → SPARQL acceptance test (MFN rate validation)
@@ -257,20 +280,23 @@ Any individual produced by a `eucn:GrapeFermentation` process and marked carbona
     docs.yml            Widoco HTML docs → gh-pages branch
 data/
   intermediate/       Fetcher + scraper cache (gitignored)
+  legal_text/         CN code legal text notes from CLASS API (gitignored)
+  axiom_candidates/   Per-node LLM axiom proposals + approval status (gitignored)
   ontology/           Built TTL + TRIG files
                         eucn-core-{date}.ttl, eucn-core-latest.ttl (stable alias)
                         eucn-ch{N}-{slug}-{date}.ttl, eucn-ch{N}-{slug}-latest.ttl
 src/
-  fetcher/            TARIC XML / XLSX fetcher (httpx + lxml)
+  fetcher/            TARIC XML / XLSX fetcher, DDS2 commodity details, tariffnumber API
   scraper/            Playwright EZT-Online wizard scraper
-  ontology/           RDF builder: TBox, ABox, IRI minting, provenance
-  reasoning/          Konclude OWL consistency check wrapper
+  agent/              LLM axiom agent: context builder, chapter runner, node registry
+  ontology/           RDF builder: TBox, ABox, heading classes, IRI minting, provenance
+  reasoning/          Konclude OWL consistency check + classify wrapper
   sparql/             Pyoxigraph SPARQL store
   pipeline.py         Main orchestration CLI
 tools/
   konclude/           Bundled Konclude WASM reasoner (Node.js, 8 MB)
 tests/
-  unit/               Schema, IRI, OWL axiom tests
+  unit/               Schema, IRI, OWL axiom, agent context tests
   integration/        Pipeline, fetcher, scraper, reasoning tests
   acceptance/         SPARQL MFN rate validation
 ```

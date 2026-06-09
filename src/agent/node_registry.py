@@ -35,6 +35,8 @@ class NodeRegistry:
         stored = self._load_one(cn_code)
         if stored is None:
             return True
+        if stored.status == "failed":
+            return True
         return stored.source_text_hash != source_text_hash or stored.tbox_hash != tbox_hash
 
     def upsert(self, axiom_set: NodeAxiomSet) -> None:
