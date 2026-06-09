@@ -21,14 +21,14 @@ from src.fetcher.taric_dds2 import (
 # ---------------------------------------------------------------------------
 FIXTURE_JS = (
     'sectiontree = ['
-    'true,"SECTION I","Live animals; animal products",'
-    '[[true,"CHAPTER 1","Live animals","0100000000",null],'
-    '[true,"CHAPTER 2","Meat and edible meat offal","0200000000",null]],'
-    'true,"SECTION IV","Prepared foodstuffs; beverages, spirits and vinegar; '
+    '["false","SECTION I","Live animals; animal products",'
+    '[["false","CHAPTER 1","Live animals","0100000000",null],'
+    '["false","CHAPTER 2","Meat and edible meat offal","0200000000",null]]],'
+    '["false","SECTION IV","Prepared foodstuffs; beverages, spirits and vinegar; '
     'tobacco and manufactured tobacco substitutes",'
-    '[[true,"CHAPTER 17","Sugars and sugar confectionery","1700000000",null],'
-    '[true,"CHAPTER 18","Cocoa and cocoa preparations","1800000000",null],'
-    '[true,"CHAPTER 22","Beverages, spirits and vinegar","2200000000",null]]'
+    '[["false","CHAPTER 17","Sugars and sugar confectionery","1700000000",null],'
+    '["false","CHAPTER 18","Cocoa and cocoa preparations","1800000000",null],'
+    '["false","CHAPTER 22","Beverages, spirits and vinegar","2200000000",null]]]'
     '];\nchapterfootnotes = [];\n'
 )
 

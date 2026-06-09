@@ -72,24 +72,22 @@ def _parse_nomenclaturetree_js(content: str) -> list[SectionEntry]:
     json_text = content[start:end + 1]
     raw = json.loads(json_text)
 
-    # Format: flat array of groups:
-    #   [has_children_bool, "SECTION I", "description", [[ch_entry], ...], ...]
+    # Actual structure: array of section arrays
+    #   [[has_children, "SECTION I", "description", [[ch_entry], ...]], ...]
     # Each ch_entry: [has_children, "CHAPTER N", "description", "NN00000000", footnotes_or_null]
     entries = []
-    i = 0
-    while i < len(raw):
-        _has_children = raw[i]
-        section_name = raw[i + 1]   # "SECTION I"
-        section_desc = raw[i + 2]   # "description"
-        chapters_raw = raw[i + 3]   # [[...], ...]
-        i += 4
+    for section in raw:
+        if not isinstance(section, list) or len(section) < 4:
+            continue
+        section_name = section[1]   # "SECTION I"
+        section_desc = section[2]   # "description"
+        chapters_raw = section[3]   # [[...], ...]
 
-        roman = section_name.split()[-1]  # last word, e.g. "I", "IV"
+        roman = str(section_name).split()[-1]  # last word, e.g. "I", "IV"
 
         chapter_codes = []
-        for ch in chapters_raw:
-            # ch_entry: [has_children, "CHAPTER N", "description", "NN00000000", footnotes_or_null]
-            if len(ch) >= 4:
+        for ch in (chapters_raw or []):
+            if isinstance(ch, list) and len(ch) >= 4:
                 ch_name = ch[1]  # "CHAPTER 22" or "CHAPTER 1"
                 parts = str(ch_name).split()
                 if parts:
