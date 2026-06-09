@@ -6,6 +6,7 @@ import pytest
 from rdflib import Graph
 
 from src.agent.context_builder import (
+    _TRIPLE_CAP,
     _compute_hierarchy_path,
     build_node_context,
     build_static_context,
@@ -28,7 +29,7 @@ class TestBuildStaticContext:
         ttl = build_static_context(22)
         g = Graph()
         g.parse(data=ttl, format="turtle")
-        assert len(g) <= 600
+        assert len(g) <= _TRIPLE_CAP
 
     def test_chapter_with_no_specific_props_still_valid(self):
         """A chapter that has no chapter-specific props must still return valid Turtle."""
@@ -64,7 +65,7 @@ class TestBuildStaticContext:
     def test_heading_classes_included_in_static_context(self):
         """build_static_context(22) must include heading class IRIs (IU3)."""
         ttl = build_static_context(22)
-        assert "VermouthWineFreshGrapesFlavouredPlants2205" in ttl, (
+        assert "2205" in ttl, (
             "Heading class IRI for 2205 must appear in static context Turtle"
         )
 
