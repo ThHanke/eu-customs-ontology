@@ -68,3 +68,7 @@ def additional_code_iri(code: str) -> URIRef:
 
 def measurement_unit_iri(code: str) -> URIRef:
     return mint_iri(f"unit:{code}")
+
+
+def section_iri(roman: str) -> URIRef:
+    return mint_iri(f"section:{roman}")

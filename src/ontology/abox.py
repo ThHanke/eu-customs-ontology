@@ -20,8 +20,10 @@ from src.ontology.iri import (
     measure_type_iri,
     measurement_unit_iri,
     regulation_iri,
+    section_iri,
     taric_measure_iri,
 )
+from src.fetcher.taric_dds2 import SectionEntry
 from src.ontology.namespaces import DCTERMS, EUCN
 from src.ontology.chapter_registry import get_chapter
 from src.ontology.wizard_axioms import WizardAxiomCoverage, transform
@@ -145,6 +147,15 @@ def _ensure_additional_code(g: Graph, ac: AdditionalCodeRecord) -> URIRef:
     return iri
 
 
+def _ensure_section(g: Graph, roman: str, label_en: str, label_de: str | None) -> URIRef:
+    iri = section_iri(roman)
+    g.add((iri, RDF.type, EUCN.TARICSection))
+    g.add((iri, RDFS.label, Literal(label_en, lang="en")))
+    if label_de:
+        g.add((iri, RDFS.label, Literal(label_de, lang="de")))
+    return iri
+
+
 def _add_measure(g: Graph, measure: TARICMeasure) -> URIRef:
     iri = taric_measure_iri(measure.sid)
     g.add((iri, RDF.type, EUCN.TARICMeasure))
@@ -259,6 +270,8 @@ def build_abox(
     chapter_data: ChapterData,
     wizard_tree: WizardTree,
     graph: Graph,
+    *,
+    section_entries: list[SectionEntry] | None = None,
 ) -> tuple[Graph, WizardAxiomCoverage]:
     """Populate ABox from intermediate JSON. Idempotent.
 
@@ -268,6 +281,17 @@ def build_abox(
     g.bind("eucn", EUCN)
     g.bind("dcterms", DCTERMS)
     g.bind("skos", SKOS)
+
+    # Section hierarchy (optional)
+    if section_entries:
+        chapter_str = f"{wizard_tree.chapter:02d}"
+        for sec in section_entries:
+            if chapter_str in sec.chapter_codes:
+                sec_iri = _ensure_section(g, sec.roman_numeral, sec.label_en, sec.label_de)
+                ch = chapter_iri(wizard_tree.chapter)
+                g.add((ch, RDF.type, EUCN.Chapter))
+                g.add((ch, EUCN.belongsToSection, sec_iri))
+                break
 
     cn_iris: dict[str, URIRef] = {}
 

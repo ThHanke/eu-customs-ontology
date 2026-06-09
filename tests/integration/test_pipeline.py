@@ -375,3 +375,56 @@ class TestAboxNodeRegistryDispatch:
         from src.ontology.abox import build_abox
         result_g, coverage = build_abox(cd, wt, g)
         assert result_g is g  # same graph returned
+
+
+class TestAboxSectionEntities:
+    """Tests for optional TARICSection population in build_abox."""
+
+    def test_section_entities_in_ttl_when_entries_provided(self):
+        """build_abox with section_entries produces TARICSection and belongsToSection triples."""
+        from rdflib import Graph
+        from src.ontology.abox import build_abox
+        from src.fetcher.taric_dds2 import SectionEntry
+        from src.schema.taric import ChapterData
+        from src.schema.wizard import ClassificationNode, WizardTree
+
+        root = ClassificationNode(
+            node_id="root", question_text="Q?", path_from_root=[],
+            answer_options=[], is_terminal=False,
+        )
+        wt = WizardTree(chapter=22, nodes={"root": root}, root_node_id="root")
+        cd = ChapterData(chapter=22, measures=[])
+        g = Graph()
+
+        entries = [SectionEntry(
+            roman_numeral="IV",
+            label_en="Prepared foodstuffs",
+            label_de=None,
+            chapter_codes=["22"],
+        )]
+
+        result_g, _ = build_abox(cd, wt, g, section_entries=entries)
+
+        ttl = result_g.serialize(format="turtle")
+        assert "TARICSection" in ttl
+        assert "belongsToSection" in ttl
+
+    def test_build_abox_without_section_entries_no_section_triples(self):
+        """build_abox without section_entries produces no TARICSection triples (backwards compat)."""
+        from rdflib import Graph
+        from src.ontology.abox import build_abox
+        from src.schema.taric import ChapterData
+        from src.schema.wizard import ClassificationNode, WizardTree
+
+        root = ClassificationNode(
+            node_id="root", question_text="Q?", path_from_root=[],
+            answer_options=[], is_terminal=False,
+        )
+        wt = WizardTree(chapter=22, nodes={"root": root}, root_node_id="root")
+        cd = ChapterData(chapter=22, measures=[])
+        g = Graph()
+
+        result_g, _ = build_abox(cd, wt, g)  # no section_entries
+
+        ttl = result_g.serialize(format="turtle")
+        assert "TARICSection" not in ttl
