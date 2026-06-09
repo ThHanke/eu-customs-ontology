@@ -184,11 +184,21 @@ class LLMAxiomAgent:
                 tool_block, tool_input = _parse_tool_use(response.content)
 
                 # Build NodeAxiomSet from tool output
+                raw_classes = tool_input.get("new_classes", [])
+                raw_props = tool_input.get("new_properties", [])
+                raw_restrictions = tool_input.get("restrictions", [])
+                for field, items in (("new_classes", raw_classes), ("new_properties", raw_props), ("restrictions", raw_restrictions)):
+                    bad = [x for x in items if not isinstance(x, dict)]
+                    if bad:
+                        raise ValueError(
+                            f"{field} must be a list of JSON objects, not strings. "
+                            f"Bad items: {bad!r}. Each item must be a dict with the required fields."
+                        )
                 axiom_set = NodeAxiomSet(
                     cn_code=tool_input["cn_code"],
-                    new_classes=[NewClass(**c) for c in tool_input.get("new_classes", [])],
-                    new_properties=[NewProperty(**p) for p in tool_input.get("new_properties", [])],
-                    restrictions=[NodeRestriction(**r) for r in tool_input.get("restrictions", [])],
+                    new_classes=[NewClass(**c) for c in raw_classes],
+                    new_properties=[NewProperty(**p) for p in raw_props],
+                    restrictions=[NodeRestriction(**r) for r in raw_restrictions],
                     coverage_score=tool_input["coverage_score"],
                     coverage_explanation=tool_input["coverage_explanation"],
                     source_note_ids=tool_input.get("source_note_ids", []),

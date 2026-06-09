@@ -13,8 +13,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from rdflib import Graph
+from rdflib import Graph, URIRef
 
+from src.ontology.namespaces import EUCN
 from src.ontology.discriminating_props_beverages import add_discriminating_props_beverages
 from src.ontology.product_classes_beverages import add_product_classes_beverages
 from src.ontology.process_classes_beverages import add_process_classes_beverages
@@ -34,6 +35,7 @@ class ChapterModule:
     add_product_classes: Callable[[Graph], None]
     add_process_classes: Callable[[Graph], None]
     add_equivalence_axioms: Callable[[Graph], None] | None = None
+    root_class_iri: URIRef | None = None
 
 
 CHAPTERS: dict[int, ChapterModule] = {
@@ -44,6 +46,7 @@ CHAPTERS: dict[int, ChapterModule] = {
         add_product_classes=add_product_classes_beverages,
         add_process_classes=add_process_classes_beverages,
         add_equivalence_axioms=None,  # retired 2026-06-08
+        root_class_iri=EUCN.Beverage,
     ),
     23: ChapterModule(
         label="Residues and waste from the food industries; prepared animal fodder",

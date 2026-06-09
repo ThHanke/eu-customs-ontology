@@ -4,6 +4,7 @@ import hashlib
 import logging
 import re
 from datetime import date
+from pathlib import Path
 
 from rdflib import Graph
 
@@ -13,7 +14,17 @@ from src.schema.wizard import ClassificationNode
 
 logger = logging.getLogger(__name__)
 
-_TRIPLE_CAP = 500
+_TRIPLE_CAP = 600
+
+_DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
+
+
+def _load_heading_labels(chapter: int) -> dict:
+    cache = _DATA_ROOT / "intermediate" / f"tariffnumber_ch{chapter:02d}.json"
+    if not cache.exists():
+        return {}
+    from src.ontology.heading_classes import load_heading_labels
+    return load_heading_labels(cache)
 
 
 def build_static_context(chapter: int, extract_date: date | None = None) -> str:
@@ -33,7 +44,8 @@ def build_static_context(chapter: int, extract_date: date | None = None) -> str:
     """
     g = Graph()
     kwargs = {} if extract_date is None else {"extract_date": extract_date}
-    build_tbox(g, chapter=chapter, **kwargs)
+    heading_labels = _load_heading_labels(chapter)
+    build_tbox(g, chapter=chapter, heading_labels=heading_labels or None, **kwargs)
     triple_count = len(g)
     if triple_count > _TRIPLE_CAP:
         logger.warning(
@@ -50,8 +62,8 @@ def build_static_context(chapter: int, extract_date: date | None = None) -> str:
 def build_node_context(
     cn_code: str,
     legal_sections: list[LegalSection],
-    wizard_nodes: dict[str, list[ClassificationNode]],
     running_tbox_ttl: str,
+    all_wizard_nodes: dict[str, ClassificationNode] | None = None,
 ) -> dict:
     """Return structured per-node context for the LLM prompt.
 
@@ -61,13 +73,14 @@ def build_node_context(
         The CN code for which the context is assembled.
     legal_sections:
         Legal text sections relevant to this node (filtered by caller).
-    wizard_nodes:
-        Mapping of cn_code -> list[ClassificationNode].  Used to look up
-        ancestor nodes and collect question_text for the hierarchy path.
     running_tbox_ttl:
         Current TBox Turtle string (grows as the agent emits new axioms).
+    all_wizard_nodes:
+        Flat mapping of node_id (8-digit zero-padded) -> ClassificationNode
+        covering all nodes in the wizard tree (including intermediate nodes).
+        Used by _compute_hierarchy_path to resolve the ancestor chain.
     """
-    hierarchy_path = _compute_hierarchy_path(cn_code, wizard_nodes)
+    hierarchy_path = _compute_hierarchy_path(cn_code, all_wizard_nodes or {})
 
     notes_en = [
         s.source_text
@@ -102,20 +115,36 @@ def compute_tbox_hash(chapter: int) -> str:
 
 def _compute_hierarchy_path(
     cn_code: str,
-    wizard_nodes: dict[str, list[ClassificationNode]],
+    all_wizard_nodes: dict[str, ClassificationNode],
 ) -> list[dict]:
-    """Return ordered list of ancestor dicts from shortest prefix to longest."""
+    """Return ordered ancestor dicts from chapter root down to direct parent.
+
+    Parameters
+    ----------
+    cn_code:
+        The CN code to resolve ancestors for.  Padded to 8 digits with
+        trailing zeros before lookup (e.g. ``"2205"`` → ``"22050000"``).
+    all_wizard_nodes:
+        Flat mapping of node_id (8-digit zero-padded) -> ClassificationNode
+        covering all nodes in the wizard tree.
+    """
+    if not all_wizard_nodes:
+        return []
+    node_id = cn_code.ljust(8, "0")
+    node = all_wizard_nodes.get(node_id)
+    if node is None:
+        return []
     ancestors = []
-    for candidate_code, nodes in wizard_nodes.items():
-        if candidate_code != cn_code and cn_code.startswith(candidate_code):
-            question_texts = [n.question_text for n in nodes] if nodes else []
-            ancestors.append(
-                {
-                    "cn_code": candidate_code,
-                    "question_texts": question_texts,
-                }
-            )
-    ancestors.sort(key=lambda x: len(x["cn_code"]))
+    for ancestor_id in node.path_from_root:
+        ancestor = all_wizard_nodes.get(ancestor_id)
+        if ancestor is None:
+            continue
+        ancestors.append(
+            {
+                "cn_code": ancestor_id,
+                "question_texts": [ancestor.question_text] if ancestor.question_text else [],
+            }
+        )
     return ancestors
 
 

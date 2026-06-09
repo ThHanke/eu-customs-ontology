@@ -27,10 +27,14 @@ LOG_FILE = ROOT / "data" / "logs" / "pipeline.log"
 
 def _configure_logging() -> None:
     fmt = "%(asctime)s %(levelname)-8s %(name)s — %(message)s"
+    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG,
         format=fmt,
-        handlers=[logging.StreamHandler(sys.stderr)],
+        handlers=[
+            logging.StreamHandler(sys.stderr),
+            logging.FileHandler(LOG_FILE, mode="w", encoding="utf-8"),
+        ],
     )
     # Quiet noisy third-party loggers
     for noisy in ("httpcore", "httpx", "anthropic._base_client"):
@@ -56,13 +60,14 @@ def run(
     skip_fetch: bool = False,
     skip_scrape: bool = False,
     skip_legal_text: bool = False,
+    skip_commodity_details: bool = False,
     xml_path: Path | None = None,
     xlsx_path: Path | None = None,
     no_reasoner: bool = False,
     no_classify: bool = False,
     force: bool = False,
     extract_date: Date | None = None,
-    run_axiom_agent: bool = False,
+    run_axiom_agent: bool = True,
     agent_model: str = "claude-sonnet-4-6",
 ) -> None:
     if extract_date is None:
@@ -125,13 +130,95 @@ def run(
         root_id = next((n["node_id"] for n in raw_nodes if not n["path_from_root"]), "")
         wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
 
+    # ── Step 2.5b: Fetch commodity details from EU TARIC DDS2 ───────────────
+    enriched_json = DATA_INTERMEDIATE / f"taric_ch{chapter:02d}_enriched.json"
+    if not skip_commodity_details and (force or not enriched_json.exists()):
+        with _step("fetch-commodity-details"):
+            from src.fetcher.taric_dds2 import fetch_chapter_commodities
+            from src.schema.taric import ChapterData as _CD
+
+            cn_codes_8d: list[str] = []
+            if wizard_tree is not None:
+                cn_codes_8d = sorted({
+                    n.cn_code for n in wizard_tree.nodes.values() if n.cn_code
+                })
+            elif taric_json.exists():
+                raw_cd = _CD.model_validate_json(taric_json.read_text())
+                cn_codes_8d = sorted({m.commodity_code[:8] for m in raw_cd.measures})
+
+            dds2_measures_by_code = fetch_chapter_commodities(
+                chapter, cn_codes_8d, DATA_INTERMEDIATE, force=force
+            )
+            all_dds2_measures = [m for ms in dds2_measures_by_code.values() for m in ms]
+            enriched = _CD(chapter=chapter, measures=all_dds2_measures)
+            enriched_json.write_text(enriched.model_dump_json())
+            print(f"  [fetch-commodity-details] {len(cn_codes_8d)} codes, "
+                  f"{len(all_dds2_measures)} measures (EU DDS2)")
+    else:
+        if skip_commodity_details:
+            print("[fetch-commodity-details] skipped (--skip-commodity-details)")
+        else:
+            print(f"[fetch-commodity-details] skipped (using existing {enriched_json.name})")
+
+    # ── Step 2.5a: Build heading-level labels from tariffnumber.com API ─────
+    heading_labels_path = DATA_INTERMEDIATE / f"tariffnumber_ch{chapter:02d}.json"
+    if force or not heading_labels_path.exists():
+        with _step("build-heading-labels"):
+            import json as _json
+            from src.fetcher.tariffnumber_api import fetch_code_labels
+            from src.schema.legal_text import LegalSection as _LS
+
+            # Collect 4-digit headings + 8-digit terminals from wizard tree
+            if wizard_tree is None:
+                logger.warning("[build-heading-labels] no wizard tree — skipping")
+            else:
+                headings_4d: set[str] = set()
+                terminals_8d: set[str] = set()
+                for node in wizard_tree.nodes.values():
+                    if node.cn_code:
+                        headings_4d.add(node.cn_code[:4])
+                        terminals_8d.add(node.cn_code)
+
+                # Find codes already covered by CLASS API (notes.jsonl)
+                covered_cn: set[str] = set()
+                notes_path = ROOT / "data" / "legal_text" / f"ch{chapter:02d}" / "notes.jsonl"
+                if notes_path.exists():
+                    for _line in notes_path.read_text(encoding="utf-8").splitlines():
+                        _line = _line.strip()
+                        if _line:
+                            covered_cn.add(_LS.model_validate_json(_line).cn_code)
+
+                uncovered_8d = terminals_8d - covered_cn
+                codes_to_fetch = sorted(headings_4d | uncovered_8d)
+                print(f"  [build-heading-labels] fetching {len(codes_to_fetch)} codes "
+                      f"({len(headings_4d)} headings + {len(uncovered_8d)} uncovered terminals)")
+
+                # Read existing cache to skip unchanged entries
+                existing: dict[str, dict[str, str]] = {}
+                if heading_labels_path.exists() and not force:
+                    existing = _json.loads(heading_labels_path.read_text())
+                new_codes = [c for c in codes_to_fetch if c not in existing or force]
+
+                if new_codes:
+                    fetched = fetch_code_labels(new_codes)
+                    existing.update(fetched)
+                    heading_labels_path.write_text(
+                        _json.dumps(existing, ensure_ascii=False, indent=2)
+                    )
+                    print(f"  [build-heading-labels] fetched {len(new_codes)} codes → "
+                          f"{heading_labels_path.name}")
+                else:
+                    print(f"  [build-heading-labels] all codes cached")
+    else:
+        print(f"[build-heading-labels] skipped (using existing {heading_labels_path.name})")
+
     # ── Step 2.6a: Run axiom agent (LLM-based) ──────────────────────────────
     if run_axiom_agent:
         with _step("run-axiom-agent"):
             import os
             if not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("ANTHROPIC_FOUNDRY_API_KEY"):
                 raise EnvironmentError(
-                    "ANTHROPIC_API_KEY or ANTHROPIC_FOUNDRY_API_KEY environment variable is required for --run-axiom-agent"
+                    "ANTHROPIC_API_KEY or ANTHROPIC_FOUNDRY_API_KEY environment variable is required for axiom agent (use --skip-axiom-agent to skip)"
                 )
             from src.agent.chapter_runner import ChapterRunner
             from src.agent.coverage_reporter import build_report, write_report
@@ -236,6 +323,14 @@ def run(
     else:
         print(f"[build-core] skipped (using existing {core_ttl_out.name})")
 
+    # ── Step 2.5c: Fetch DDS2 section hierarchy ──────────────────────────────
+    section_entries = None
+    try:
+        from src.fetcher.taric_dds2 import fetch_section_hierarchy
+        section_entries = fetch_section_hierarchy("en", extract_date, DATA_INTERMEDIATE)
+    except Exception as exc:
+        logger.warning("DDS2 section hierarchy fetch failed: %s — continuing without sections", exc)
+
     # ── Step 3: Build ontology ───────────────────────────────────────────────
     if force or not ttl_out.exists():
         with _step("build-ontology"):
@@ -244,8 +339,14 @@ def run(
             from src.ontology.tbox import build_tbox
             from src.schema.taric import ChapterData
 
-            # Load intermediate data
+            # Load intermediate data (XLSX base + DDS2 enrichment if available)
             chapter_data = ChapterData.model_validate_json(taric_json.read_text())
+            if enriched_json.exists():
+                dds2_cd = ChapterData.model_validate_json(enriched_json.read_text())
+                chapter_data = ChapterData(
+                    chapter=chapter_data.chapter,
+                    measures=list(chapter_data.measures) + list(dds2_cd.measures),
+                )
 
             # Re-use wizard_tree loaded earlier; fall back to loading from disk if needed
             if wizard_tree is None:
@@ -258,10 +359,34 @@ def run(
                 )
                 wizard_tree = WizardTree(chapter=chapter, nodes=nodes, root_node_id=root_id)
 
+            # Load heading labels + derive uncovered terminal codes
+            import json as _json
+            _heading_labels: dict = {}
+            _uncovered_cn: set[str] = set()
+            if heading_labels_path.exists():
+                _heading_labels = _json.loads(heading_labels_path.read_text())
+                _all_terminals = {
+                    n.cn_code for n in wizard_tree.nodes.values() if n.cn_code
+                }
+                _notes_p = ROOT / "data" / "legal_text" / f"ch{chapter:02d}" / "notes.jsonl"
+                _covered: set[str] = set()
+                if _notes_p.exists():
+                    from src.schema.legal_text import LegalSection as _LS2
+                    for _ln in _notes_p.read_text(encoding="utf-8").splitlines():
+                        if _ln.strip():
+                            _covered.add(_LS2.model_validate_json(_ln).cn_code)
+                _uncovered_cn = _all_terminals - _covered
+
             # Build TBox + ABox in default graph
             g = Graph()
-            build_tbox(g, extract_date=extract_date)
-            g, wizard_coverage = build_abox(chapter_data, wizard_tree, g)
+            build_tbox(
+                g,
+                extract_date=extract_date,
+                chapter=chapter,
+                heading_labels=_heading_labels or None,
+                uncovered_cn_codes=_uncovered_cn or None,
+            )
+            g, wizard_coverage = build_abox(chapter_data, wizard_tree, g, section_entries=section_entries)
 
             # Provenance in named graph
             ds = Dataset()
@@ -363,6 +488,7 @@ def main() -> None:
     p.add_argument("--skip-fetch", action="store_true")
     p.add_argument("--skip-scrape", action="store_true")
     p.add_argument("--skip-legal-text", action="store_true")
+    p.add_argument("--skip-commodity-details", action="store_true")
     p.add_argument("--xml-path", type=Path, default=None)
     p.add_argument("--xlsx-path", type=Path, default=None, help="CIRCABC Duties Import xlsx")
     p.add_argument("--no-reasoner", action="store_true")
@@ -370,10 +496,10 @@ def main() -> None:
     p.add_argument("--force", action="store_true")
     p.add_argument("--extract-date", type=Date.fromisoformat, default=None,
                    metavar="YYYY-MM-DD", help="TARIC data extract date (default: today)")
-    p.add_argument("--run-axiom-agent", action="store_true",
-                   help="Run LLM-based axiom agent (requires ANTHROPIC_API_KEY)")
+    p.add_argument("--skip-axiom-agent", dest="run_axiom_agent", action="store_false",
+                   help="Skip LLM-based axiom agent")
     p.add_argument("--agent-model", default="claude-sonnet-4-6",
-                   metavar="MODEL", help="Model for --run-axiom-agent (default: claude-sonnet-4-6)")
+                   metavar="MODEL", help="Model for axiom agent (default: claude-sonnet-4-6)")
     args = p.parse_args()
 
     run(
@@ -381,6 +507,7 @@ def main() -> None:
         skip_fetch=args.skip_fetch,
         skip_scrape=args.skip_scrape,
         skip_legal_text=args.skip_legal_text,
+        skip_commodity_details=args.skip_commodity_details,
         xml_path=args.xml_path,
         xlsx_path=args.xlsx_path,
         no_reasoner=args.no_reasoner,

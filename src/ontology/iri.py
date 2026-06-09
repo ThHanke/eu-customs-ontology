@@ -32,3 +32,43 @@ def chapter_iri(chapter: int) -> URIRef:
 
 def heading_iri(heading: str) -> URIRef:
     return mint_iri(f"heading:{heading}")
+
+
+def measure_type_iri(code: str) -> URIRef:
+    return mint_iri(f"mtype:{code}")
+
+
+def geographic_area_iri(code: str) -> URIRef:
+    return mint_iri(f"area:{code}")
+
+
+def footnote_iri(code: str) -> URIRef:
+    return mint_iri(f"footnote:{code}")
+
+
+def certificate_iri(code: str) -> URIRef:
+    return mint_iri(f"cert:{code}")
+
+
+def regulation_iri(regulation_id: str) -> URIRef:
+    return mint_iri(f"reg:{regulation_id}")
+
+
+def duty_expression_iri(measure_sid: str) -> URIRef:
+    return mint_iri(f"duty:{measure_sid}")
+
+
+def measure_condition_iri(condition_sid: str) -> URIRef:
+    return mint_iri(f"cond:{condition_sid}")
+
+
+def additional_code_iri(code: str) -> URIRef:
+    return mint_iri(f"addcode:{code}")
+
+
+def measurement_unit_iri(code: str) -> URIRef:
+    return mint_iri(f"unit:{code}")
+
+
+def section_iri(roman: str) -> URIRef:
+    return mint_iri(f"section:{roman}")

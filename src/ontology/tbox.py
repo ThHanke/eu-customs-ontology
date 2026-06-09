@@ -43,7 +43,13 @@ def _data_prop(g: Graph, iri: URIRef, label_en: str, label_de: str, def_en: str,
         g.add((iri, RDFS.range, range_))
 
 
-def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22) -> Graph:
+def build_tbox(
+    graph: Graph,
+    extract_date: Date | None = None,
+    chapter: int = 22,
+    heading_labels: dict | None = None,
+    uncovered_cn_codes: set | None = None,
+) -> Graph:
     """Add all TBox triples to graph. Idempotent."""
     if extract_date is None:
         extract_date = Date.today()
@@ -109,6 +115,11 @@ def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22
     ch.add_product_classes(g)
     ch.add_process_classes(g)
 
+    # ── Heading classes from tariffnumber.com labels (if available) ───────────
+    if heading_labels:
+        from src.ontology.heading_classes import add_heading_classes
+        add_heading_classes(g, chapter, heading_labels, uncovered_cn_codes or set(), chapter_root_iri=ch.root_class_iri)
+
     # ── Classes ────────────────────────────────────────────────────────────────
     _class(g, EUCN.CNCode, "CN Code", "KN-Code",
            "commodity nomenclature code of eight digits assigned within the "
@@ -163,6 +174,82 @@ def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22
            "bestimmte Warengruppe innerhalb eines Kapitels durch weitere Differenzierung nach "
            "Material, Verarbeitungsstufe oder Verwendungszweck identifiziert")
 
+    _class(g, EUCN.TARICSection, "TARIC Section", "TARIC-Abschnitt",
+           "Roman-numeral top-level grouping in the TARIC and Harmonized System nomenclature "
+           "that aggregates related chapters under a common thematic heading",
+           "Gliederungsebene mit römischer Nummerierung im TARIC und Harmonisierten System, "
+           "die verwandte Kapitel unter einem gemeinsamen Thema zusammenfasst")
+
+    _class(g, EUCN.TARICSubheading, "TARIC Subheading", "TARIC-Unterposition",
+           "six-digit subdivision of the Harmonized System nomenclature that further "
+           "differentiates goods within a four-digit heading",
+           "sechsstellige Unterteilung des Harmonisierten Systems, die Waren innerhalb einer "
+           "vierstelligen Position weiter differenziert")
+    g.add((EUCN.TARICSubheading, RDFS.subClassOf, EUCN.CNCode))
+
+    _class(g, EUCN.MeasureType, "Measure Type", "Maßnahmetyp",
+           "controlled-vocabulary individual identifying the regulatory category of a TARIC "
+           "measure, such as third-country duty (103), tariff preference (142), or licence "
+           "condition (750)",
+           "Controlled-Vocabulary-Instanz, die die Regelungskategorie einer TARIC-Maßnahme "
+           "identifiziert, z. B. Drittlandszollsatz (103), Zollpräferenz (142) oder "
+           "Genehmigungspflicht (750)")
+
+    _class(g, EUCN.GeographicArea, "Geographic Area", "Geografisches Gebiet",
+           "named individual representing a country, customs union, trade bloc, or the "
+           "catch-all designation ERGA OMNES (code 1011) that delimits the geographic scope "
+           "of a TARIC measure",
+           "benannte Instanz, die ein Land, eine Zollunion, einen Handelsblock oder die "
+           "Sammelbezeichnung ERGA OMNES (Code 1011) repräsentiert, die den geografischen "
+           "Geltungsbereich einer TARIC-Maßnahme bestimmt")
+
+    _class(g, EUCN.DutyExpression, "Duty Expression", "Zollausdruck",
+           "structured representation of the duty rate applicable under a single TARIC measure, "
+           "combining a numeric amount with its unit of measurement",
+           "strukturierte Darstellung des im Rahmen einer TARIC-Maßnahme geltenden Zollsatzes, "
+           "bestehend aus einem numerischen Betrag und seiner Maßeinheit")
+
+    _class(g, EUCN.MeasureCondition, "Measure Condition", "Maßnahmebedingung",
+           "prerequisite or restriction attached to a TARIC measure specifying a certificate "
+           "to be presented, a quantity threshold to be observed, or an exemption clause",
+           "Voraussetzung oder Einschränkung einer TARIC-Maßnahme, die ein vorzulegendes "
+           "Zertifikat, einen einzuhaltenden Mengenschwellenwert oder eine Ausnahmeklausel "
+           "festlegt")
+
+    _class(g, EUCN.Certificate, "Certificate", "Zertifikat",
+           "trade or regulatory document identified by a D-, C-, or Y-prefix code required "
+           "as a condition for the application of a TARIC measure",
+           "Handels- oder Verwaltungsdokument, das durch einen D-, C- oder Y-Präfix-Code "
+           "identifiziert wird und als Bedingung für die Anwendung einer TARIC-Maßnahme "
+           "erforderlich ist")
+
+    _class(g, EUCN.Footnote, "Footnote", "Fußnote",
+           "legal annotation identified by a TN-prefix code that qualifies or restricts the "
+           "scope of a TARIC measure or nomenclature position",
+           "rechtliche Anmerkung, identifiziert durch einen TN-Präfix-Code, die den "
+           "Geltungsbereich einer TARIC-Maßnahme oder Nomenklaturstelle qualifiziert oder "
+           "einschränkt")
+
+    _class(g, EUCN.AdditionalCode, "Additional Code", "Zusatzcode",
+           "four-character TARIC code appended to a commodity code to specify sub-categories "
+           "for trade-remedy, authorised-use, or excise-duty purposes",
+           "vierstelliger TARIC-Code, der einem Warencode angehängt wird, um Unterkategorien "
+           "für Handelsschutzmaßnahmen, besondere Verwendung oder Verbrauchsteuerzwecke "
+           "anzugeben")
+
+    _class(g, EUCN.Regulation, "Regulation", "Verordnung",
+           "EU Regulation, Decision, or Directive that creates or amends one or more TARIC "
+           "measures, identified by its official journal reference",
+           "EU-Verordnung, -Beschluss oder -Richtlinie, die eine oder mehrere TARIC-Maßnahmen "
+           "erlässt oder ändert, identifiziert durch ihre Amtsblatt-Fundstelle")
+
+    _class(g, EUCN.MeasurementUnit, "Measurement Unit", "Maßeinheit",
+           "unit used in a TARIC duty expression or measure condition, such as ASV "
+           "(percentage by volume), HLT (hectolitre), or SPR (standard percentage of alcohol)",
+           "Einheit, die in einem TARIC-Zollausdruck oder einer Maßnahmebedingung verwendet "
+           "wird, z. B. ASV (Volumenprozent), HLT (Hektoliter) oder SPR "
+           "(Standardalkoholgehalt in Prozent)")
+
     # ── Object properties ──────────────────────────────────────────────────────
     _obj_prop(g, EUCN.classifiesAs, "classifies as", "wird eingereiht als",
               "relation between a terminal classification node and the CN code to which goods "
@@ -195,6 +282,74 @@ def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22
               "Beziehung zwischen einem KN-Code und dem zweistelligen Kapitel des Harmonisierten "
               "Systems, in dessen Nomenklaturgeltungsbereich der Code fällt",
               domain=EUCN.CNCode, range_=EUCN.Chapter)
+
+    _obj_prop(g, EUCN.belongsToHeading, "belongs to heading", "gehört zu Position",
+              "relation between a CN code and the four-digit heading that it subdivides",
+              "Beziehung zwischen einem KN-Code und der vierstelligen Position, die er "
+              "unterteilt",
+              domain=EUCN.CNCode, range_=EUCN.Heading)
+
+    _obj_prop(g, EUCN.belongsToSection, "belongs to section", "gehört zu Abschnitt",
+              "relation between a chapter and the Roman-numeral TARIC section that contains it",
+              "Beziehung zwischen einem Kapitel und dem TARIC-Abschnitt mit römischer Nummerierung, "
+              "der es enthält",
+              domain=EUCN.Chapter, range_=EUCN.TARICSection)
+
+    _obj_prop(g, EUCN.hasMeasureType, "has measure type", "hat Maßnahmetyp",
+              "relation between a TARIC measure and its regulatory category individual",
+              "Beziehung zwischen einer TARIC-Maßnahme und ihrer Regelungskategorie-Instanz",
+              domain=EUCN.TARICMeasure, range_=EUCN.MeasureType)
+
+    _obj_prop(g, EUCN.hasGeographicArea, "has geographic area", "hat geografisches Gebiet",
+              "relation between a TARIC measure and the geographic area individual defining "
+              "its territorial scope",
+              "Beziehung zwischen einer TARIC-Maßnahme und der geografischen Gebiet-Instanz, "
+              "die ihren territorialen Geltungsbereich definiert",
+              domain=EUCN.TARICMeasure, range_=EUCN.GeographicArea)
+
+    _obj_prop(g, EUCN.hasDutyExpression, "has duty expression", "hat Zollausdruck",
+              "relation between a TARIC measure and its duty expression individual",
+              "Beziehung zwischen einer TARIC-Maßnahme und ihrer Zollausdruck-Instanz",
+              domain=EUCN.TARICMeasure, range_=EUCN.DutyExpression)
+
+    _obj_prop(g, EUCN.hasCondition, "has condition", "hat Bedingung",
+              "relation between a TARIC measure and a measure condition it imposes",
+              "Beziehung zwischen einer TARIC-Maßnahme und einer von ihr auferlegten "
+              "Maßnahmebedingung",
+              domain=EUCN.TARICMeasure, range_=EUCN.MeasureCondition)
+
+    _obj_prop(g, EUCN.hasFootnote, "has footnote", "hat Fußnote",
+              "relation between a TARIC measure or CN code and a footnote that qualifies "
+              "its scope",
+              "Beziehung zwischen einer TARIC-Maßnahme oder einem KN-Code und einer Fußnote, "
+              "die deren Geltungsbereich qualifiziert")
+
+    _obj_prop(g, EUCN.hasRegulation, "has regulation", "hat Verordnung",
+              "relation between a TARIC measure and the EU legal act that created it",
+              "Beziehung zwischen einer TARIC-Maßnahme und dem EU-Rechtsakt, der sie erlassen "
+              "hat",
+              domain=EUCN.TARICMeasure, range_=EUCN.Regulation)
+
+    _obj_prop(g, EUCN.hasCertificate, "has certificate", "hat Zertifikat",
+              "relation between a measure condition and the certificate document required to "
+              "satisfy it",
+              "Beziehung zwischen einer Maßnahmebedingung und dem Zertifikatsdokument, das "
+              "zu ihrer Erfüllung erforderlich ist",
+              domain=EUCN.MeasureCondition, range_=EUCN.Certificate)
+
+    _obj_prop(g, EUCN.hasAdditionalCode, "has additional code", "hat Zusatzcode",
+              "relation between a TARIC measure and the additional code that further "
+              "qualifies the goods it applies to",
+              "Beziehung zwischen einer TARIC-Maßnahme und dem Zusatzcode, der die Waren, "
+              "auf die sie zutrifft, weiter qualifiziert",
+              domain=EUCN.TARICMeasure, range_=EUCN.AdditionalCode)
+
+    _obj_prop(g, EUCN.hasMeasurementUnit, "has measurement unit", "hat Maßeinheit",
+              "relation between a duty expression or measure condition and the unit of "
+              "measurement used for the rate or threshold",
+              "Beziehung zwischen einem Zollausdruck oder einer Maßnahmebedingung und der "
+              "für den Satz oder Schwellenwert verwendeten Maßeinheit",
+              range_=EUCN.MeasurementUnit)
 
     # ── Data properties ────────────────────────────────────────────────────────
     _data_prop(g, EUCN.codeString, "code string", "Codenummer",
@@ -285,6 +440,61 @@ def build_tbox(graph: Graph, extract_date: Date | None = None, chapter: int = 22
                "or last amended a TARIC measure",
                "Kennung der EU-Verordnung oder der maßnahmenerzeugenden Verordnung, die eine "
                "TARIC-Maßnahme erlassen oder zuletzt geändert hat",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.measureTypeCode, "measure type code", "Maßnahmetyp-Code",
+               "numeric string identifying a TARIC measure type, e.g. '103' for third-country "
+               "duty or '142' for tariff preference",
+               "numerische Zeichenfolge zur Identifizierung eines TARIC-Maßnahmetyps, z. B. "
+               "'103' für Drittlandszollsatz oder '142' für Zollpräferenz",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.measureTypeSeries, "measure type series", "Maßnahmetyp-Reihe",
+               "single-character series identifier (A–Q) grouping related TARIC measure types "
+               "by regulatory function",
+               "einstelliger Reihenbezeichner (A–Q), der verwandte TARIC-Maßnahmetypen nach "
+               "ihrer Regelungsfunktion zusammenfasst",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.areaCode, "area code", "Gebietskennung",
+               "ISO 3166-1 alpha-2 country code or TARIC-assigned group code identifying a "
+               "geographic area, e.g. 'DE' for Germany or '1011' for ERGA OMNES",
+               "ISO 3166-1 Alpha-2-Ländercode oder TARIC-Gruppencode zur Identifizierung eines "
+               "geografischen Gebiets, z. B. 'DE' für Deutschland oder '1011' für ERGA OMNES",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.footnoteCode, "footnote code", "Fußnotencode",
+               "TN-prefix code uniquely identifying a TARIC footnote, e.g. 'TN207'",
+               "TN-Präfix-Code zur eindeutigen Identifizierung einer TARIC-Fußnote, "
+               "z. B. 'TN207'",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.conditionCode, "condition code", "Bedingungscode",
+               "single-character code identifying the type of a measure condition, "
+               "e.g. 'B' for document presentation or 'E' for quantity threshold",
+               "einstelliger Code zur Identifizierung des Typs einer Maßnahmebedingung, "
+               "z. B. 'B' für Dokumentenvorlage oder 'E' für Mengenschwellenwert",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.additionalCodeValue, "additional code value", "Zusatzcode-Wert",
+               "four-character TARIC additional code string, e.g. 'X301' for the low-alcohol "
+               "excise category",
+               "vierstellige TARIC-Zusatzcode-Zeichenfolge, z. B. 'X301' für die "
+               "Verbrauchsteuerkategorie Alkoholarme Getränke",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.quotaOrderNumber, "quota order number", "Kontingentordnungsnummer",
+               "six-digit quota order number gating a preferential tariff rate under a TARIC "
+               "tariff quota measure",
+               "sechsstellige Kontingentordnungsnummer, die einen Präferenzzollsatz im Rahmen "
+               "einer TARIC-Tarifkontingenmaßnahme bedingt",
+               range_=XSD.string)
+
+    _data_prop(g, EUCN.regulationRef, "regulation reference", "Verordnungsreferenz",
+               "official journal reference or regulation code of the legal act underlying a "
+               "TARIC measure, e.g. 'R2658/87'",
+               "Amtsblatt-Fundstelle oder Verordnungscode des einer TARIC-Maßnahme zugrunde "
+               "liegenden Rechtsakts, z. B. 'R2658/87'",
                range_=XSD.string)
 
     return g

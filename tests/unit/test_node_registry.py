@@ -138,6 +138,18 @@ def test_staleness_all_four_combinations(tmp_path: Path):
 
 
 # ---------------------------------------------------------------------------
+# Staleness: failed status → always stale (even when hashes match)
+# ---------------------------------------------------------------------------
+
+
+def test_is_stale_returns_true_when_status_is_failed(tmp_path: Path):
+    reg = NodeRegistry(tmp_path)
+    reg.upsert(_make_axiom_set(cn_code="2204", source_text_hash="src", tbox_hash="tbox", status="failed"))
+
+    assert reg.is_stale("2204", "src", "tbox") is True
+
+
+# ---------------------------------------------------------------------------
 # Edge case: get_approved for unknown cn_code returns None
 # ---------------------------------------------------------------------------
 

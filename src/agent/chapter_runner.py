@@ -94,12 +94,6 @@ class ChapterRunner:
         # Resolve base_tbox_path
         base_tbox_path = self._resolve_base_tbox()
 
-        # Build wizard_nodes lookup
-        wizard_nodes_by_cn: dict[str, list] = {}
-        for node in wizard_tree.nodes.values():
-            if node.cn_code:
-                wizard_nodes_by_cn.setdefault(node.cn_code, []).append(node)
-
         # Build LLM agent (shared across nodes in this chapter run)
         agent = LLMAxiomAgent(model=self.model, static_context=static_context)
 
@@ -125,6 +119,15 @@ class ChapterRunner:
                 result.skipped += 1
                 continue
 
+            # Stale but approved — preserve; TBox additions don't invalidate approved axioms
+            if not force:
+                existing = node_registry.get_approved(cn_code)
+                if existing is not None:
+                    logger.info("[agent] skip %s (approved, tbox bump only)", cn_code)
+                    result.approved += 1
+                    self._append_to_running_tbox(existing, running_tbox_path)
+                    continue
+
             logger.info("[agent] process %s", cn_code)
 
             # Build node context
@@ -135,8 +138,8 @@ class ChapterRunner:
             node_context = context_builder.build_node_context(
                 cn_code=cn_code,
                 legal_sections=sections,
-                wizard_nodes=wizard_nodes_by_cn,
                 running_tbox_ttl=running_tbox_ttl,
+                all_wizard_nodes=wizard_tree.nodes,
             )
 
             # Call agent

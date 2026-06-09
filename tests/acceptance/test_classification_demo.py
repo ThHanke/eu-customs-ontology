@@ -28,45 +28,67 @@ skip_no_native = pytest.mark.skipif(
     reason="Native Konclude binary not found — run scripts/acquire-native-konclude.sh",
 )
 
-# Expected inferred types per individual (must be subset of actual inferred types)
+# Expected inferred types per individual (must be subset of actual inferred types).
+# Hierarchy after hierarchy fix: agent class → heading class (2201-2209) → eucn:Beverage
 EXPECTED: dict[str, set[str]] = {
-    # Explicit type → reasoner infers superclass chain via subClassOf
+    # Champagne: 3-level chain → Beverage
     "https://w3id.org/eucn/demo/champagne-brut": {
-        "https://w3id.org/eucn/SparklingWine",
+        "https://w3id.org/eucn/Champagne22041011",
+        "https://w3id.org/eucn/WineOfFreshGrapes2204",
+        "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/bordeaux-rouge": {
-        "https://w3id.org/eucn/WineOfFreshGrapes",
+        "https://w3id.org/eucn/WineOfFreshGrapes2204",
+        "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/port-wine": {
-        "https://w3id.org/eucn/FortifiedWine",
-        "https://w3id.org/eucn/WineOfFreshGrapes",
+        "https://w3id.org/eucn/FortifiedWine2204",
+        "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204",
+        "https://w3id.org/eucn/Beverage",
     },
+    # Vermouth is under chapter 2205, directly subClassOf Beverage
     "https://w3id.org/eucn/demo/dry-vermouth": {
-        "https://w3id.org/eucn/AromatizedWine2205",
-        "https://w3id.org/eucn/WineOfFreshGrapes",
+        "https://w3id.org/eucn/VermouthWineFreshGrapesFlavouredPlants2205",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/apple-cider": {
-        "https://w3id.org/eucn/OtherFermentedBeverage2206",
+        "https://w3id.org/eucn/CiderPerryMeadSakFermentedBeverages2206",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/sparkling-lemonade": {
-        "https://w3id.org/eucn/NonAlcoholicBeverage",
+        "https://w3id.org/eucn/NonAlcoholicFlavouredBeverage2202",
+        "https://w3id.org/eucn/Beverage",
     },
-    "https://w3id.org/eucn/demo/whisky-12y": {
-        "https://w3id.org/eucn/SpiritousBeverage2208",
+    "https://w3id.org/eucn/demo/scotch-whisky": {
+        "https://w3id.org/eucn/ScotchWhisky2208",
+        "https://w3id.org/eucn/SpiritsBeverages2208",
+        "https://w3id.org/eucn/Beverage",
+    },
+    # SingleMaltWhisky22083030: newly approved node; also infers 4 restriction superclasses
+    "https://w3id.org/eucn/demo/single-malt-glenlivet": {
+        "https://w3id.org/eucn/SingleMaltWhisky22083030",
+        "https://w3id.org/eucn/SpiritsBeverages2208",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/gin-small": {
         "https://w3id.org/eucn/GinSmallContainer22085011",
-        "https://w3id.org/eucn/Gin",
-        "https://w3id.org/eucn/SpiritousBeverage2208",
+        "https://w3id.org/eucn/Gin2208",
+        "https://w3id.org/eucn/SpiritsBeverages2208",
+        "https://w3id.org/eucn/Beverage",
     },
     "https://w3id.org/eucn/demo/gin-large": {
         "https://w3id.org/eucn/GinLargeContainer22085019",
-        "https://w3id.org/eucn/Gin",
-        "https://w3id.org/eucn/SpiritousBeverage2208",
+        "https://w3id.org/eucn/Gin2208",
+        "https://w3id.org/eucn/SpiritsBeverages2208",
+        "https://w3id.org/eucn/Beverage",
     },
+    # Vinegar: subClassOf Vinegar2209 → BFO material entity (vinegar is not a beverage)
     "https://w3id.org/eucn/demo/wine-vinegar-small": {
         "https://w3id.org/eucn/WineVinegarSmallContainer22090011",
-        "https://w3id.org/eucn/WineVinegar",
+        "https://w3id.org/eucn/WineVinegar2209",
+        "https://w3id.org/eucn/Vinegar2209",
     },
     # Packaging equivalence inference
     "https://w3id.org/eucn/demo/bottle-075": {
@@ -74,6 +96,15 @@ EXPECTED: dict[str, set[str]] = {
     },
     "https://w3id.org/eucn/demo/keg-20": {
         "https://w3id.org/eucn/LargeContainer",
+    },
+    # Bordeaux wine: subClassOf chain → Beverage; its bottle inferred as SmallContainer
+    "https://w3id.org/eucn/demo/bordeaux-small-bottle-wine": {
+        "https://w3id.org/eucn/WinesProducedBordeauxContainersActualAlcoholic22042142",
+        "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204",
+        "https://w3id.org/eucn/Beverage",
+    },
+    "https://w3id.org/eucn/demo/bordeaux-bottle": {
+        "https://w3id.org/eucn/SmallContainer",
     },
 }
 
@@ -117,60 +148,74 @@ class TestBeverageRealization:
         ttl = _build_combined_ttl(tmp_path)
         assert check_consistency(ttl) is True
 
-    def test_champagne_inferred_as_sparkling_wine(self, tmp_path):
+    def test_champagne_inferred_full_chain(self, tmp_path):
         types = self._realize(tmp_path)
-        assert "https://w3id.org/eucn/SparklingWine" in types.get(
-            "https://w3id.org/eucn/demo/champagne-brut", []
-        )
+        ind = "https://w3id.org/eucn/demo/champagne-brut"
+        assert "https://w3id.org/eucn/Champagne22041011" in types.get(ind, [])
+        assert "https://w3id.org/eucn/WineOfFreshGrapes2204" in types.get(ind, [])
+        assert "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
-    def test_port_inferred_as_wine_of_fresh_grapes(self, tmp_path):
+    def test_port_inferred_as_fortified_wine(self, tmp_path):
         types = self._realize(tmp_path)
         ind = "https://w3id.org/eucn/demo/port-wine"
-        assert "https://w3id.org/eucn/FortifiedWine" in types.get(ind, [])
-        assert "https://w3id.org/eucn/WineOfFreshGrapes" in types.get(ind, [])
+        assert "https://w3id.org/eucn/FortifiedWine2204" in types.get(ind, [])
+        assert "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
-    def test_vermouth_inferred_as_aromatized_wine(self, tmp_path):
+    def test_vermouth_inferred_as_beverage(self, tmp_path):
         types = self._realize(tmp_path)
         ind = "https://w3id.org/eucn/demo/dry-vermouth"
-        assert "https://w3id.org/eucn/AromatizedWine2205" in types.get(ind, [])
-        assert "https://w3id.org/eucn/WineOfFreshGrapes" in types.get(ind, [])
+        assert "https://w3id.org/eucn/VermouthWineFreshGrapesFlavouredPlants2205" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
-    def test_cider_inferred_as_fermented_beverage(self, tmp_path):
+    def test_cider_inferred_as_beverage(self, tmp_path):
         types = self._realize(tmp_path)
-        assert "https://w3id.org/eucn/OtherFermentedBeverage2206" in types.get(
-            "https://w3id.org/eucn/demo/apple-cider", []
-        )
+        ind = "https://w3id.org/eucn/demo/apple-cider"
+        assert "https://w3id.org/eucn/CiderPerryMeadSakFermentedBeverages2206" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
-    def test_lemonade_inferred_as_nonalcoholic(self, tmp_path):
+    def test_lemonade_inferred_as_beverage(self, tmp_path):
         types = self._realize(tmp_path)
-        assert "https://w3id.org/eucn/NonAlcoholicBeverage" in types.get(
-            "https://w3id.org/eucn/demo/sparkling-lemonade", []
-        )
+        ind = "https://w3id.org/eucn/demo/sparkling-lemonade"
+        assert "https://w3id.org/eucn/NonAlcoholicFlavouredBeverage2202" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
-    def test_whisky_inferred_as_spirituous_beverage(self, tmp_path):
+    def test_scotch_whisky_inferred_chain(self, tmp_path):
         types = self._realize(tmp_path)
-        assert "https://w3id.org/eucn/SpiritousBeverage2208" in types.get(
-            "https://w3id.org/eucn/demo/whisky-12y", []
-        )
+        ind = "https://w3id.org/eucn/demo/scotch-whisky"
+        assert "https://w3id.org/eucn/ScotchWhisky2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/SpiritsBeverages2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
+
+    def test_single_malt_inferred_chain(self, tmp_path):
+        """SingleMaltWhisky22083030 (newly approved node) inferred through SpiritsBeverages2208."""
+        types = self._realize(tmp_path)
+        ind = "https://w3id.org/eucn/demo/single-malt-glenlivet"
+        assert "https://w3id.org/eucn/SingleMaltWhisky22083030" in types.get(ind, [])
+        assert "https://w3id.org/eucn/SpiritsBeverages2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
     def test_gin_small_inferred_chain(self, tmp_path):
         types = self._realize(tmp_path)
         ind = "https://w3id.org/eucn/demo/gin-small"
         assert "https://w3id.org/eucn/GinSmallContainer22085011" in types.get(ind, [])
-        assert "https://w3id.org/eucn/Gin" in types.get(ind, [])
-        assert "https://w3id.org/eucn/SpiritousBeverage2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Gin2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/SpiritsBeverages2208" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
 
     def test_gin_large_inferred_chain(self, tmp_path):
         types = self._realize(tmp_path)
         ind = "https://w3id.org/eucn/demo/gin-large"
         assert "https://w3id.org/eucn/GinLargeContainer22085019" in types.get(ind, [])
-        assert "https://w3id.org/eucn/Gin" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Gin2208" in types.get(ind, [])
 
-    def test_wine_vinegar_small_inferred_chain(self, tmp_path):
+    def test_wine_vinegar_inferred_chain(self, tmp_path):
         types = self._realize(tmp_path)
         ind = "https://w3id.org/eucn/demo/wine-vinegar-small"
         assert "https://w3id.org/eucn/WineVinegarSmallContainer22090011" in types.get(ind, [])
-        assert "https://w3id.org/eucn/WineVinegar" in types.get(ind, [])
+        assert "https://w3id.org/eucn/WineVinegar2209" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Vinegar2209" in types.get(ind, [])
 
     def test_small_bottle_inferred_as_small_container(self, tmp_path):
         """Packaging with Volume < 2 L inferred as SmallContainer via equivalence axiom."""
@@ -184,6 +229,21 @@ class TestBeverageRealization:
         types = self._realize(tmp_path)
         assert "https://w3id.org/eucn/LargeContainer" in types.get(
             "https://w3id.org/eucn/demo/keg-20", []
+        )
+
+    def test_bordeaux_wine_inferred_as_beverage(self, tmp_path):
+        """Bordeaux wine individual classified through heading class to Beverage."""
+        types = self._realize(tmp_path)
+        ind = "https://w3id.org/eucn/demo/bordeaux-small-bottle-wine"
+        assert "https://w3id.org/eucn/WinesProducedBordeauxContainersActualAlcoholic22042142" in types.get(ind, [])
+        assert "https://w3id.org/eucn/WineFreshGrapesInclFortifiedWines2204" in types.get(ind, [])
+        assert "https://w3id.org/eucn/Beverage" in types.get(ind, [])
+
+    def test_bordeaux_bottle_inferred_as_small_container(self, tmp_path):
+        """The 0.75 L bottle associated with the Bordeaux wine is inferred as SmallContainer."""
+        types = self._realize(tmp_path)
+        assert "https://w3id.org/eucn/SmallContainer" in types.get(
+            "https://w3id.org/eucn/demo/bordeaux-bottle", []
         )
 
     def test_no_individual_classified_as_nothing(self, tmp_path):

@@ -81,6 +81,7 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=False,
             no_classify=True,
             extract_date=ed,
@@ -105,6 +106,7 @@ class TestPipelineIntegration:
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=False,
             no_classify=False,
             extract_date=ed,
@@ -122,7 +124,8 @@ class TestPipelineIntegration:
         # Must not raise even with no_classify=True
         pipeline_mod.run(
             chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-            no_reasoner=True, no_classify=True, extract_date=ed,
+            skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+            run_axiom_agent=False,
         )
         trig = tmp_path / "eucn-ch22-beverages-2026-06-05.trig"
         assert trig.exists(), ".trig written from build step regardless of classify"
@@ -139,14 +142,16 @@ class TestPipelineIntegration:
         out1.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out1)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+                         run_axiom_agent=False)
         nt1 = sorted((out1 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         out2 = tmp_path / "run2"
         out2.mkdir()
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", out2)
         pipeline_mod.run(chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
-                         no_reasoner=True, no_classify=True, extract_date=ed)
+                         skip_commodity_details=True, no_reasoner=True, no_classify=True, extract_date=ed,
+                         run_axiom_agent=False)
         nt2 = sorted((out2 / "eucn-ch22-beverages-2026-06-05.ttl").read_text().splitlines())
 
         assert nt1 == nt2, "Output not idempotent — sorted Turtle lines differ"
@@ -160,8 +165,9 @@ class TestPipelineIntegration:
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
 
-        # Ensure the env var is absent
+        # Ensure both API key env vars are absent
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.delenv("ANTHROPIC_FOUNDRY_API_KEY", raising=False)
 
         with pytest.raises(EnvironmentError, match="ANTHROPIC_API_KEY"):
             pipeline_mod.run(
@@ -169,6 +175,7 @@ class TestPipelineIntegration:
                 skip_fetch=True,
                 skip_scrape=True,
                 skip_legal_text=True,
+                skip_commodity_details=True,
                 no_reasoner=True,
                 no_classify=True,
                 extract_date=date(2026, 6, 5),
@@ -205,6 +212,7 @@ class TestPipelineIntegration:
                 skip_fetch=True,
                 skip_scrape=True,
                 skip_legal_text=True,
+                skip_commodity_details=True,
                 no_reasoner=True,
                 no_classify=True,
                 extract_date=ed,
@@ -217,27 +225,77 @@ class TestPipelineIntegration:
         content = ttl.read_text()
         assert "w3id.org/eucn" in content
 
-    def test_pipeline_without_run_axiom_agent_uses_hand_authored(self, tmp_path, monkeypatch):
-        """Without --run-axiom-agent the pipeline uses hand-authored axioms (flag defaults to False)."""
+    def test_pipeline_skip_axiom_agent_no_api_key_needed(self, tmp_path, monkeypatch):
+        """With run_axiom_agent=False the pipeline skips the agent and needs no API key."""
         import src.pipeline as pipeline_mod
         monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
         monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
         _write_fixture_json(tmp_path)
         ed = date(2026, 6, 5)
 
-        # run_axiom_agent not passed → defaults to False, must not raise even without API key
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         pipeline_mod.run(
             chapter=22,
             skip_fetch=True,
             skip_scrape=True,
             skip_legal_text=True,
+            skip_commodity_details=True,
             no_reasoner=True,
             no_classify=True,
             extract_date=ed,
+            run_axiom_agent=False,
         )
         ttl = tmp_path / "eucn-ch22-beverages-2026-06-05.ttl"
         assert ttl.exists()
+
+    def test_fetch_commodity_details_uses_dds2(self, tmp_path, monkeypatch):
+        """fetch-commodity-details step calls taric_dds2.fetch_chapter_commodities."""
+        import src.pipeline as pipeline_mod
+        from src.schema.taric import ChapterData
+
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+
+        called_with = {}
+
+        def mock_fetch_chapter_commodities(chapter, cn_codes, cache_dir, *, force=False):
+            called_with['chapter'] = chapter
+            called_with['called'] = True
+            return {}
+
+        with patch("src.fetcher.taric_dds2.fetch_chapter_commodities", mock_fetch_chapter_commodities):
+            pipeline_mod.run(
+                chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
+                no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+                run_axiom_agent=False,
+            )
+
+        assert called_with.get('called'), "fetch_chapter_commodities was not called"
+        assert called_with['chapter'] == 22
+
+    def test_pipeline_section_entries_passed_to_abox(self, tmp_path, monkeypatch):
+        """Pipeline passes section_entries to build_abox when fetch_section_hierarchy succeeds."""
+        import src.pipeline as pipeline_mod
+        from src.fetcher.taric_dds2 import SectionEntry
+
+        monkeypatch.setattr(pipeline_mod, "DATA_INTERMEDIATE", tmp_path)
+        monkeypatch.setattr(pipeline_mod, "DATA_ONTOLOGY", tmp_path)
+        _write_fixture_json(tmp_path)
+
+        fixture_entries = [SectionEntry(roman_numeral="IV", label_en="Prepared foodstuffs",
+                                        label_de=None, chapter_codes=["22"])]
+
+        with patch("src.fetcher.taric_dds2.fetch_section_hierarchy", return_value=fixture_entries):
+            pipeline_mod.run(
+                chapter=22, skip_fetch=True, skip_scrape=True, skip_legal_text=True,
+                skip_commodity_details=True,
+                no_reasoner=True, no_classify=True, extract_date=date(2026, 6, 5),
+                run_axiom_agent=False,
+            )
+
+        ttl = (tmp_path / "eucn-ch22-beverages-2026-06-05.ttl").read_text()
+        assert "TARICSection" in ttl or "belongsToSection" in ttl
 
 
 class TestAboxNodeRegistryDispatch:
@@ -373,3 +431,56 @@ class TestAboxNodeRegistryDispatch:
         from src.ontology.abox import build_abox
         result_g, coverage = build_abox(cd, wt, g)
         assert result_g is g  # same graph returned
+
+
+class TestAboxSectionEntities:
+    """Tests for optional TARICSection population in build_abox."""
+
+    def test_section_entities_in_ttl_when_entries_provided(self):
+        """build_abox with section_entries produces TARICSection and belongsToSection triples."""
+        from rdflib import Graph
+        from src.ontology.abox import build_abox
+        from src.fetcher.taric_dds2 import SectionEntry
+        from src.schema.taric import ChapterData
+        from src.schema.wizard import ClassificationNode, WizardTree
+
+        root = ClassificationNode(
+            node_id="root", question_text="Q?", path_from_root=[],
+            answer_options=[], is_terminal=False,
+        )
+        wt = WizardTree(chapter=22, nodes={"root": root}, root_node_id="root")
+        cd = ChapterData(chapter=22, measures=[])
+        g = Graph()
+
+        entries = [SectionEntry(
+            roman_numeral="IV",
+            label_en="Prepared foodstuffs",
+            label_de=None,
+            chapter_codes=["22"],
+        )]
+
+        result_g, _ = build_abox(cd, wt, g, section_entries=entries)
+
+        ttl = result_g.serialize(format="turtle")
+        assert "TARICSection" in ttl
+        assert "belongsToSection" in ttl
+
+    def test_build_abox_without_section_entries_no_section_triples(self):
+        """build_abox without section_entries produces no TARICSection triples (backwards compat)."""
+        from rdflib import Graph
+        from src.ontology.abox import build_abox
+        from src.schema.taric import ChapterData
+        from src.schema.wizard import ClassificationNode, WizardTree
+
+        root = ClassificationNode(
+            node_id="root", question_text="Q?", path_from_root=[],
+            answer_options=[], is_terminal=False,
+        )
+        wt = WizardTree(chapter=22, nodes={"root": root}, root_node_id="root")
+        cd = ChapterData(chapter=22, measures=[])
+        g = Graph()
+
+        result_g, _ = build_abox(cd, wt, g)  # no section_entries
+
+        ttl = result_g.serialize(format="turtle")
+        assert "TARICSection" not in ttl
