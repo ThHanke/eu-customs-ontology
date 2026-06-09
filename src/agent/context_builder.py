@@ -14,7 +14,7 @@ from src.schema.wizard import ClassificationNode
 
 logger = logging.getLogger(__name__)
 
-_TRIPLE_CAP = 500
+_TRIPLE_CAP = 600
 
 _DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
 
@@ -44,8 +44,8 @@ def build_static_context(chapter: int, extract_date: date | None = None) -> str:
     """
     g = Graph()
     kwargs = {} if extract_date is None else {"extract_date": extract_date}
-    # Exclude heading classes — per-heading taxonomy triples aren't relevant to axiom generation
-    build_tbox(g, chapter=chapter, heading_labels=None, **kwargs)
+    heading_labels = _load_heading_labels(chapter)
+    build_tbox(g, chapter=chapter, heading_labels=heading_labels or None, **kwargs)
     triple_count = len(g)
     if triple_count > _TRIPLE_CAP:
         logger.warning(

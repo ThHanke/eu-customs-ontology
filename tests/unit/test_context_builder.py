@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
 from rdflib import Graph
 
@@ -58,6 +60,37 @@ class TestBuildStaticContext:
             "BFO_0000030 must have rdfs:subClassOf BFO_0000004 (independent continuant)"
         assert (bfo_process, RDFS.subClassOf, bfo_occurrent) in g, \
             "BFO_0000015 must have rdfs:subClassOf BFO_0000003 (occurrent)"
+
+    def test_heading_classes_included_in_static_context(self):
+        """build_static_context(22) must include heading class IRIs (IU3)."""
+        ttl = build_static_context(22)
+        assert "VermouthWineFreshGrapesFlavouredPlants2205" in ttl, (
+            "Heading class IRI for 2205 must appear in static context Turtle"
+        )
+
+    def test_heading_classes_subclass_of_beverage(self):
+        """Heading classes must have rdfs:subClassOf eucn:Beverage (IU1+IU3 integration)."""
+        ttl = build_static_context(22)
+        g = Graph()
+        g.parse(data=ttl, format="turtle")
+        from rdflib.namespace import RDFS
+        from rdflib import URIRef
+        from src.ontology.namespaces import EUCN
+        beverage = EUCN["Beverage"]
+        subclass_of_beverage = list(g.subjects(RDFS.subClassOf, beverage))
+        assert len(subclass_of_beverage) >= 1, (
+            "At least one heading class must have rdfs:subClassOf eucn:Beverage"
+        )
+
+    def test_missing_heading_labels_file_does_not_crash(self):
+        """When _load_heading_labels returns {}, build_static_context must not crash."""
+        with patch(
+            "src.agent.context_builder._load_heading_labels", return_value={}
+        ):
+            ttl = build_static_context(22)
+        g = Graph()
+        g.parse(data=ttl, format="turtle")
+        assert len(g) > 0
 
 
 # ── compute_tbox_hash ─────────────────────────────────────────────────────────
