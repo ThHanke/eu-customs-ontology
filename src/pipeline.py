@@ -27,10 +27,14 @@ LOG_FILE = ROOT / "data" / "logs" / "pipeline.log"
 
 def _configure_logging() -> None:
     fmt = "%(asctime)s %(levelname)-8s %(name)s — %(message)s"
+    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG,
         format=fmt,
-        handlers=[logging.StreamHandler(sys.stderr)],
+        handlers=[
+            logging.StreamHandler(sys.stderr),
+            logging.FileHandler(LOG_FILE, mode="w", encoding="utf-8"),
+        ],
     )
     # Quiet noisy third-party loggers
     for noisy in ("httpcore", "httpx", "anthropic._base_client"):

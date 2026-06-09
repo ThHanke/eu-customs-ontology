@@ -337,7 +337,8 @@ def fetch_commodity_measures(
 
         sid_m = re.search(r'Sid=([^&]+)', iframe_src)
         if not sid_m:
-            logger.warning("DDS2: no Sid in iframe src for %s: %s", code_10d, iframe_src)
+            logger.debug("DDS2: no measures for %s (empty iframe)", code_10d)
+            cache_file.write_text("[]", encoding="utf-8")
             return []
         sid = sid_m.group(1)
 

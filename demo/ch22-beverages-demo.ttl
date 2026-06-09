@@ -13,35 +13,35 @@ PREFIX demo: <https://w3id.org/eucn/demo/>
 # Individuals are explicitly typed as the most-specific agent-defined subclass.
 # The reasoner infers membership in all superclasses (subClassOf transitivity).
 
-# CN 2204 10 — SparklingWine (agent-defined)
-demo:champagne-brut a owl:NamedIndividual, eucn:SparklingWine .
+# CN 2204 10 — Champagne subClassOf SparklingWine
+demo:champagne-brut a owl:NamedIndividual, eucn:Champagne .
 
-# CN 2204 — WineOfFreshGrapes (agent-defined)
+# CN 2204 — WineOfFreshGrapes (agent-defined top-level wine class)
 demo:bordeaux-rouge a owl:NamedIndividual, eucn:WineOfFreshGrapes .
 
 # CN 2204 — FortifiedWine subClassOf WineOfFreshGrapes
 demo:port-wine a owl:NamedIndividual, eucn:FortifiedWine .
 
-# CN 2205 — AromatizedWine2205 subClassOf WineOfFreshGrapes
-demo:dry-vermouth a owl:NamedIndividual, eucn:AromatizedWine2205 .
+# CN 2205 — FlavouredWineOfFreshGrapes subClassOf WineOfFreshGrapes
+demo:dry-vermouth a owl:NamedIndividual, eucn:FlavouredWineOfFreshGrapes .
 
-# CN 2206 — OtherFermentedBeverage2206 (agent-defined)
-demo:apple-cider a owl:NamedIndividual, eucn:OtherFermentedBeverage2206 .
+# CN 2206 — CiderPerryMeadSakFermentedBeverages2206 (agent-defined)
+demo:apple-cider a owl:NamedIndividual, eucn:CiderPerryMeadSakFermentedBeverages2206 .
 
 # CN 2202 — NonAlcoholicBeverage (agent-defined)
 demo:sparkling-lemonade a owl:NamedIndividual, eucn:NonAlcoholicBeverage .
 
-# CN 2208 — SpiritousBeverage2208 (agent-defined)
-demo:whisky-12y a owl:NamedIndividual, eucn:SpiritousBeverage2208 .
+# CN 2208 — Whisky subClassOf SpiritousBeverage
+demo:whisky-12y a owl:NamedIndividual, eucn:Whisky .
 
-# CN 2208 05 11 — GinSmallContainer22085011 subClassOf Gin subClassOf SpiritousBeverage2208
-demo:gin-small a owl:NamedIndividual, eucn:GinSmallContainer22085011 .
+# CN 2208 05 11 — GinInSmallContainer subClassOf Gin subClassOf SpiritousBeverage
+demo:gin-small a owl:NamedIndividual, eucn:GinInSmallContainer .
 
-# CN 2208 05 19 — GinLargeContainer22085019 subClassOf Gin subClassOf SpiritousBeverage2208
-demo:gin-large a owl:NamedIndividual, eucn:GinLargeContainer22085019 .
+# CN 2208 05 19 — GinInLargeContainer subClassOf Gin subClassOf SpiritousBeverage
+demo:gin-large a owl:NamedIndividual, eucn:GinInLargeContainer .
 
-# CN 2209 11 — WineVinegarSmallContainer22090011 subClassOf WineVinegar
-demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer22090011 .
+# CN 2209 — WineVinegarSmallContainer subClassOf WineVinegar
+demo:wine-vinegar-small a owl:NamedIndividual, eucn:WineVinegarSmallContainer .
 
 # ── ABox: packaging individuals (demonstrate equivalence axiom inference) ──────
 # SmallContainer ≡ Packaging ⊓ (hasQuality some (Volume ⊓ inLitres < 2.0))

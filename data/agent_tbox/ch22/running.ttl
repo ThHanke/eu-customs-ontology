@@ -2,789 +2,793 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <https://w3id.org/eucn/AceticFermentationProcess> a owl:Class ;
-    rdfs:label "acetic fermentation process (wine vinegar production)"@en ;
+    rdfs:label "Acetic Fermentation Process"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
-<https://w3id.org/eucn/AeratedWater> a owl:Class ;
-    rdfs:label "aerated water (other than natural mineral water)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/MineralOrCarbonatedWater> .
-
-<https://w3id.org/eucn/AgaveDistillationProcess> a owl:Class ;
-    rdfs:label "agave distillation process (non-tequila)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
-
-<https://w3id.org/eucn/AlcoholicStrengthByVolumeQuality> a owl:Class ;
-    rdfs:label "alcoholic strength by volume quality"@en ;
+<https://w3id.org/eucn/AddedFlavouringQuality> a owl:Class ;
+    rdfs:label "Added Flavouring Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/AlcoholicTeaBeverage> a owl:Class ;
-    rdfs:label "tea with alcohol"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/AddedSodaWaterQuality> a owl:Class ;
+    rdfs:label "Added Soda Water Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/AniseedDistillationProcess> a owl:Class ;
-    rdfs:label "aniseed distillation process"@en ;
+<https://w3id.org/eucn/AddedSugarOrSweeteningMatterQuality> a owl:Class ;
+    rdfs:label "Added Sugar or Sweetening Matter Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/AddedVitaminOrMineralQuality> a owl:Class ;
+    rdfs:label "Added Vitamin or Mineral Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/AeratedWater> a owl:Class ;
+    rdfs:label "Aerated Water"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/MineralOrCarbonatedWater> .
+
+<https://w3id.org/eucn/AgaveFeedstock> a owl:Class ;
+    rdfs:label "Agave Plant Feedstock"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/AgaveSpiritOtherThanTequilaProductionProcess> a owl:Class ;
+    rdfs:label "Agave Spirit (other than Tequila) Production Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/AromatizationProcess> a owl:Class ;
-    rdfs:label "aromatization process"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-<https://w3id.org/eucn/AromatizedWine2205> a owl:Class ;
-    rdfs:label "aromatized wine of fresh grapes (heading 2205)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
-
-<https://w3id.org/eucn/ArrackProductionProcess> a owl:Class ;
-    rdfs:label "arrack production process"@en ;
+<https://w3id.org/eucn/AniseedSpiritProductionProcess> a owl:Class ;
+    rdfs:label "Aniseed Spirit Production Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/ArrackSmallContainer22089011> a owl:Class ;
-    rdfs:label "arrack in containers ≤ 2 L (CN 2208 90 11)"@en ;
+<https://w3id.org/eucn/AroHerbSpiritProductionProcess> a owl:Class ;
+    rdfs:label "Aromatic Herb Spirit Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/ArrackInSmallContainer> a owl:Class ;
+    rdfs:label "Arrack in containers ≤ 2 L (CN 2208 90 11)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Arrack> .
 
+<https://w3id.org/eucn/ArrackProductionProcess> a owl:Class ;
+    rdfs:label "Arrack Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
 <https://w3id.org/eucn/BlendedGrainWhisky> a owl:Class ;
-    rdfs:label "blended grain whisky"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Blended Grain Whisky"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/GrainWhisky> .
 
-<https://w3id.org/eucn/BlendedMaltScotchWhisky22083041> a owl:Class ;
-    rdfs:label "blended malt Scotch whisky in containers ≤ 2 L (CN 2208 30 41)"@en ;
+<https://w3id.org/eucn/BlendedMaltScotchWhisky> a owl:Class ;
+    rdfs:label "Blended Malt Scotch Whisky (CN 2208 30 41/49)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/BlendedMaltWhisky> .
 
-<https://w3id.org/eucn/BlendedMaltScotchWhisky22083049> a owl:Class ;
-    rdfs:label "blended malt Scotch whisky in containers > 2 L (CN 2208 30 49)"@en ;
+<https://w3id.org/eucn/BlendedMaltWhiskyInLargeContainer> a owl:Class ;
+    rdfs:label "Blended Malt Whisky in containers > 2 L (CN 2208 30 49)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/BlendedMaltWhisky> .
 
-<https://w3id.org/eucn/BlendedScotchWhiskyLargeContainer22083079> a owl:Class ;
-    rdfs:label "blended Scotch whisky in containers > 2 L (CN 2208 30 79)"@en ;
+<https://w3id.org/eucn/BlendedMaltWhiskyInSmallContainer> a owl:Class ;
+    rdfs:label "Blended Malt Whisky in containers ≤ 2 L (CN 2208 30 41)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/BlendedMaltWhisky> .
+
+<https://w3id.org/eucn/BlendedScotchWhiskyLargeContainer> a owl:Class ;
+    rdfs:label "Blended Scotch Whisky in containers > 2 L (CN 2208 30 79)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/BlendedScotchWhisky> .
 
-<https://w3id.org/eucn/BlendedScotchWhiskySmallContainer22083071> a owl:Class ;
-    rdfs:label "blended Scotch whisky in containers ≤ 2 L (CN 2208 30 71)"@en ;
+<https://w3id.org/eucn/BlendedScotchWhiskySmallContainer> a owl:Class ;
+    rdfs:label "Blended Scotch Whisky in containers ≤ 2 L (CN 2208 30 71)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/BlendedScotchWhisky> .
 
 <https://w3id.org/eucn/BlendingProcess> a owl:Class ;
-    rdfs:label "blending process (whisky)"@en ;
+    rdfs:label "Whisky Blending Process"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
-<https://w3id.org/eucn/CarbonationQuality> a owl:Class ;
-    rdfs:label "carbonation quality"@en ;
+<https://w3id.org/eucn/CarbonatedQuality> a owl:Class ;
+    rdfs:label "Carbonated Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/CerealMash> a owl:Class ;
+    rdfs:label "Cereal Mash"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/Champagne> a owl:Class ;
     rdfs:label "Champagne"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/SparklingWine> .
 
-<https://w3id.org/eucn/ChampagneGrape> a owl:Class ;
-    rdfs:label "grape harvested in the Champagne province"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/ChampagneGrapeProduction> a owl:Class ;
+    rdfs:label "Champagne Grape Wine Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/GrapeWineProduction> .
 
-<https://w3id.org/eucn/ChampagneProductionProcess> a owl:Class ;
-    rdfs:label "Champagne production process"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
+<https://w3id.org/eucn/ChampagneRegionOriginQuality> a owl:Class ;
+    rdfs:label "Champagne Region Origin Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/ChampagneRegion> a owl:Class ;
-    rdfs:label "Champagne region (French province)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/ConcentratedGrapeMust22043092> a owl:Class ;
-    rdfs:label "concentrated grape must (CN 2204 30 92)"@en ;
+<https://w3id.org/eucn/ConcentratedGrapeMust> a owl:Class ;
+    rdfs:label "Concentrated Grape Must (CN 2204 30 92)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/GrapeMust2204> .
 
-<https://w3id.org/eucn/ConcentratedGrapeMust22043096> a owl:Class ;
-    rdfs:label "concentrated grape must (CN 2204 30 96)"@en ;
+<https://w3id.org/eucn/ConcentratedGrapeMust2204_30_96> a owl:Class ;
+    rdfs:label "Concentrated Grape Must other than for direct consumption as beverage (CN 2204 30 96)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/GrapeMust2204> .
 
 <https://w3id.org/eucn/ConcentratedGrapeMustFermentationProcess> a owl:Class ;
-    rdfs:label "concentrated grape must fermentation process"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
+    rdfs:label "Fermentation Process from Concentrated Grape Must"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/FermentationProcess> .
 
-<https://w3id.org/eucn/ConcentrationQuality> a owl:Class ;
-    rdfs:label "concentration quality (grape must)"@en ;
+<https://w3id.org/eucn/ConcentratedGrapeMustFermentedBeverage> a owl:Class ;
+    rdfs:label "Still Fermented Beverage from Concentrated Grape Must in containers ≤ 2 L (CN 2206 00 51)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
+
+<https://w3id.org/eucn/ConcentratedGrapeMustFermentedBeverageLargeContainer> a owl:Class ;
+    rdfs:label "Still Fermented Beverage from Concentrated Grape Must in containers > 2 L (CN 2206 00 89)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
+
+<https://w3id.org/eucn/ConcentratedQuality> a owl:Class ;
+    rdfs:label "Concentrated Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/CulinaryPreparation> a owl:Class ;
-    rdfs:label "culinary preparation from Chapter 22 goods"@en ;
+<https://w3id.org/eucn/ContinuousStillDistillationProcess> a owl:Class ;
+    rdfs:label "Continuous Still Distillation Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/DairyDerivedFat> a owl:Class ;
+    rdfs:label "Fat Obtained from Dairy Products (headings 0401–0404)"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/DairyFatFraction0401to0404> a owl:Class ;
-    rdfs:label "fat fraction from dairy products of headings 0401 to 0404"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/FatFrom0401to0404Products> .
+<https://w3id.org/eucn/DairyFatContentQuality> a owl:Class ;
+    rdfs:label "Dairy Fat Content Quality (from headings 0401–0404)"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/DenaturatedEthylAlcohol2207_20> a owl:Class ;
-    rdfs:label "denatured ethyl alcohol and other spirits, of any strength (CN 2207 20)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/DenaturingAgent> a owl:Class ;
-    rdfs:label "denaturing agent"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/DenaturatedEthylAlcohol> a owl:Class ;
+    rdfs:label "Denatured Ethyl Alcohol and Spirits of Any Strength (CN 2207 20 00)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
 <https://w3id.org/eucn/DenaturingProcess> a owl:Class ;
-    rdfs:label "denaturing process"@en ;
+    rdfs:label "Denaturing Process"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
-<https://w3id.org/eucn/Directive200954ECCompliance> a owl:Class ;
-    rdfs:label "Directive 2009/54/EC compliance quality"@en ;
+<https://w3id.org/eucn/DenaturingQuality> a owl:Class ;
+    rdfs:label "Denatured Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/DistilledOrConductivityWater> a owl:Class ;
-    rdfs:label "distilled or conductivity water and water of similar purity"@en ;
+<https://w3id.org/eucn/DenaturingStrengthQuality> a owl:Class ;
+    rdfs:label "Any Alcoholic Strength Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/DenaturingSubstance> a owl:Class ;
+    rdfs:label "Denaturing Substance"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/ExcessPressureQuality> a owl:Class ;
-    rdfs:label "excess pressure quality"@en ;
+    rdfs:label "Excess Pressure Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/FermentationArrestNonAlcohol> a owl:Class ;
-    rdfs:label "fermentation arrest by non-alcohol means"@en ;
+<https://w3id.org/eucn/FermentationArrestedWithoutAlcoholQuality> a owl:Class ;
+    rdfs:label "Fermentation Arrested Without Alcohol Addition Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/FermentedBeverageMixture2206> a owl:Class ;
-    rdfs:label "fermented beverage mixture of heading 2206"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
+<https://w3id.org/eucn/FermentedBeverageMixture> a owl:Class ;
+    rdfs:label "Mixture of Fermented Beverages or Fermented and Non-Alcoholic Beverages (heading 2206)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
 
 <https://w3id.org/eucn/FermentedSugarCaneProduct> a owl:Class ;
-    rdfs:label "fermented sugar-cane product"@en ;
+    rdfs:label "Fermented Sugar-Cane Product"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/FilledMilkBeverage> a owl:Class ;
-    rdfs:label "filled milk beverage (CN 2202 99 95)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
+    rdfs:label "Filled Milk Beverage (CN 2202 99 95)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SweetenedFlavouredOrAeratedWater> .
 
-<https://w3id.org/eucn/FlavoringAgent> a owl:Class ;
-    rdfs:label "flavoring agent (plant or aromatic substance)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/FlavouringSubstance> a owl:Class ;
-    rdfs:label "flavouring substance"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/FortifiedWine> a owl:Class ;
-    rdfs:label "fortified wine"@en ;
+<https://w3id.org/eucn/FlavouredWineOfFreshGrapes> a owl:Class ;
+    rdfs:label "Vermouth and Flavoured Wine of Fresh Grapes (heading 2205)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/FruitBrandySmallContainer22089071> a owl:Class ;
-    rdfs:label "fruit spirit (distilled from fruit) in containers ≤ 2 L (CN 2208 90 71)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/FlavouringProcess> a owl:Class ;
+    rdfs:label "Flavouring Process (with plants or aromatic substances)"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
-<https://w3id.org/eucn/FruitDistillationProcess> a owl:Class ;
-    rdfs:label "fruit distillation process"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+<https://w3id.org/eucn/FortifiedWine> a owl:Class ;
+    rdfs:label "Fortified Wine"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
 <https://w3id.org/eucn/FruitFeedstock> a owl:Class ;
-    rdfs:label "fruit feedstock (fermentation/distillation feedstock, any fruit including apples and pears)"@en ;
+    rdfs:label "Fruit Feedstock (for distillation)"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/FruitOrVegetableJuice2009> a owl:Class ;
-    rdfs:label "fruit or vegetable juice of heading 2009"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/GinDistillationProcess> a owl:Class ;
-    rdfs:label "gin distillation process"@en ;
+<https://w3id.org/eucn/FruitFermentationDistillationProcess> a owl:Class ;
+    rdfs:label "Fruit Fermentation and Distillation Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/GinLargeContainer22085019> a owl:Class ;
-    rdfs:label "gin in containers > 2 L (CN 2208 50 19)"@en ;
+<https://w3id.org/eucn/FruitSpiritInSmallContainer> a owl:Class ;
+    rdfs:label "Fruit Spirit in containers ≤ 2 L (CN 2208 90 71)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/FruitSpirit> .
+
+<https://w3id.org/eucn/GinInLargeContainer> a owl:Class ;
+    rdfs:label "Gin in containers > 2 L (CN 2208 50 19)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Gin> .
 
-<https://w3id.org/eucn/GinSmallContainer22085011> a owl:Class ;
-    rdfs:label "gin in containers ≤ 2 L (CN 2208 50 11)"@en ;
+<https://w3id.org/eucn/GinInSmallContainer> a owl:Class ;
+    rdfs:label "Gin in containers ≤ 2 L (CN 2208 50 11)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Gin> .
 
-<https://w3id.org/eucn/GleraGrape> a owl:Class ;
-    rdfs:label "Glera grape"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/GrainMash> a owl:Class ;
-    rdfs:label "fermented mash of malted barley with other cereal grains (grain whisky feedstock)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/GlераGrapeVarietalQuality> a owl:Class ;
+    rdfs:label "Glera Grape Varietal Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/GrapeDistillateFeedstock> a owl:Class ;
-    rdfs:label "grape wine or grape marc (distillation feedstock)"@en ;
+    rdfs:label "Grape-Based Distillation Feedstock"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/GrapeDistillationProcess> a owl:Class ;
-    rdfs:label "grape wine or grape marc distillation process"@en ;
+    rdfs:label "Grape Distillation Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/GrapeFermentationProcess> a owl:Class ;
-    rdfs:label "grape fermentation process"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
 <https://w3id.org/eucn/GrapeMarc> a owl:Class ;
-    rdfs:label "grape marc (pomace)"@en ;
+    rdfs:label "Grape Marc"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/GrapeMarcFermentationProcess> a owl:Class ;
-    rdfs:label "grape marc fermentation process (piquette production)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
+    rdfs:label "Grape Marc Fermentation Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/FermentationProcess> .
 
-<https://w3id.org/eucn/GrapeMust22043010> a owl:Class ;
-    rdfs:label "grape must in fermentation or with fermentation arrested otherwise than by alcohol (CN 2204 30 10)"@en ;
+<https://w3id.org/eucn/GrapeMustInFermentationOrArrestedWithoutAlcohol> a owl:Class ;
+    rdfs:label "Grape Must in Fermentation or with Fermentation Arrested Otherwise than by Addition of Alcohol (CN 2204 30 10)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/GrapeMust2204> .
 
-<https://w3id.org/eucn/HerbalOrRootDistillationProcess> a owl:Class ;
-    rdfs:label "herbal or root spirit distillation process"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+<https://w3id.org/eucn/GrapeSpirit> a owl:Class ;
+    rdfs:label "Spirit obtained by distilling grape wine or grape marc (CN 2208 20)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/IceAndSnow> a owl:Class ;
-    rdfs:label "ice and snow"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/IceOrSnow> a owl:Class ;
+    rdfs:label "Ice and Snow"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherWater> .
 
-<https://w3id.org/eucn/JuniperBerry> a owl:Class ;
-    rdfs:label "juniper berry"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/InFermentationQuality> a owl:Class ;
+    rdfs:label "In Fermentation Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/LiqueurLargeContainer22087090> a owl:Class ;
-    rdfs:label "liqueur or cordial in containers > 2 L (CN 2208 70 90)"@en ;
+<https://w3id.org/eucn/JuniperBerryAromaticQuality> a owl:Class ;
+    rdfs:label "Juniper Berry Aromatic Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/LiqueurInLargeContainer> a owl:Class ;
+    rdfs:label "Liqueur in containers > 2 L (CN 2208 70 90)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Liqueur> .
 
-<https://w3id.org/eucn/LiqueurSmallContainer22087010> a owl:Class ;
-    rdfs:label "liqueur in containers ≤ 2 L (CN 2208 70 10)"@en ;
+<https://w3id.org/eucn/LiqueurInSmallContainer> a owl:Class ;
+    rdfs:label "Liqueur in containers ≤ 2 L (CN 2208 70 10)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Liqueur> .
+
+<https://w3id.org/eucn/LiqueurSweeteningQuality> a owl:Class ;
+    rdfs:label "Sweetening Quality (Liqueur)"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/LostFermentedBeverageCharacterQuality> a owl:Class ;
+    rdfs:label "Lost Fermented Beverage Character Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/MaltedBarleyMash> a owl:Class ;
-    rdfs:label "fermented mash of malted barley (single malt whisky feedstock)"@en ;
+    rdfs:label "Malted Barley Mash"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/MaturationQuality> a owl:Class ;
-    rdfs:label "maturation quality (whisky)"@en ;
+<https://w3id.org/eucn/MinAlcohol37_5VolQuality> a owl:Class ;
+    rdfs:label "Minimum Alcoholic Strength 37.5% vol Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/MinAlcohol40VolQuality> a owl:Class ;
+    rdfs:label "Minimum Alcoholic Strength 40% vol Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/MixedCerealGrainMash> a owl:Class ;
+    rdfs:label "Mixed Cereal Grain Mash (malted barley with other cereals)"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/MultiDistilleryOriginQuality> a owl:Class ;
-    rdfs:label "multi-distillery origin quality"@en ;
+    rdfs:label "Multi-Distillery Origin Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/MushroomStopperPackaging> a owl:Class ;
-    rdfs:label "mushroom stopper packaging (with tie or fastening)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/Packaging> .
+<https://w3id.org/eucn/MushroomStopperBottleQuality> a owl:Class ;
+    rdfs:label "Mushroom Stopper Bottle Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/NaturalMineralWater> a owl:Class ;
-    rdfs:label "natural mineral water"@en ;
+    rdfs:label "Natural Mineral Water (CN 2201 10 19)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/MineralOrCarbonatedWater> .
 
-<https://w3id.org/eucn/NonGrapeFermentationProcess> a owl:Class ;
-    rdfs:label "non-grape fermentation process"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
-
-<https://w3id.org/eucn/OrganolepticCharacteristicsQuality> a owl:Class ;
-    rdfs:label "organoleptic characteristics quality"@en ;
+<https://w3id.org/eucn/NaturalMineralWaterQuality> a owl:Class ;
+    rdfs:label "Natural Mineral Water Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/OtherFruitBrandy22089048> a owl:Class ;
-    rdfs:label "other fruit spirit (distilled from fruit other than plums, pears or cherries) in containers > 2 L (CN 2208 90 48)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/NeutralOrganolepticCharacterQuality> a owl:Class ;
+    rdfs:label "Neutral Organoleptic Character Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/OrganolepticCharacteristicsQuality> a owl:Class ;
+    rdfs:label "Organoleptic Characteristics Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/OtherFruitFeedstock> a owl:Class ;
-    rdfs:label "other fruit feedstock (fermentation/distillation feedstock, excluding plums, pears and cherries)"@en ;
+    rdfs:label "Other Fruit Feedstock (fruit other than plums, pears or cherries)"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/OtherFruitFermentationAndDistillationProcess> a owl:Class ;
-    rdfs:label "other fruit alcoholic fermentation and distillation process"@en ;
+<https://w3id.org/eucn/OtherFruitFermentationDistillationProcess> a owl:Class ;
+    rdfs:label "Other Fruit Fermentation and Distillation Process (fruit other than plums, pears or cherries)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/OtherNonAlcoholicBeverage22029999> a owl:Class ;
-    rdfs:label "other non-alcoholic beverage (CN 2202 99 99)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
+<https://w3id.org/eucn/OtherFruitSpiritInSmallContainer> a owl:Class ;
+    rdfs:label "Other Fruit Spirit in containers ≤ 2 L (CN 2208 90 48)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFruitSpirit> .
 
-<https://w3id.org/eucn/OtherSparklingWine22041094> a owl:Class ;
-    rdfs:label "other sparkling wine (CN 2204 10 94)"@en ;
+<https://w3id.org/eucn/OtherMineralOrCarbonatedWater> a owl:Class ;
+    rdfs:label "Other Mineral Water and Aerated Water (CN 2201 10 90)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/MineralOrCarbonatedWater> .
+
+<https://w3id.org/eucn/OtherNonAlcoholicBeverageWithDairyFat> a owl:Class ;
+    rdfs:label "Other Non-Alcoholic Beverage Containing Dairy Fat (CN 2202 99 91–99)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SweetenedFlavouredOrAeratedWater> .
+
+<https://w3id.org/eucn/OtherNonSparklingFermentedBeverage> a owl:Class ;
+    rdfs:label "Other Non-Sparkling Fermented Beverage (CN 2206 00 39)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
+
+<https://w3id.org/eucn/OtherSparklingWine> a owl:Class ;
+    rdfs:label "Other Sparkling Wine (CN 2204 10 96)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/SparklingWine> .
 
-<https://w3id.org/eucn/OtherSparklingWine22041096> a owl:Class ;
-    rdfs:label "other sparkling wine (CN 2204 10 96)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SparklingWine> .
+<https://w3id.org/eucn/OtherSpiritousBeverage> a owl:Class ;
+    rdfs:label "Other Spirituous Beverage (CN 2208 90 56)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/OtherSpiritousBeverage22089056> a owl:Class ;
-    rdfs:label "other spirituous beverage (CN 2208 90 56)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/OtherSpiritousBeverageNESLargeContainer> a owl:Class ;
+    rdfs:label "Other Spirituous Beverage not elsewhere specified in containers > 2 L (CN 2208 90 77)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherSpiritousBeverageNES> .
 
-<https://w3id.org/eucn/OtherSpiritousBeverage22089069> a owl:Class ;
-    rdfs:label "other spirituous beverage (CN 2208 90 69)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/OtherSpiritousBeverageNESLargeContainer78> a owl:Class ;
+    rdfs:label "Other Spirituous Beverage not elsewhere specified in containers > 2 L (CN 2208 90 78)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherSpiritousBeverageNES> .
 
-<https://w3id.org/eucn/OtherSpiritousBeverage22089077> a owl:Class ;
-    rdfs:label "other spirituous beverage in containers > 2 L (CN 2208 90 77)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/OtherSpiritousBeverage22089078> a owl:Class ;
-    rdfs:label "other spirituous beverage in containers > 2 L (CN 2208 90 78)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/OtherStillWineLargeContainer_22042293> a owl:Class ;
-    rdfs:label "other still wine of fresh grapes in containers > 2 L (CN 2204 22 93)"@en ;
+<https://w3id.org/eucn/OtherStillWineLargeContainerNoPDONoPGI> a owl:Class ;
+    rdfs:label "Other Wine of Fresh Grapes (no PDO/PGI) in containers > 2 L (CN 2204 22 98)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/OtherStillWineLargeContainer_22042298> a owl:Class ;
-    rdfs:label "other still wine of fresh grapes in containers > 2 L (CN 2204 22 98)"@en ;
+<https://w3id.org/eucn/OtherStillWineLargeContainerNoPDONoPGIHighAlcohol> a owl:Class ;
+    rdfs:label "Other Still Wine of Fresh Grapes (no PDO/PGI) in containers > 2 L with actual alcoholic strength > 15% vol (CN 2204 29 90)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/OtherStillWineLargeContainer_22042990> a owl:Class ;
-    rdfs:label "other still wine of fresh grapes (no PDO/PGI), in containers > 2 L (CN 2204 29 90)"@en ;
+<https://w3id.org/eucn/OtherStillWineLargeContainerNoPDONoPGIMediumAlcohol> a owl:Class ;
+    rdfs:label "Other Still Wine of Fresh Grapes (no PDO/PGI) in containers > 2 L with actual alcoholic strength > 13% vol and ≤ 15% vol (CN 2204 29 96)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/OtherStillWineLargeContainer_22042996> a owl:Class ;
-    rdfs:label "other still wine of fresh grapes (no PDO/PGI), actual alcoholic strength > 15% vol, in containers > 2 L (CN 2204 29 96)"@en ;
+<https://w3id.org/eucn/OtherStillWineSmallContainer> a owl:Class ;
+    rdfs:label "Other Still Wine of Fresh Grapes in containers ≤ 2 L (CN 2204 21 98)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/OtherStillWineSmallContainer_22042198> a owl:Class ;
-    rdfs:label "other still wine of fresh grapes, in containers ≤ 2 L (CN 2204 21 98)"@en ;
+<https://w3id.org/eucn/OtherVinegarLargeContainer> a owl:Class ;
+    rdfs:label "Other Vinegar (not wine vinegar) in containers > 2 L (CN 2209 00 99)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Vinegar> .
+
+<https://w3id.org/eucn/OtherVinegarSmallContainer> a owl:Class ;
+    rdfs:label "Other Vinegar (not wine vinegar) in containers ≤ 2 L (CN 2209 00 91)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Vinegar> .
+
+<https://w3id.org/eucn/OtherWineSmallContainerNoPDONoPGI> a owl:Class ;
+    rdfs:label "Other Wine of Fresh Grapes (no PDO/PGI) in containers ≤ 2 L (CN 2204 22 93)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/OtherVinegarLargeContainer22090099> a owl:Class ;
-    rdfs:label "other vinegar (not wine vinegar) in containers > 2 L (CN 2209 00 99)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/PDOOriginQuality> a owl:Class ;
+    rdfs:label "Protected Designation of Origin (PDO) Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/OtherVinegarSmallContainer22090091> a owl:Class ;
-    rdfs:label "other vinegar (not wine vinegar) in containers ≤ 2 L (CN 2209 00 91)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/PDOWineLargeContainerHighAlcohol> a owl:Class ;
+    rdfs:label "Wine with PDO in containers > 2 L with actual alcoholic strength > 15% vol (CN 2204 29 28)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/PDOWineLargeContainerLowAlcohol> a owl:Class ;
+    rdfs:label "Wine with PDO in containers > 2 L with actual alcoholic strength ≤ 13% vol (CN 2204 29 38)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/PDOWineSmallContainerHighAlcohol> a owl:Class ;
+    rdfs:label "Wine with PDO in containers ≤ 2 L with actual alcoholic strength > 15% vol"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/PDOWineSmallContainer> .
+
+<https://w3id.org/eucn/PDOWineSmallContainerLowAlcohol> a owl:Class ;
+    rdfs:label "Wine with PDO in containers ≤ 2 L with actual alcoholic strength ≤ 15% vol (CN 2204 22 26)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/PDOWineSmallContainer> .
+
+<https://w3id.org/eucn/PDOWineSmallContainerMediumAlcohol> a owl:Class ;
+    rdfs:label "Wine with PDO in containers ≤ 2 L with actual alcoholic strength > 13% vol and ≤ 15% vol (CN 2204 22 38)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/PDOWineSmallContainer> .
+
+<https://w3id.org/eucn/PGIOriginQuality> a owl:Class ;
+    rdfs:label "Protected Geographical Indication (PGI) Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/PGIWineLargeContainerHighAlcohol> a owl:Class ;
+    rdfs:label "Wine with PGI in containers > 2 L with actual alcoholic strength > 15% vol (CN 2204 29 79)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/PGIWineLargeContainerOtherAlcohol> a owl:Class ;
+    rdfs:label "Wine with PGI in containers > 2 L with actual alcoholic strength ≤ 15% vol (CN 2204 29 80)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/PGIWineSmallContainerLowAlcohol> a owl:Class ;
+    rdfs:label "Wine with PGI in containers ≤ 2 L with actual alcoholic strength ≤ 15% vol (CN 2204 22 79)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/PGIWineSmallContainer> .
 
 <https://w3id.org/eucn/Piquette> a owl:Class ;
-    rdfs:label "piquette (wine from grape marc)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
+    rdfs:label "Piquette (CN 2206 00 10)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
 
-<https://w3id.org/eucn/PlantExtractIngredient> a owl:Class ;
-    rdfs:label "plant extract ingredient (including herbal extract)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/PlantExtractQuality> a owl:Class ;
+    rdfs:label "Plant Extract Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/PlumsOrCherriesOrPearsBrandyLargeContainer22089038> a owl:Class ;
-    rdfs:label "plum, pear or cherry brandy in containers > 2 L (CN 2208 90 38)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/PlumsOrCherriesOrPearsBrandy> .
-
-<https://w3id.org/eucn/PlumsOrCherriesOrPearsBrandySmallContainer22089033> a owl:Class ;
-    rdfs:label "plum, pear or cherry brandy in containers ≤ 2 L (CN 2208 90 33)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/PlumsOrCherriesOrPearsBrandy> .
-
-<https://w3id.org/eucn/PlumsOrCherriesOrPearsFermentedMash> a owl:Class ;
-    rdfs:label "fermented mash of plums, pears or cherries (stone/pip fruit mash)"@en ;
+<https://w3id.org/eucn/PlantRootFeedstock> a owl:Class ;
+    rdfs:label "Plant Root Feedstock"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
 <https://w3id.org/eucn/PotStillDistillationProcess> a owl:Class ;
-    rdfs:label "pot still distillation process"@en ;
+    rdfs:label "Pot Still Distillation Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
 <https://w3id.org/eucn/Prosecco> a owl:Class ;
     rdfs:label "Prosecco"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/SparklingWine> .
 
-<https://w3id.org/eucn/ProseccoDesignationRegion> a owl:Class ;
-    rdfs:label "Prosecco designation of origin region"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/ProtectedDesignationOfOriginQuality> a owl:Class ;
-    rdfs:label "protected designation of origin (PDO) quality"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
-
-<https://w3id.org/eucn/ProtectedGeographicalIndicationQuality> a owl:Class ;
-    rdfs:label "protected geographical indication (PGI) quality"@en ;
+<https://w3id.org/eucn/ProseccoPDOOriginQuality> a owl:Class ;
+    rdfs:label "Prosecco PDO Origin Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/PurificationProcess> a owl:Class ;
-    rdfs:label "purification process (post-fermentation alcohol purification)"@en ;
+    rdfs:label "Purification Process (spirits)"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
-<https://w3id.org/eucn/RectifiedCerealSpirit> a owl:Class ;
-    rdfs:label "rectified cereal spirit"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/RefinedVegetableFatOrOil> a owl:Class ;
-    rdfs:label "refined vegetable fat or oil"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/RiceFeedstock> a owl:Class ;
-    rdfs:label "rice (arrack feedstock)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/RumOrSugarCaneSpirit22084051> a owl:Class ;
-    rdfs:label "rum or other sugar-cane spirit in containers ≤ 2 L (CN 2208 40 51)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/RumOrSugarCaneSpiritLargeContainer22084091> a owl:Class ;
-    rdfs:label "rum or other sugar-cane spirit in containers > 2 L (CN 2208 40 91)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/ScotchWhiskyOriginQuality> a owl:Class ;
-    rdfs:label "Scotch whisky origin quality"@en ;
+<https://w3id.org/eucn/ReadyForConsumptionQuality> a owl:Class ;
+    rdfs:label "Ready for Consumption Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/ScotchWhiskyWithSoda22083061> a owl:Class ;
-    rdfs:label "Scotch whisky with added soda water in containers ≤ 2 L (CN 2208 30 61)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SemiSparklingWineLargeContainer_22042910> a owl:Class ;
-    rdfs:label "semi-sparkling wine of fresh grapes in containers > 2 L (CN 2204 29 10)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWine> .
-
-<https://w3id.org/eucn/SemiSparklingWinePDOSmallContainer_22042226> a owl:Class ;
-    rdfs:label "semi-sparkling wine of fresh grapes with PDO, actual alcoholic strength > 15% vol, in containers ≤ 2 L (CN 2204 22 26)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWineWithPDO2204Small> .
-
-<https://w3id.org/eucn/SemiSparklingWinePDOSmallContainer_22042238> a owl:Class ;
-    rdfs:label "semi-sparkling wine of fresh grapes with PDO, actual alcoholic strength ≤ 15% vol, other, in containers ≤ 2 L (CN 2204 22 38)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWineWithPDO2204Small> .
-
-<https://w3id.org/eucn/SemiSparklingWineSmallContainer_22042210> a owl:Class ;
-    rdfs:label "semi-sparkling wine in containers ≤ 2 L (CN 2204 22 10)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWine> .
-
-<https://w3id.org/eucn/SingleDistilleryOriginQuality> a owl:Class ;
-    rdfs:label "single distillery origin quality"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
-
-<https://w3id.org/eucn/SingleGrainOrBlendedGrainWhisky22083069> a owl:Class ;
-    rdfs:label "single grain whisky or blended grain whisky in containers > 2 L (CN 2208 30 69)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SingleGrainScotchWhiskyIngredient> a owl:Class ;
-    rdfs:label "single grain Scotch whisky (blending ingredient)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SingleGrainWhisky> a owl:Class ;
-    rdfs:label "single grain whisky"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SingleMaltScotchWhiskyIngredient> a owl:Class ;
-    rdfs:label "single malt Scotch whisky (blending ingredient)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SingleMaltWhisky> a owl:Class ;
-    rdfs:label "single malt whisky (CN 2208 30 30)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SkimmedMilkBase> a owl:Class ;
-    rdfs:label "skimmed milk or powdered skimmed milk base"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SkinCareAerosolPresentation> a owl:Class ;
-    rdfs:label "skin-care aerosol presentation"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
-
-<https://w3id.org/eucn/SodaWater> a owl:Class ;
-    rdfs:label "soda water"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SorghumOrLeesFeedstock> a owl:Class ;
-    rdfs:label "sorghum or lees (yeast lees) distillation feedstock"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SparklingFermentedBeverage2206> a owl:Class ;
-    rdfs:label "sparkling other fermented beverage of heading 2206"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
-
-<https://w3id.org/eucn/SpecialYeast> a owl:Class ;
-    rdfs:label "special yeast (arrack fermentation agent)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SpiritFromGrapeDistillation2208_20> a owl:Class ;
-    rdfs:label "spirit obtained by distilling grape wine or grape marc (CN 2208 20)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SpiritousBeverageMixture> a owl:Class ;
-    rdfs:label "mixture of spirituous beverages or spirituous beverages mixed with fruit or vegetable juice"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/SpiritousBeverageWithAeratedWater> a owl:Class ;
-    rdfs:label "spirituous beverage with added aerated water"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
-
-<https://w3id.org/eucn/StillConcentratedGrapeMustWine2206Large> a owl:Class ;
-    rdfs:label "still wine-like beverage from concentrated grape must in containers > 2 L (CN 2206 00 89)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
-
-<https://w3id.org/eucn/StillConcentratedGrapeMustWine2206Small> a owl:Class ;
-    rdfs:label "still wine-like beverage from concentrated grape must in containers ≤ 2 L (CN 2206 00 51)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
-
-<https://w3id.org/eucn/StillOtherFermentedBeverage22060039> a owl:Class ;
-    rdfs:label "still other fermented beverage of heading 2206 (CN 2206 00 39)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage2206> .
-
-<https://w3id.org/eucn/StillWinePDOLargeContainer_22042928> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO, actual alcoholic strength > 15% vol, other, in containers > 2 L (CN 2204 29 28)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPDO2204Large> .
-
-<https://w3id.org/eucn/StillWinePDOLargeContainer_22042938> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO, actual alcoholic strength ≤ 15% vol, other, in containers > 2 L (CN 2204 29 38)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPDO2204Large> .
-
-<https://w3id.org/eucn/StillWinePDOSmallContainer_22042174> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO, actual alcoholic strength > 15% vol, in containers ≤ 2 L (CN 2204 21 74)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPDO2204Small> .
-
-<https://w3id.org/eucn/StillWinePDOSmallContainer_22042178> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO, actual alcoholic strength > 15% vol, other, in containers ≤ 2 L (CN 2204 21 78)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPDO2204Small> .
-
-<https://w3id.org/eucn/StillWinePGILargeContainer_22042279> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI, in containers > 2 L (CN 2204 22 79)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPGI2204Large> .
-
-<https://w3id.org/eucn/StillWinePGILargeContainer_22042979> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI, actual alcoholic strength ≤ 15% vol, in containers > 2 L (CN 2204 29 79)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPGI2204Large> .
-
-<https://w3id.org/eucn/StillWinePGILargeContainer_22042980> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI, actual alcoholic strength > 15% vol, in containers > 2 L (CN 2204 29 80)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPGI2204Large> .
-
-<https://w3id.org/eucn/StillWinePGISmallContainer_22042180> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI, in containers ≤ 2 L (CN 2204 21 80)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/StillWineWithPGI2204Small> .
-
-<https://w3id.org/eucn/StoneFruitMashDistillationProcess> a owl:Class ;
-    rdfs:label "stone/pip fruit mash distillation process (plum, pear, cherry brandy)"@en ;
+<https://w3id.org/eucn/RectifiedCerealSpiritDistillationProcess> a owl:Class ;
+    rdfs:label "Rectified Cereal Spirit or Ethyl Alcohol Distillation with Aromatics Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/SugarCaneDistillationProcess> a owl:Class ;
-    rdfs:label "sugar-cane distillation process"@en ;
+<https://w3id.org/eucn/RefinedVegetableFatOrOil> a owl:Class ;
+    rdfs:label "Refined Vegetable Fat or Oil"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/RootSpiritProductionProcess> a owl:Class ;
+    rdfs:label "Root Spirit Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/RumAndSugarCaneSpiritLargeContainer> a owl:Class ;
+    rdfs:label "Rum and Other Spirits from Fermented Sugar-Cane Products in containers > 2 L (CN 2208 40 91)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/RumAndSugarCaneSpirit> .
+
+<https://w3id.org/eucn/RumAndSugarCaneSpiritSmallContainer> a owl:Class ;
+    rdfs:label "Rum and Other Spirits from Fermented Sugar-Cane Products in containers ≤ 2 L (CN 2208 40 51)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/RumAndSugarCaneSpirit> .
+
+<https://w3id.org/eucn/ScotchWhisky> a owl:Class ;
+    rdfs:label "Scotch Whisky (CN 2208 30 61)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Whisky> .
+
+<https://w3id.org/eucn/ScotlandOriginQuality> a owl:Class ;
+    rdfs:label "Scotland Origin Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/SemiSparklingWine> a owl:Class ;
+    rdfs:label "Semi-Sparkling Wine (1 bar ≤ excess pressure < 3 bar, CN 2204 21 06–09)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/SemiSparklingWineLargeContainer> a owl:Class ;
+    rdfs:label "Semi-Sparkling Wine of Fresh Grapes in containers > 2 L (CN 2204 29 10)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/SemiSparklingWineSmallContainer> a owl:Class ;
+    rdfs:label "Semi-Sparkling Wine of Fresh Grapes in containers ≤ 2 L (CN 2204 22 10)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/SingleDistilleryOriginQuality> a owl:Class ;
+    rdfs:label "Single Distillery Origin Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/SingleGrainScotchWhisky> a owl:Class ;
+    rdfs:label "Single Grain Scotch Whisky (CN 2208 30 61)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SingleGrainWhisky> .
+
+<https://w3id.org/eucn/SingleGrainScotchWhiskyLargeContainer> a owl:Class ;
+    rdfs:label "Single Grain Scotch Whisky in containers > 2 L (CN 2208 30 69)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SingleGrainWhisky> .
+
+<https://w3id.org/eucn/SingleMaltScotchWhisky> a owl:Class ;
+    rdfs:label "Single Malt Scotch Whisky"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SingleMaltWhisky> .
+
+<https://w3id.org/eucn/SkimmedMilkBase> a owl:Class ;
+    rdfs:label "Skimmed Milk or Powdered Skimmed Milk Base"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/SorghumFeedstock> a owl:Class ;
+    rdfs:label "Sorghum Feedstock"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/SorghumSpiritProductionProcess> a owl:Class ;
+    rdfs:label "Sorghum Spirit Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/SparklingOtherFermentedBeverage> a owl:Class ;
+    rdfs:label "Sparkling Other Fermented Beverage (CN 2206 00 31)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherFermentedBeverage> .
+
+<https://w3id.org/eucn/SpecialYeastFermentationQuality> a owl:Class ;
+    rdfs:label "Special Yeast Fermentation Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/SpiritousBeverageMixtureQuality> a owl:Class ;
+    rdfs:label "Spirituous Beverage Mixture Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
+
+<https://w3id.org/eucn/StillWineSmallContainerHighTotalDryExtract> a owl:Class ;
+    rdfs:label "Still Wine of Fresh Grapes in containers ≤ 2 L with high total dry extract (CN 2204 21 78)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+
+<https://w3id.org/eucn/StoneFruitBrandyInLargeContainer> a owl:Class ;
+    rdfs:label "Plum, Pear or Cherry Brandy in containers > 2 L (CN 2208 90 38)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/StoneFruitBrandyInSmallContainer> a owl:Class ;
+    rdfs:label "Plum, Pear or Cherry Brandy in containers ≤ 2 L (CN 2208 90 33)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/StoneFruitMash> a owl:Class ;
+    rdfs:label "Stone Fruit Mash (plum, pear, or cherry)"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/StoneFruitMashFermentationDistillationProcess> a owl:Class ;
+    rdfs:label "Stone Fruit Mash Fermentation and Distillation Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/SugarCaneFermentationProcess> a owl:Class ;
+    rdfs:label "Sugar-Cane Fermentation and Distillation Process"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
 <https://w3id.org/eucn/SugarCaneMolassesFeedstock> a owl:Class ;
-    rdfs:label "sugar-cane molasses (arrack feedstock)"@en ;
+    rdfs:label "Sugar-Cane Molasses Feedstock"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SugarOrSweeteningMatter> a owl:Class ;
-    rdfs:label "sugar or other sweetening matter"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SweetenedFlavouredWater2202_10> a owl:Class ;
-    rdfs:label "sweetened or flavoured water (CN 2202 10)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SweetenedOrFlavouredWaterBeverage> .
 
 <https://w3id.org/eucn/SweetenedOrFlavouredWater> a owl:Class ;
-    rdfs:label "sweetened or flavoured water for direct consumption"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+    rdfs:label "Sweetened or Flavoured Water"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
-<https://w3id.org/eucn/SweeteningQuality> a owl:Class ;
-    rdfs:label "sweetening quality (liqueur minimum sugar content)"@en ;
+<https://w3id.org/eucn/SweetenedOrFlavouredWater2202_10> a owl:Class ;
+    rdfs:label "Waters with added sugar, sweetening matter or flavouring (CN 2202 10)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SweetenedFlavouredOrAeratedWater> .
+
+<https://w3id.org/eucn/TeaAlcoholMixtureQuality> a owl:Class ;
+    rdfs:label "Tea with Alcohol Quality"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
-<https://w3id.org/eucn/TokajRegion> a owl:Class ;
-    rdfs:label "Tokaj wine region"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/TokajPDOOriginQuality> a owl:Class ;
+    rdfs:label "Tokaj PDO Origin Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/TokajWine> a owl:Class ;
-    rdfs:label "Tokaj wine (CN 2204 21 23)"@en ;
+    rdfs:label "Tokaj Wine (CN 2204 21 23)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/TokajWine22042233> a owl:Class ;
-    rdfs:label "Tokaj wine in containers ≤ 2 L (CN 2204 22 33)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWine> .
-
 <https://w3id.org/eucn/TonicPreparationBeverage> a owl:Class ;
-    rdfs:label "tonic preparation (non-alcoholic beverage, CN 2202 99 19)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
+    rdfs:label "Tonic Preparation (non-alcoholic beverage, CN 2202 99 19)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SweetenedFlavouredOrAeratedWater> .
 
-<https://w3id.org/eucn/TotalDryMatterThreshold> a owl:Class ;
-    rdfs:label "total dry matter threshold quality (Additional Note 4A, Chapter 22)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/TotalDryMatterQuality> .
+<https://w3id.org/eucn/TotalDryExtractQuality> a owl:Class ;
+    rdfs:label "Total Dry Extract Quality"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
 
 <https://w3id.org/eucn/TreatedNaturalWater> a owl:Class ;
-    rdfs:label "treated natural water (filtered, sterilised, purified or softened)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/MineralOrCarbonatedWater> .
+    rdfs:label "Treated Natural Water (filtered, sterilised, purified or softened)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherWater> .
 
-<https://w3id.org/eucn/UndenaturedEthylAlcohol2207> a owl:Class ;
-    rdfs:label "undenatured ethyl alcohol of alcoholic strength ≥ 80 % vol (CN 2207 10)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/UndenatureEthylAlcohol> a owl:Class ;
+    rdfs:label "Undenatured Ethyl Alcohol of an alcoholic strength of 80 % vol or higher (CN 2207 10 00)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
-<https://w3id.org/eucn/UndenaturedEthylAlcoholBelow80LargeContainer22089099> a owl:Class ;
-    rdfs:label "undenatured ethyl alcohol < 80 % vol in containers > 2 L (CN 2208 90 99)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/UndenatureddEthylAlcoholBelow80VolLargeContainer> a owl:Class ;
+    rdfs:label "Undenatured Ethyl Alcohol below 80 % vol in containers > 2 L (CN 2208 90 99)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/VitaminOrMineralAdditive> a owl:Class ;
-    rdfs:label "vitamin or mineral additive"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/VodkaDistillationProcess> a owl:Class ;
+    rdfs:label "Vodka Distillation Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
 
-<https://w3id.org/eucn/VodkaLargeContainer22086091> a owl:Class ;
-    rdfs:label "vodka in containers > 2 L (CN 2208 60 91)"@en ;
+<https://w3id.org/eucn/VodkaInLargeContainer> a owl:Class ;
+    rdfs:label "Vodka in containers > 2 L (CN 2208 60 91)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Vodka> .
 
-<https://w3id.org/eucn/VodkaSmallContainer22086011> a owl:Class ;
-    rdfs:label "vodka in containers ≤ 2 L (CN 2208 60 11)"@en ;
+<https://w3id.org/eucn/VodkaInSmallContainer> a owl:Class ;
+    rdfs:label "Vodka in containers ≤ 2 L (CN 2208 60 11)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/Vodka> .
 
 <https://w3id.org/eucn/WaterTreatmentProcess> a owl:Class ;
-    rdfs:label "water treatment process (filtering, sterilisation, purification or softening)"@en ;
+    rdfs:label "Water Treatment Process"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
 <https://w3id.org/eucn/WaterVapour> a owl:Class ;
-    rdfs:label "water vapour"@en ;
+    rdfs:label "Water Vapour"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/OtherWater> .
+
+<https://w3id.org/eucn/WhiskyDistillationProcess> a owl:Class ;
+    rdfs:label "Whisky Distillation Process (from cereal mash)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/WineFeedstock> a owl:Class ;
+    rdfs:label "Wine Feedstock"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/WineVinegarLargeContainer22090019> a owl:Class ;
-    rdfs:label "wine vinegar in containers > 2 L (CN 2209 00 19)"@en ;
+<https://w3id.org/eucn/WineVinegarLargeContainer> a owl:Class ;
+    rdfs:label "Wine Vinegar in containers > 2 L (CN 2209 00 19)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineVinegar> .
 
-<https://w3id.org/eucn/WineVinegarSmallContainer22090011> a owl:Class ;
-    rdfs:label "wine vinegar in containers ≤ 2 L (CN 2209 00 11)"@en ;
+<https://w3id.org/eucn/WineVinegarSmallContainer> a owl:Class ;
+    rdfs:label "Wine Vinegar in containers ≤ 2 L (CN 2209 00 11)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineVinegar> .
 
-<https://w3id.org/eucn/alcoholicStrengthByVolumePercent> a owl:DatatypeProperty,
+<https://w3id.org/eucn/YeastOrLeesFeedstock> a owl:Class ;
+    rdfs:label "Yeast or Fermentation Lees Feedstock"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+
+<https://w3id.org/eucn/YeastOrLeesSpiritProductionProcess> a owl:Class ;
+    rdfs:label "Yeast Spirit or Lees Spirit Production Process"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/DistillationProcess> .
+
+<https://w3id.org/eucn/dairyFatContentPercent> a owl:DatatypeProperty,
         owl:FunctionalProperty ;
-    rdfs:label "alcoholic strength by volume percent (quality-linked)"@en .
+    rdfs:label "dairy fat content percent (from headings 0401–0404)"@en .
 
 <https://w3id.org/eucn/excessPressureBar> a owl:DatatypeProperty,
         owl:FunctionalProperty ;
-    rdfs:label "excess pressure in bar at 20 °C"@en .
-
-<https://w3id.org/eucn/fatContentFromDairyPercent> a owl:DatatypeProperty,
-        owl:FunctionalProperty ;
-    rdfs:label "fat content from dairy products of headings 0401–0404 (% by weight)"@en .
-
-<https://w3id.org/eucn/hasAceticFermentationProcess> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has acetic fermentation process"@en .
-
-<https://w3id.org/eucn/hasAddedFat> a owl:ObjectProperty ;
-    rdfs:label "has added fat"@en .
-
-<https://w3id.org/eucn/hasAddedFlavouring> a owl:ObjectProperty ;
-    rdfs:label "has added flavouring"@en .
-
-<https://w3id.org/eucn/hasAddedSweetener> a owl:ObjectProperty ;
-    rdfs:label "has added sweetener"@en .
-
-<https://w3id.org/eucn/hasBaseIngredient> a owl:ObjectProperty ;
-    rdfs:label "has base ingredient"@en .
-
-<https://w3id.org/eucn/hasBlendingProcess> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has blending process"@en .
+    rdfs:label "excess pressure in bar"@en .
 
 <https://w3id.org/eucn/hasDistillationFeedstock> a owl:ObjectProperty ;
     rdfs:label "has distillation feedstock"@en .
 
-<https://w3id.org/eucn/hasDistillationProcess> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has distillation process"@en .
+<https://w3id.org/eucn/hasMilkBase> a owl:ObjectProperty ;
+    rdfs:label "has milk base"@en .
 
-<https://w3id.org/eucn/hasFermentationProcess> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has fermentation process"@en .
+<https://w3id.org/eucn/hasMolassesFeedstock> a owl:ObjectProperty ;
+    rdfs:label "has molasses or plant juice feedstock"@en .
 
-<https://w3id.org/eucn/hasGrapeOrigin> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has grape origin region"@en .
+<https://w3id.org/eucn/hasSugarCaneFeedstock> a owl:ObjectProperty ;
+    rdfs:label "has sugar-cane fermented feedstock"@en .
 
-<https://w3id.org/eucn/hasGrapeVariety> a owl:ObjectProperty ;
-    rdfs:label "has grape variety"@en .
-
-<https://w3id.org/eucn/hasIngredient> a owl:ObjectProperty ;
-    rdfs:label "has ingredient"@en .
-
-<https://w3id.org/eucn/hasProductionRegion> a owl:FunctionalProperty,
-        owl:ObjectProperty ;
-    rdfs:label "has production region"@en .
-
-<https://w3id.org/eucn/hasWaterTreatmentProcess> a owl:ObjectProperty ;
-    rdfs:label "has water treatment process"@en .
-
-<https://w3id.org/eucn/isFlavouredWith> a owl:ObjectProperty ;
-    rdfs:label "is flavoured with"@en .
+<https://w3id.org/eucn/hasVegetableFatOrOil> a owl:ObjectProperty ;
+    rdfs:label "has refined vegetable fat or oil"@en .
 
 <https://w3id.org/eucn/isForDirectConsumptionAsBeverage> a owl:DatatypeProperty,
         owl:FunctionalProperty ;
-    rdfs:label "is for direct consumption as a beverage"@en .
+    rdfs:label "is for direct consumption as beverage"@en .
 
-<https://w3id.org/eucn/liquidVolumeInLitres> a owl:DatatypeProperty,
+<https://w3id.org/eucn/totalDryExtractGPerL> a owl:DatatypeProperty,
         owl:FunctionalProperty ;
-    rdfs:label "liquid volume in litres"@en .
+    rdfs:label "total dry extract in g/L"@en .
 
 <https://w3id.org/eucn/Arrack> a owl:Class ;
-    rdfs:label "arrack"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Arrack (CN 2208 90 11/19)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/FatFrom0401to0404Products> a owl:Class ;
-    rdfs:label "fat obtained from products of headings 0401 to 0404"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/FruitSpirit> a owl:Class ;
+    rdfs:label "Fruit Spirit (distilled from fruit, CN 2208 90 71/77/78)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/StillWineWithPGI2204Small> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI in containers ≤ 2 L (CN 2204 21 79–80)"@en ;
+<https://w3id.org/eucn/GrapeWineProduction> a owl:Class ;
+    rdfs:label "Grape Wine Production Process"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
+
+<https://w3id.org/eucn/OtherFruitSpirit> a owl:Class ;
+    rdfs:label "Other Fruit Spirit (spirits distilled from fruit other than plums, pears or cherries, CN 2208 90 48)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/PGIWineSmallContainer> a owl:Class ;
+    rdfs:label "Wine with Protected Geographical Indication (PGI) in containers ≤ 2 L"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
-<https://w3id.org/eucn/SweetenedOrFlavouredWaterBeverage> a owl:Class ;
-    rdfs:label "sweetened or flavoured water beverage"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
-
-<https://w3id.org/eucn/TotalDryMatterQuality> a owl:Class ;
-    rdfs:label "total dry matter quality (non-volatile substances)"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000019> .
-
-<https://w3id.org/eucn/BlendedMaltWhisky> a owl:Class ;
-    rdfs:label "blended malt whisky"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/SingleMaltWhisky> a owl:Class ;
+    rdfs:label "Single Malt Whisky (CN 2208 30 30)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
 <https://w3id.org/eucn/BlendedScotchWhisky> a owl:Class ;
-    rdfs:label "blended Scotch whisky"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Blended Scotch Whisky (CN 2208 30 71/79)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Whisky> .
+
+<https://w3id.org/eucn/FermentationProcess> a owl:Class ;
+    rdfs:label "Fermentation Process"@en ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
 <https://w3id.org/eucn/Gin> a owl:Class ;
-    rdfs:label "gin"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Gin (CN 2208 50)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/GrainWhisky> a owl:Class ;
+    rdfs:label "Grain Whisky"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Whisky> .
 
 <https://w3id.org/eucn/Liqueur> a owl:Class ;
-    rdfs:label "liqueur (CN 2208 70)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Liqueur (CN 2208 70)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/PlumsOrCherriesOrPearsBrandy> a owl:Class ;
-    rdfs:label "plum, pear or cherry brandy (Slivovitz / Williams / Kirsch)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+<https://w3id.org/eucn/NonAlcoholicBeverage> a owl:Class ;
+    rdfs:label "Non-Alcoholic Beverage"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
-<https://w3id.org/eucn/SemiSparklingWineWithPDO2204Small> a owl:Class ;
-    rdfs:label "semi-sparkling wine of fresh grapes with PDO in containers ≤ 2 L (CN 2204 22 10–38)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SemiSparklingWine> .
+<https://w3id.org/eucn/OtherSpiritousBeverageNES> a owl:Class ;
+    rdfs:label "Other Spirituous Beverage not elsewhere specified (CN 2208 90 69)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/StillWineWithPDO2204Large> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO in containers > 2 L (CN 2204 29 xx)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+<https://w3id.org/eucn/RumAndSugarCaneSpirit> a owl:Class ;
+    rdfs:label "Rum and Other Spirits from Fermented Sugar-Cane Products (CN 2208 40)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/StillWineWithPDO2204Small> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PDO in containers ≤ 2 L (CN 2204 21 11–78)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+<https://w3id.org/eucn/SingleGrainWhisky> a owl:Class ;
+    rdfs:label "Single Grain Whisky"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/GrainWhisky> .
 
 <https://w3id.org/eucn/Vodka> a owl:Class ;
-    rdfs:label "vodka (CN 2208 60)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage2208> .
+    rdfs:label "Vodka (CN 2208 60)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
 
-<https://w3id.org/eucn/WineVinegar> a owl:Class ;
-    rdfs:label "wine vinegar"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/GrapeMust2204> a owl:Class ;
-    rdfs:label "grape must of heading 2204"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/MineralOrCarbonatedWater> a owl:Class ;
-    rdfs:label "mineral water or carbonated water (heading 2201)"@en ;
+<https://w3id.org/eucn/Water> a owl:Class ;
+    rdfs:label "Water (heading 2201)"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
 
-<https://w3id.org/eucn/StillWineWithPGI2204Large> a owl:Class ;
-    rdfs:label "still wine of fresh grapes with PGI in containers > 2 L (CN 2204 29 xx)"@en ;
-    rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
+<https://w3id.org/eucn/WineVinegar> a owl:Class ;
+    rdfs:label "Wine Vinegar (CN 2209 00 11/19)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Vinegar> .
 
-<https://w3id.org/eucn/SemiSparklingWine> a owl:Class ;
-    rdfs:label "semi-sparkling wine (pétillant / frizzante)"@en ;
+<https://w3id.org/eucn/BlendedMaltWhisky> a owl:Class ;
+    rdfs:label "Blended Malt Whisky (CN 2208 30 41/49)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/GrapeMust2204> a owl:Class ;
+    rdfs:label "Grape Must (heading 2204)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
+
+<https://w3id.org/eucn/MineralOrCarbonatedWater> a owl:Class ;
+    rdfs:label "Mineral Water and Carbonated Water (CN 2201 10)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Water> .
+
+<https://w3id.org/eucn/OtherWater> a owl:Class ;
+    rdfs:label "Other Water (CN 2201 90 00)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Water> .
+
+<https://w3id.org/eucn/PDOWineSmallContainer> a owl:Class ;
+    rdfs:label "Wine with Protected Designation of Origin (PDO) in containers of ≤ 2 litres"@en ;
     rdfs:subClassOf <https://w3id.org/eucn/WineOfFreshGrapes> .
 
 <https://w3id.org/eucn/SparklingWine> a owl:Class ;
-    rdfs:label "sparkling wine"@en ;
+    rdfs:label "Sparkling Wine"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
+
+<https://w3id.org/eucn/Vinegar> a owl:Class ;
+    rdfs:label "Vinegar (heading 2209)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
+
+<https://w3id.org/eucn/Whisky> a owl:Class ;
+    rdfs:label "Whisky (CN 2208 30)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/SpiritousBeverage> .
+
+<https://w3id.org/eucn/SweetenedFlavouredOrAeratedWater> a owl:Class ;
+    rdfs:label "Sweetened, Flavoured or Aerated Water (heading 2202)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/NonAlcoholicBeverage> .
+
+<https://w3id.org/eucn/OtherFermentedBeverage> a owl:Class ;
+    rdfs:label "Other Fermented Beverage (heading 2206)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
+
+<https://w3id.org/eucn/Beverage> a owl:Class ;
+    rdfs:label "Beverage"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
 
-<https://w3id.org/eucn/NonAlcoholicBeverage> a owl:Class ;
-    rdfs:label "non-alcoholic beverage"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/OtherFermentedBeverage2206> a owl:Class ;
-    rdfs:label "other fermented beverage of heading 2206"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+<https://w3id.org/eucn/SpiritousBeverage> a owl:Class ;
+    rdfs:label "Spirituous Beverage (heading 2208)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
 <https://w3id.org/eucn/DistillationProcess> a owl:Class ;
-    rdfs:label "distillation process"@en ;
+    rdfs:label "Distillation Process"@en ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000015> .
 
 <https://w3id.org/eucn/WineOfFreshGrapes> a owl:Class ;
-    rdfs:label "wine of fresh grapes"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
-
-<https://w3id.org/eucn/SpiritousBeverage2208> a owl:Class ;
-    rdfs:label "spirituous beverage of heading 2208"@en ;
-    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000030> .
+    rdfs:label "Wine of Fresh Grapes (heading 2204)"@en ;
+    rdfs:subClassOf <https://w3id.org/eucn/Beverage> .
 
