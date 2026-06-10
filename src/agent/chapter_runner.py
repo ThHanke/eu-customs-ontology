@@ -189,19 +189,19 @@ class ChapterRunner:
         return hashlib.sha256(combined.encode()).hexdigest()
 
     def _resolve_base_tbox(self) -> Path:
-        """Find or build the base TBox TTL for this chapter."""
-        ontology_dir = self.data_root / "ontology"
-        if ontology_dir.exists():
-            flat_ttls = sorted(ontology_dir.glob(f"eucn-ch{self.chapter:02d}-*-flat.ttl"))
-            if flat_ttls:
-                return flat_ttls[-1]
+        """Build a lean structural TBox for per-node consistency checks.
 
-        # Build from scratch
-        g = Graph()
-        build_tbox(g, chapter=self.chapter)
+        Uses only BFO + EUCN core + chapter headings (~500 triples), NOT the
+        full flat ontology. The full flat file (90k+ triples) causes Konclude
+        OOM/timeout; the lean TBox is fast (<1s native) and sufficient for
+        detecting intra-node axiom inconsistencies. Cross-node consistency is
+        verified by the final build-step Konclude check.
+        """
         base_tbox_dir = self.data_root / "agent_tbox" / f"ch{self.chapter:02d}"
         base_tbox_dir.mkdir(parents=True, exist_ok=True)
         base_tbox_path = base_tbox_dir / "base_tbox.ttl"
+        g = Graph()
+        build_tbox(g, chapter=self.chapter)
         g.serialize(destination=str(base_tbox_path), format="turtle")
         return base_tbox_path
 

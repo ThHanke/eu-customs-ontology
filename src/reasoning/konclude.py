@@ -22,11 +22,10 @@ class KoncludeConsistencyError(Exception):
 
 
 def check_consistency(ttl_path: Path) -> bool:
-    """Run Konclude consistency check on a Turtle file.
+    """Run Konclude WASM consistency check on a Turtle file.
 
-    Returns True if ontology is consistent.
-    Raises KoncludeConsistencyError if inconsistent (exit code 1).
-    Raises FileNotFoundError if Konclude CLI not found.
+    Returns True if consistent. Raises KoncludeConsistencyError if inconsistent.
+    Fast (<5s) on lean per-node TBoxes; may approach timeout on large flat files.
     """
     cli = Path(KONCLUDE_CLI_PATH)
     if not cli.exists():
