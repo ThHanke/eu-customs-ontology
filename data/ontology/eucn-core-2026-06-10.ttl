@@ -18,6 +18,17 @@ bfo:BFO_0000051
     skos:definition "a core relation that holds between a whole and its parts"@en ;
 .
 
+bfo:BFO_0000066
+    a owl:ObjectProperty ;
+    rdfs:label
+        "findet statt in"@de ,
+        "occurs in"@en ;
+    rdfs:domain bfo:BFO_0000015 ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:range bfo:BFO_0000029 ;
+    skos:definition "a relation between an occurrent (process) and an independent continuant (site) that is the spatial region in which the process takes place"@en ;
+.
+
 eucn:LargeContainer
     a owl:Class ;
     rdfs:label
@@ -167,16 +178,20 @@ bfo:BFO_0000004
         "continuant that is not specifically dependent on or generically dependent on any other entity"@en ;
 .
 
-bfo:BFO_0000015
+bfo:BFO_0000029
     a owl:Class ;
     rdfs:label
-        "Prozess"@de ,
-        "process"@en ;
+        "Ort"@de ,
+        "site"@en ;
     rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
-    rdfs:subClassOf bfo:BFO_0000003 ;
-    skos:definition
-        "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
-        "entity that exists in time by occurring or happening, and that has temporal parts"@en ;
+    rdfs:subClassOf bfo:BFO_0000141 ;
+    skos:definition "a three-dimensional immaterial entity whose boundaries are determined by some material entity and that can be occupied by a material entity or process; used here for geographic appellations, production regions, and countries"@en ;
+.
+
+bfo:BFO_0000141
+    a owl:Class ;
+    rdfs:label "immaterial entity"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
 .
 
 bfo:RO_0002234
@@ -188,6 +203,18 @@ bfo:RO_0002234
     skos:definition
         "Beziehung zwischen einem Prozess und einer Kontinuant-Entität, die der Prozess ins Dasein bringt"@de ,
         "a relation between a process and a continuant entity that the process brings into existence"@en ;
+.
+
+bfo:BFO_0000015
+    a owl:Class ;
+    rdfs:label
+        "Prozess"@de ,
+        "process"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:subClassOf bfo:BFO_0000003 ;
+    skos:definition
+        "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
+        "entity that exists in time by occurring or happening, and that has temporal parts"@en ;
 .
 
 bfo:RO_0000086

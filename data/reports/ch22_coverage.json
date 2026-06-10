@@ -2,10 +2,10 @@
   "chapter": 22,
   "total_nodes": 79,
   "nodes_with_notes": 79,
-  "nodes_proposed": 76,
-  "nodes_failed": 3,
+  "nodes_proposed": 0,
+  "nodes_failed": 1,
   "nodes_skipped": 0,
-  "mean_coverage_score": 0.8156578947368426,
+  "mean_coverage_score": 0.8206410256410263,
   "low_coverage_nodes": [],
-  "generated_at": "2026-06-09T22:10:32.741565+00:00"
+  "generated_at": "2026-06-10T07:19:00.974438+00:00"
 }
