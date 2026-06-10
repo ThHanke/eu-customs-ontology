@@ -10,7 +10,9 @@ BFO = Namespace("http://purl.obolibrary.org/obo/")
 BFO_OBJECT = BFO["BFO_0000030"]    # material entity
 BFO_PROCESS = BFO["BFO_0000015"]   # process
 BFO_QUALITY = BFO["BFO_0000019"]   # quality
+BFO_SITE = BFO["BFO_0000029"]      # site (immaterial entity: geographic region/appellation)
 BFO_HAS_PART = BFO["BFO_0000051"]  # has_part (object property)
+BFO_OCCURS_IN = BFO["BFO_0000066"] # occurs_in (process occurs in a site)
 RO_HAS_OUTPUT = BFO["RO_0002234"]
 RO_HAS_QUALITY = BFO["RO_0000086"] # has_quality (object property)
 

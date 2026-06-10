@@ -12,7 +12,7 @@ class NewClass(BaseModel):
     label_de: str
     definition_en: str
     bfo_parent_iri: str
-    class_type: Literal["material_entity", "process", "quality", "other"]
+    class_type: Literal["material_entity", "process", "quality", "site", "other"]
 
     @field_validator("bfo_parent_iri")
     @classmethod
@@ -126,8 +126,8 @@ PROPOSE_AXIOMS_TOOL_SCHEMA: dict = {
                         },
                         "class_type": {
                             "type": "string",
-                            "enum": ["material_entity", "process", "quality", "other"],
-                            "description": "BFO category for the new class.",
+                            "enum": ["material_entity", "process", "quality", "site", "other"],
+                            "description": "BFO category for the new class. Use 'site' for geographic regions, appellations, and countries (BFO:Site, BFO_0000029).",
                         },
                     },
                     "required": [

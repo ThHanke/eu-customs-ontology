@@ -3,7 +3,10 @@ from __future__ import annotations
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
-from src.ontology.namespaces import BFO, BFO_HAS_PART, BFO_OBJECT, BFO_PROCESS, RO_HAS_OUTPUT, RO_HAS_QUALITY
+from src.ontology.namespaces import (
+    BFO, BFO_HAS_PART, BFO_OBJECT, BFO_OCCURS_IN, BFO_PROCESS, BFO_SITE,
+    RO_HAS_OUTPUT, RO_HAS_QUALITY,
+)
 
 BFO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl")
 RO_ONTOLOGY_URI = URIRef("http://purl.obolibrary.org/obo/ro.owl")
@@ -81,6 +84,36 @@ def add_bfo_stubs(graph: Graph) -> None:
         "a core relation that holds between a whole and its parts",
         lang="en",
     )))
+
+    # BFO:Site (BFO_0000029) — immaterial entity representing a geographic location or region
+    BFO_IMMATERIAL_ENTITY = BFO["BFO_0000141"]
+    g.add((BFO_IMMATERIAL_ENTITY, RDF.type, OWL.Class))
+    g.add((BFO_IMMATERIAL_ENTITY, RDFS.label, Literal("immaterial entity", lang="en")))
+    g.add((BFO_IMMATERIAL_ENTITY, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_SITE, RDF.type, OWL.Class))
+    g.add((BFO_SITE, RDFS.label, Literal("site", lang="en")))
+    g.add((BFO_SITE, RDFS.label, Literal("Ort", lang="de")))
+    g.add((BFO_SITE, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_SITE, SKOS.definition, Literal(
+        "a three-dimensional immaterial entity whose boundaries are determined by some "
+        "material entity and that can be occupied by a material entity or process; "
+        "used here for geographic appellations, production regions, and countries",
+        lang="en",
+    )))
+    g.add((BFO_SITE, RDFS.subClassOf, BFO_IMMATERIAL_ENTITY))
+
+    # BFO:occurs_in (BFO_0000066) — relates a process to the site where it occurs
+    g.add((BFO_OCCURS_IN, RDF.type, OWL.ObjectProperty))
+    g.add((BFO_OCCURS_IN, RDFS.label, Literal("occurs in", lang="en")))
+    g.add((BFO_OCCURS_IN, RDFS.label, Literal("findet statt in", lang="de")))
+    g.add((BFO_OCCURS_IN, RDFS.isDefinedBy, BFO_ONTOLOGY_URI))
+    g.add((BFO_OCCURS_IN, SKOS.definition, Literal(
+        "a relation between an occurrent (process) and an independent continuant (site) "
+        "that is the spatial region in which the process takes place",
+        lang="en",
+    )))
+    g.add((BFO_OCCURS_IN, RDFS.domain, BFO_PROCESS))
+    g.add((BFO_OCCURS_IN, RDFS.range, BFO_SITE))
 
     # RO:has_quality (RO_0000086)
     g.add((RO_HAS_QUALITY, RDF.type, OWL.ObjectProperty))

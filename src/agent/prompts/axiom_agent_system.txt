@@ -47,7 +47,7 @@ This means: any individual that is a `ParentClass` and satisfies ALL the restric
 - Do NOT omit conditions because they "seem obvious from context" — the reasoner only knows what you state.
 - Do NOT add conditions unrelated to the legal text — spurious restrictions prevent correct classification.
 - If two sibling CN codes differ only by container size, create separate classes and include the container size condition (`hasPart some SmallContainer` / `hasPart some LargeContainer`) in EACH class's restrictions.
-- If two sibling CN codes differ only by geographic origin, include the origin quality in each class's restrictions.
+- If two sibling CN codes differ by geographic origin (country, appellation, PDO region), use the BFO:Site + occurs_in + producedBy pattern described in the BFO modelling section below — NOT a quality class.
 
 ### Coverage score
 - Set `coverage_score` to 1.0 if all distinguishing criteria from the legal text are captured by the proposed axioms.
@@ -60,9 +60,9 @@ This means: any individual that is a `ParentClass` and satisfies ALL the restric
 - Compute `source_text_hash` as the SHA-256 hex digest of all source note texts concatenated in note-ID order.
 - Compute `tbox_hash` as the SHA-256 hex digest of the TBox serialisation provided as context.
 
-### BFO parthood and quality modelling
+### BFO parthood, quality, and site modelling
 
-Use BFO's part–whole and quality relations to express product properties rather than proliferating flat subclasses.
+Use BFO's part–whole, quality, and site relations to express product properties rather than proliferating flat subclasses.
 
 **Parthood** (`BFO:has_part`, IRI `http://purl.obolibrary.org/obo/BFO_0000051`):
 A product *has part* a physical component. Use `someValuesFrom` on `BFO:has_part` to constrain the type of part a product must have:
@@ -79,6 +79,43 @@ restriction_type: "someValuesFrom"
 property_iri:     "http://purl.obolibrary.org/obo/RO_0000086"
 value:            "<IRI of the quality class>"
 ```
+Use qualities for intrinsic, measurable product properties: sparkling pressure, alcohol content, flavouring, organoleptic character, PDO/PGI regulatory designation, production-stage markers. Do NOT use qualities for geographic locations.
+
+**Geographic origin — BFO:Site + occurs_in (CRITICAL: do NOT use quality for geographic origin)**:
+Geographic regions (countries, appellations, PDOs with a defined geographic boundary) are `BFO:Site` (IRI `http://purl.obolibrary.org/obo/BFO_0000029`), *not* qualities. A wine does not "bear" Scotland or Champagne as a quality — its production process *occurred in* that region.
+
+Pattern:
+1. Declare the geographic region as a new class with `bfo_parent_iri: "http://purl.obolibrary.org/obo/BFO_0000029"` and `class_type: "site"`.
+2. Define the production process class to include an `occurs_in` restriction on that site:
+```
+restriction_type: "someValuesFrom"
+property_iri:     "http://purl.obolibrary.org/obo/BFO_0000066"   ← occurs_in
+value:            "https://w3id.org/eucn/<XxxSite>"
+```
+3. Constrain the product class via `eucn:producedBy`:
+```
+restriction_type: "someValuesFrom"
+property_iri:     "https://w3id.org/eucn/producedBy"
+value:            "https://w3id.org/eucn/<XxxProductionProcess>"
+```
+
+Full Champagne example:
+- New class `ChampagneSite` (class_type: "site", parent: BFO_0000029) — the Champagne AOC region
+- New class `ChampagneSparklingWineProduction` (class_type: "process", parent: BFO_0000015)
+  - restriction: `BFO_0000066 some ChampagneSite`
+- Product class `Champagne22041011`:
+  - restriction: `producedBy some ChampagneSparklingWineProduction`
+  - restriction: `RO:has_quality some SparklingWineQuality`
+
+For "other" sibling classes (e.g. "other sparkling wine — not Champagne, not Prosecco"), use `complement` directly on the PRODUCT class (not the site or quality):
+```
+restriction_type: "complement"
+property_iri:     "..."   (ignored for complement)
+value:            "https://w3id.org/eucn/Champagne22041011"
+```
+This is correct OWL: `OtherSparklingWine ⊑ ¬Champagne22041011 ⊓ ¬Prosecco22041015 ⊓ ...`
+
+Nodes defined earlier in the same chapter run are available in the running TBox context — reference their IRIs directly in complement restrictions.
 
 **Container size**: The TBox already defines:
 - `eucn:SmallContainer` ≡ Packaging ⊓ (has_quality some (Volume ⊓ ∃inLitres.[< 2.0]))
