@@ -1,0 +1,247 @@
+PREFIX bfo: <http://purl.obolibrary.org/obo/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX eucn: <https://w3id.org/eucn/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+bfo:BFO_0000051
+    a owl:ObjectProperty ;
+    rdfs:label
+        "hat Teil"@de ,
+        "has part"@en ;
+    rdfs:domain bfo:BFO_0000030 ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:range bfo:BFO_0000030 ;
+    skos:definition "a core relation that holds between a whole and its parts"@en ;
+.
+
+eucn:LargeContainer
+    a owl:Class ;
+    rdfs:label
+        "Großbehälter (≥ 2 L)"@de ,
+        "large container (≥ 2 L)"@en ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                eucn:Packaging
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty bfo:RO_0000086 ;
+                    owl:someValuesFrom
+                        [
+                            a owl:Class ;
+                            owl:intersectionOf (
+                                eucn:Volume
+                                
+                                [
+                                    a owl:Restriction ;
+                                    owl:onProperty eucn:inLitres ;
+                                    owl:someValuesFrom
+                                        [
+                                            a rdfs:Datatype ;
+                                            owl:onDatatype xsd:decimal ;
+                                            owl:withRestrictions (
+                                                
+                                                [
+                                                    xsd:minInclusive 2.0 ;
+                                                ]
+                                            ) ;
+                                        ] ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Verpackung, deren Volumeneigenschaft einen Wert von mindestens 2 Litern hat."@de ,
+        "Packaging whose Volume quality has a value of at least 2 litres."@en ;
+.
+
+eucn:SmallContainer
+    a owl:Class ;
+    rdfs:label
+        "Kleinbehälter (< 2 L)"@de ,
+        "small container (< 2 L)"@en ;
+    owl:equivalentClass
+        [
+            a owl:Class ;
+            owl:intersectionOf (
+                eucn:Packaging
+                
+                [
+                    a owl:Restriction ;
+                    owl:onProperty bfo:RO_0000086 ;
+                    owl:someValuesFrom
+                        [
+                            a owl:Class ;
+                            owl:intersectionOf (
+                                eucn:Volume
+                                
+                                [
+                                    a owl:Restriction ;
+                                    owl:onProperty eucn:inLitres ;
+                                    owl:someValuesFrom
+                                        [
+                                            a rdfs:Datatype ;
+                                            owl:onDatatype xsd:decimal ;
+                                            owl:withRestrictions (
+                                                
+                                                [
+                                                    xsd:maxExclusive 2.0 ;
+                                                ]
+                                            ) ;
+                                        ] ;
+                                ]
+                            ) ;
+                        ] ;
+                ]
+            ) ;
+        ] ;
+    skos:definition
+        "Verpackung, deren Volumeneigenschaft einen Wert von weniger als 2 Litern hat."@de ,
+        "Packaging whose Volume quality has a value of less than 2 litres."@en ;
+.
+
+eucn:cnHeadingCode
+    a owl:DatatypeProperty ;
+    rdfs:label
+        "KN-Positionsnummer"@de ,
+        "CN heading code"@en ;
+    rdfs:range xsd:string ;
+    skos:definition
+        "Vierstellige (bzw. sechsstellige für Unterpositionen) KN-Positionsnummer, die der OWL-Reasoner aus der Produktklassenzugehörigkeit ableitet; z. B. '2203' für Bier, '220410' für Schaumwein"@de ,
+        "four-digit (or six-digit for subheadings) CN heading code inferred by the OWL reasoner from the product class membership; e.g. '2203' for Beer, '220410' for Sparkling Wine"@en ;
+.
+
+eucn:core
+    a owl:Ontology ;
+    rdfs:label
+        "EU KN Kern-Ontologie"@de ,
+        "EU CN Core Ontology"@en ;
+    dcterms:creator <https://github.com/ThHanke> ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:source <https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31987R2658> ;
+    owl:versionIRI <https://w3id.org/eucn/core/2026/06/10> ;
+    owl:versionInfo "EUCN core ontology 2026-06-10" ;
+.
+
+eucn:producedBy
+    a
+        owl:FunctionalProperty ,
+        owl:ObjectProperty ;
+    rdfs:label
+        "hergestellt durch"@de ,
+        "produced by"@en ;
+    rdfs:range bfo:BFO_0000015 ;
+    owl:inverseOf bfo:RO_0002234 ;
+    skos:definition
+        "Herstellungsprozess, durch den ein Getränk erzeugt wird; verknüpft ein Getränkeindividuum mit seinem benannten Prozesssingleton, zur Unterscheidung zwischen KN-Positionen in Kapitel 22"@de ,
+        "production process by which a beverage is made; links a beverage individual to its named process singleton, used to discriminate between CN headings in Chapter 22"@en ;
+.
+
+bfo:BFO_0000003
+    a owl:Class ;
+    rdfs:label
+        "Okkurrent"@de ,
+        "occurrent"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    skos:definition
+        "Entität, die sich in der Zeit entfaltet oder die momentane Grenze einer solchen Entität ist"@de ,
+        "entity that unfolds itself in time or it is the instantaneous boundary of such an entity"@en ;
+.
+
+bfo:BFO_0000004
+    a owl:Class ;
+    rdfs:label
+        "unabhängige Kontinuante"@de ,
+        "independent continuant"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    skos:definition
+        "Kontinuante, die weder spezifisch noch generisch von einer anderen Entität abhängig ist"@de ,
+        "continuant that is not specifically dependent on or generically dependent on any other entity"@en ;
+.
+
+bfo:BFO_0000015
+    a owl:Class ;
+    rdfs:label
+        "Prozess"@de ,
+        "process"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:subClassOf bfo:BFO_0000003 ;
+    skos:definition
+        "Entität, die in der Zeit durch Geschehen oder Stattfinden existiert und zeitliche Teile hat"@de ,
+        "entity that exists in time by occurring or happening, and that has temporal parts"@en ;
+.
+
+bfo:RO_0002234
+    a owl:ObjectProperty ;
+    rdfs:label
+        "hat Ausgabe"@de ,
+        "has output"@en ;
+    rdfs:isDefinedBy bfo:ro.owl ;
+    skos:definition
+        "Beziehung zwischen einem Prozess und einer Kontinuant-Entität, die der Prozess ins Dasein bringt"@de ,
+        "a relation between a process and a continuant entity that the process brings into existence"@en ;
+.
+
+bfo:RO_0000086
+    a owl:ObjectProperty ;
+    rdfs:label
+        "hat Eigenschaft"@de ,
+        "has quality"@en ;
+    rdfs:domain bfo:BFO_0000030 ;
+    rdfs:isDefinedBy bfo:ro.owl ;
+    skos:definition "a relation between an independent continuant and a quality that it bears"@en ;
+.
+
+eucn:Packaging
+    a owl:Class ;
+    rdfs:label
+        "Verpackung"@de ,
+        "packaging"@en ;
+    rdfs:subClassOf bfo:BFO_0000030 ;
+    skos:definition
+        "Eine materielle Entität, die als Behälter oder Verpackung eines Produkts dient."@de ,
+        "A material entity that serves as the container or packaging of a product."@en ;
+.
+
+eucn:inLitres
+    a
+        owl:DatatypeProperty ,
+        owl:FunctionalProperty ;
+    rdfs:label
+        "in Litern"@de ,
+        "in litres"@en ;
+    rdfs:domain eucn:Volume ;
+    rdfs:range xsd:decimal ;
+    skos:definition "the numeric volume value in litres of a Volume quality individual"@en ;
+.
+
+eucn:Volume
+    a owl:Class ;
+    rdfs:label
+        "Volumen"@de ,
+        "volume"@en ;
+    rdfs:subClassOf bfo:BFO_0000019 ;
+    skos:definition
+        "Eine Eigenschaft einer Verpackungsentität, die ihre Kapazität in Litern angibt."@de ,
+        "A quality of a packaging entity that represents its capacity, measured in litres."@en ;
+.
+
+bfo:BFO_0000030
+    a owl:Class ;
+    rdfs:label
+        "Objekt"@de ,
+        "object"@en ;
+    rdfs:isDefinedBy <http://purl.obolibrary.org/obo/bfo/2020/bfo-core.owl> ;
+    rdfs:subClassOf bfo:BFO_0000004 ;
+    skos:definition
+        "dreidimensionale materielle Entität, die räumlich zusammenhängend ist und kein kontinuierender Teil einer anderen materiellen Entität ist"@de ,
+        "three-dimensional material entity that is spatially self-connected and is not a continuant part of any other material entity"@en ;
+.

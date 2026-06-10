@@ -75,16 +75,39 @@ def classify(ttl_path: Path) -> str:
 
 
 def realize(ttl_path: Path, output_xml_path: Path) -> None:
-    """Run native Konclude ABox realization on a Turtle file.
+    """Run Konclude ABox realization on a Turtle file.
+
+    Uses WASM CLI (rdf-reasoner-konclude) when available. The WASM realization
+    mode is currently bugged upstream and will be fixed in an upcoming release.
+    Falls back to native binary if WASM CLI is absent.
 
     Writes OWL/XML with ClassAssertion triples to output_xml_path.
-    Requires the native Konclude binary (not the WASM CLI).
     """
+    cli = Path(KONCLUDE_CLI_PATH)
+    if cli.exists():
+        result = subprocess.run(
+            [
+                "node", str(cli),
+                "--input", str(ttl_path),
+                "--mode", "realization",
+                "--output", str(output_xml_path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=TIMEOUT_SECONDS,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Konclude WASM realization failed.\n"
+                f"stderr: {result.stderr}\nstdout: {result.stdout}"
+            )
+        return
+
     binary = Path(KONCLUDE_NATIVE_PATH)
     if not binary.exists():
         raise FileNotFoundError(
-            f"Native Konclude binary not found at {binary}. "
-            "Run scripts/acquire-native-konclude.sh in rdf-reasoner-konclude."
+            f"Neither WASM CLI ({cli}) nor native binary ({binary}) found. "
+            "Set KONCLUDE_CLI_PATH or KONCLUDE_NATIVE_PATH."
         )
     result = subprocess.run(
         [str(binary), "realization", "-i", str(ttl_path), "-o", str(output_xml_path)],
@@ -94,7 +117,7 @@ def realize(ttl_path: Path, output_xml_path: Path) -> None:
     )
     if result.returncode != 0:
         raise RuntimeError(
-            f"Konclude realization failed.\nstderr: {result.stderr}\nstdout: {result.stdout}"
+            f"Konclude native realization failed.\nstderr: {result.stderr}\nstdout: {result.stdout}"
         )
 
 

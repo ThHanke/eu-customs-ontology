@@ -127,8 +127,8 @@ eucn:core
     dcterms:creator <https://github.com/ThHanke> ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:source <https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31987R2658> ;
-    owl:versionIRI <https://w3id.org/eucn/core/2026/06/09> ;
-    owl:versionInfo "EUCN core ontology 2026-06-09" ;
+    owl:versionIRI <https://w3id.org/eucn/core/2026/06/10> ;
+    owl:versionInfo "EUCN core ontology 2026-06-10" ;
 .
 
 eucn:producedBy
