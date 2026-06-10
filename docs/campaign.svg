@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#162840" stroke-width="0.6"/>
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#2a6496"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a1628"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Footer bar -->
+  <rect x="0" y="596" width="1200" height="34" fill="#071020"/>
+  <text x="600" y="618" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="13"
+        fill="#3a8fc7" letter-spacing="4">
+    OPEN  ·  FREE  ·  BFO ISO 21838  ·  OWL 2  ·  w3id.org/eucn
+  </text>
+
+  <!-- ── LEFT PANEL ─────────────────────────────────────────── -->
+
+  <!-- EU stars (12 stars in circle, r=28, center 88,62) -->
+  <g fill="#FFD700" font-size="10" text-anchor="middle" font-family="serif">
+    <text x="88"  y="36">★</text>
+    <text x="102" y="40">★</text>
+    <text x="112" y="51">★</text>
+    <text x="116" y="65">★</text>
+    <text x="112" y="79">★</text>
+    <text x="102" y="90">★</text>
+    <text x="88"  y="94">★</text>
+    <text x="74"  y="90">★</text>
+    <text x="64"  y="79">★</text>
+    <text x="60"  y="65">★</text>
+    <text x="64"  y="51">★</text>
+    <text x="74"  y="40">★</text>
+  </g>
+
+  <!-- Title -->
+  <text x="145" y="75"
+        font-family="'Segoe UI', Arial, sans-serif"
+        font-size="38" font-weight="700" fill="#FFD700">
+    EU Customs Ontology
+  </text>
+
+  <!-- Subtitle -->
+  <text x="60" y="110"
+        font-family="'Segoe UI', Arial, sans-serif"
+        font-size="16" fill="#7a9ab8">
+    EU trade law — machine-readable, queryable, free
+  </text>
+
+  <!-- Divider -->
+  <line x1="60" y1="128" x2="520" y2="128" stroke="#FFD700" stroke-width="1.5" opacity="0.35"/>
+
+  <!-- Bullet list -->
+  <text x="60" y="162" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#e8f0f8">▸  OWL 2 ontology — BFO ISO 21838 compliant</text>
+  <text x="60" y="192" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#e8f0f8">▸  Permanent IRIs at w3id.org/eucn</text>
+  <text x="60" y="222" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#e8f0f8">▸  SPARQL-queryable · no account · no rate limit</text>
+  <text x="60" y="252" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#e8f0f8">▸  AI pipeline keeps it current with TARIC updates</text>
+  <text x="60" y="282" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#e8f0f8">▸  Free guided classification assistant coming next</text>
+
+  <!-- Progress -->
+  <text x="60" y="326" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#7a9ab8" letter-spacing="2">PROGRESS</text>
+  <!-- Track -->
+  <rect x="60" y="340" width="460" height="16" rx="8" fill="#0f2035" stroke="#1e4060" stroke-width="1"/>
+  <!-- Fill: 2/99 ≈ 9px of 460 — make it at least visible, so 18px -->
+  <rect x="60" y="340" width="18" height="16" rx="8" fill="#FFD700"/>
+  <text x="60" y="376" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" fill="#FFD700" font-weight="bold">2 chapters complete</text>
+  <text x="225" y="376" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="14" fill="#7a9ab8">  of 99 total  (~15,000 product codes)</text>
+
+  <!-- Stats -->
+  <text x="60"  y="430" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="44" font-weight="700" fill="#FFD700">15,000</text>
+  <text x="60"  y="455" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#7a9ab8">CN codes to classify</text>
+
+  <text x="280" y="430" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="44" font-weight="700" fill="#FFD700">€0</text>
+  <text x="280" y="455" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#7a9ab8">to access · forever</text>
+
+  <text x="390" y="430" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="44" font-weight="700" fill="#FFD700">99</text>
+  <text x="390" y="455" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#7a9ab8">chapters (ch.01–99)</text>
+
+  <!-- URLs -->
+  <text x="60" y="510" font-family="'Courier New', monospace"
+        font-size="14" fill="#3a8fc7">w3id.org/eucn</text>
+  <text x="60" y="533" font-family="'Courier New', monospace"
+        font-size="12" fill="#2a6070">github.com/ThHanke/eu-customs-ontology</text>
+
+  <!-- ── DIVIDER ──────────────────────────────────────────────── -->
+  <line x1="560" y1="30" x2="560" y2="590"
+        stroke="#162840" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- ── RIGHT PANEL — ontology tree ─────────────────────────── -->
+
+  <!-- Label -->
+  <text x="870" y="55" text-anchor="middle"
+        font-family="'Segoe UI', Arial, sans-serif"
+        font-size="13" fill="#7a9ab8" letter-spacing="2">EXAMPLE · CHAPTER 22 BEVERAGES</text>
+
+  <!-- Root node: bfo:MaterialEntity -->
+  <circle cx="870" cy="135" r="52" fill="#0f2035" stroke="#FFD700" stroke-width="2"/>
+  <text x="870" y="122" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="10" fill="#FFD700">bfo:</text>
+  <text x="870" y="136" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11" fill="#e8f0f8">Material</text>
+  <text x="870" y="150" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11" fill="#e8f0f8">Entity</text>
+
+  <!-- Edge root → Beverage -->
+  <line x1="870" y1="187" x2="870" y2="228"
+        stroke="#2a6496" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="892" y="213" font-family="'Segoe UI', Arial, sans-serif"
+        font-size="10" fill="#3a5a78">subClassOf</text>
+
+  <!-- Chapter node: eucn:Beverage -->
+  <circle cx="870" cy="272" r="46" fill="#0f2035" stroke="#3a8fc7" stroke-width="2"/>
+  <text x="870" y="260" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="10" fill="#3a8fc7">eucn:</text>
+  <text x="870" y="274" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11" fill="#e8f0f8">Beverage</text>
+  <text x="870" y="288" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#7a9ab8">ch.22</text>
+
+  <!-- Edges Beverage → terminals -->
+  <line x1="833" y1="311" x2="685" y2="378"
+        stroke="#2a6496" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="870" y1="318" x2="870" y2="378"
+        stroke="#2a6496" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="907" y1="311" x2="1055" y2="378"
+        stroke="#2a6496" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Terminal 1: SparklingWine -->
+  <circle cx="662" cy="418" r="42" fill="#0f2035" stroke="#3a8fc7" stroke-width="1.5"/>
+  <text x="662" y="406" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#3a8fc7">eucn:</text>
+  <text x="662" y="420" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#e8f0f8">Sparkling</text>
+  <text x="662" y="434" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#e8f0f8">Wine</text>
+  <!-- CN badge -->
+  <rect x="616" y="468" width="92" height="22" rx="5" fill="#FFD700"/>
+  <text x="662" y="483" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11"
+        fill="#0a1628" font-weight="bold">2204.10.11</text>
+
+  <!-- Terminal 2: Beer -->
+  <circle cx="870" cy="418" r="42" fill="#0f2035" stroke="#3a8fc7" stroke-width="1.5"/>
+  <text x="870" y="412" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="10" fill="#3a8fc7">eucn:</text>
+  <text x="870" y="428" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11" fill="#e8f0f8">Beer</text>
+  <!-- CN badge -->
+  <rect x="828" y="468" width="84" height="22" rx="5" fill="#FFD700"/>
+  <text x="870" y="483" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11"
+        fill="#0a1628" font-weight="bold">2203.00.01</text>
+
+  <!-- Terminal 3: WineVinegar -->
+  <circle cx="1078" cy="418" r="42" fill="#0f2035" stroke="#3a8fc7" stroke-width="1.5"/>
+  <text x="1078" y="406" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#3a8fc7">eucn:</text>
+  <text x="1078" y="420" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#e8f0f8">Wine</text>
+  <text x="1078" y="434" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="9" fill="#e8f0f8">Vinegar</text>
+  <!-- CN badge -->
+  <rect x="1032" y="468" width="92" height="22" rx="5" fill="#FFD700"/>
+  <text x="1078" y="483" text-anchor="middle"
+        font-family="'Courier New', monospace" font-size="11"
+        fill="#0a1628" font-weight="bold">2209.00.11</text>
+
+  <!-- Reasoner label -->
+  <text x="870" y="548" text-anchor="middle"
+        font-family="'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#7a9ab8">
+    OWL reasoner returns verifiable proof per classification
+  </text>
+</svg>
